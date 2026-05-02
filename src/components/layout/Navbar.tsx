@@ -78,14 +78,15 @@ export default function Navbar() {
               {SITE_CONFIG.phone}
             </a>
             <span className="opacity-70">|</span>
-            <span className="opacity-75 text-[10px] tracking-wider flex items-center gap-1.5">
+            <span className="opacity-80 text-[10px] tracking-wider flex items-center gap-2">
               Powered by
-              <img
-                src="/images/academic-origin.png"
-                alt="Academic Origin"
-                className="h-[14px] w-auto"
-                style={{ filter: "brightness(0) invert(1)", opacity: 0.85 }}
-              />
+              <span className="bg-white rounded px-1.5 py-0.5 inline-flex items-center">
+                <img
+                  src="/images/academic-origin.png"
+                  alt="Academic Origin"
+                  className="h-[13px] w-auto"
+                />
+              </span>
             </span>
           </div>
         </div>

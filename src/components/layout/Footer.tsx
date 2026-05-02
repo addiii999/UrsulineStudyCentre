@@ -173,19 +173,13 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-1.5 flex-wrap">
             <span>Powered by</span>
-            <a
-              href="https://play.google.com"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex hover:opacity-80 transition-opacity"
-            >
+            <span className="bg-white rounded px-2 py-1 inline-flex items-center hover:opacity-80 transition-opacity">
               <img
                 src="/images/academic-origin.png"
                 alt="Academic Origin"
-                className="h-[18px] md:h-[20px] w-auto"
-                style={{ filter: "brightness(0) invert(1)", opacity: 0.7 }}
+                className="h-[16px] w-auto"
               />
-            </a>
+            </span>
             <span className="mx-1 opacity-50">|</span>
             <span>Designed by {SITE_CONFIG.designer}</span>
           </div>
