@@ -96,7 +96,7 @@ export async function sendAdminNotification(data: EnquiryEmailData): Promise<voi
           </div>
         </div>
         <div class="footer">
-          <p>Ursuline Study Centre · Purliya Road, Near Ursuline Convent, Ranchi</p>
+          <p>Ursuline Study Centre · Ursuline Convent Campus, Dr. Camil Bulcke Path, Ranchi</p>
           <p style="margin-top:4px;">This is an automated notification. Do not reply to this email.</p>
         </div>
       </div>
@@ -153,7 +153,7 @@ export async function sendStudentAutoReply(
           </p>
           <div style="background:#FDF8F0; border:1px solid #e8d9b8; border-radius:8px; padding:16px; margin:20px 0;">
             <p style="margin:0; font-size:13px; color:#800000; font-weight:600;">📍 Visit Us:</p>
-            <p style="margin:6px 0 0; font-size:13px; color:#555;">Purliya Road, Near Ursuline Convent, Ranchi</p>
+            <p style="margin:6px 0 0; font-size:13px; color:#555;">Ursuline Convent Campus, Dr. Camil Bulcke Path, Ranchi</p>
             <p style="margin:4px 0 0; font-size:13px; color:#555;">📞 +91 95075 89503</p>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { MapPin, Building, Users, BookOpen, Languages } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
 
 const INFO_CHIPS = [
-  { icon: <MapPin size={14} className="text-[#C9A84C]" />, label: "Purliya Road, Ranchi" },
+  { icon: <MapPin size={14} className="text-[#C9A84C]" />, label: "Ursuline Convent Campus, Ranchi" },
   { icon: <Building size={14} className="text-[#C9A84C]" />, label: `Estd. ${SITE_CONFIG.founded}` },
   { icon: <Users size={14} className="text-[#C9A84C]" />, label: "Only Girls" },
   { icon: <BookOpen size={14} className="text-[#C9A84C]" />, label: "JAC + CBSE" },
@@ -34,7 +34,7 @@ export default function AboutSection() {
                 to providing world-class education to young girls of Jharkhand.
               </p>
               <p>
-                Situated on Purliya Road, near the iconic Ursuline Convent, our institute offers a
+                Situated at the Ursuline Convent Campus on Dr. Camil Bulcke Path, our institute offers a
                 safe, disciplined, and nurturing academic environment. We specialize in coaching for
                 Classes 9–12 covering both JAC and CBSE curricula, alongside rigorous preparation
                 for JEE, NEET, and CLAT.

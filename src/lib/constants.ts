@@ -11,7 +11,7 @@ export const SITE_CONFIG = {
   phone: "+91 95075 89503",
   email: "ursulinestudycentre@gmail.com",
   whatsapp: "919507589503",
-  address: "Purliya Road, Near Ursuline Convent, Ranchi",
+  address: "Ursuline Convent Campus, Dr. Camil Bulcke Path, Ranchi",
   mapEmbed:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3663.4!2d85.3296!3d23.3441!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDIwJzM4LjgiTiA4NcKwMTknNDYuNiJF!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin",
   playstoreLink: "https://play.google.com/store/apps/details?id=com.vefytech.academicorigin",
@@ -138,7 +138,7 @@ export const WHY_CHOOSE_US = [
   {
     icon: "map",
     title: "Trusted Location",
-    desc: "Conveniently located on Purliya Road, near Ursuline Convent - a respected academic landmark in Ranchi.",
+    desc: "Conveniently located at Ursuline Convent Campus, Dr. Camil Bulcke Path, Ranchi.",
   },
 ];
 
