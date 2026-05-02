@@ -83,7 +83,8 @@ export default function Navbar() {
               <img
                 src="/images/academic-origin.png"
                 alt="Academic Origin"
-                className="h-[14px] w-auto opacity-90"
+                className="h-[14px] w-auto"
+                style={{ filter: "brightness(0) invert(1)", opacity: 0.85 }}
               />
             </span>
           </div>

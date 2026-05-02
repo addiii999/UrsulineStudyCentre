@@ -182,7 +182,8 @@ export default function Footer() {
               <img
                 src="/images/academic-origin.png"
                 alt="Academic Origin"
-                className="h-[18px] md:h-[20px] w-auto opacity-90"
+                className="h-[18px] md:h-[20px] w-auto"
+                style={{ filter: "brightness(0) invert(1)", opacity: 0.7 }}
               />
             </a>
             <span className="mx-1 opacity-50">|</span>
