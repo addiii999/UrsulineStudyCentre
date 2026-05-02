@@ -23,13 +23,14 @@ export default function FounderSection() {
         <div className="grid lg:grid-cols-2 gap-14 items-center">
           {/* LEFT: PROFILE */}
           <div className="flex flex-col items-center lg:items-start">
-            {/* Avatar placeholder */}
+            {/* Founder Photo */}
             <div className="relative mb-6">
-              <div className="w-48 h-48 rounded-2xl bg-gradient-to-br from-[#800000] to-[#5C0000] flex items-center justify-center shadow-xl border-4 border-white">
-                <div className="text-center">
-                  <div className="text-6xl font-bold text-[#C9A84C]" style={{ fontFamily: "var(--font-serif)" }}>AP</div>
-                  <div className="text-white/70 text-xs mt-1 font-medium">Founder</div>
-                </div>
+              <div className="w-48 h-48 rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+                <img
+                  src="/images/founder.png"
+                  alt="Abhishek Pathak - Founder, Ursuline Study Centre"
+                  className="w-full h-full object-cover object-top"
+                />
               </div>
               <div className="absolute -bottom-3 -right-3 bg-[#C9A84C] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                 M.Sc Mathematics
