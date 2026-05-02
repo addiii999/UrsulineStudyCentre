@@ -1,0 +1,122 @@
+"use client";
+import { Award, Users, BookOpen, Target, ArrowRight } from "lucide-react";
+
+const ACHIEVEMENTS = [
+  { icon: <Users size={20} className="text-[#C9A84C]" />, value: "5000+", label: "Students Guided" },
+  { icon: <Target size={20} className="text-[#C9A84C]" />, value: "JEE/NEET", label: "Expert Mentorship" },
+  { icon: <Award size={20} className="text-[#C9A84C]" />, value: "10+", label: "Years of Teaching" },
+  { icon: <BookOpen size={20} className="text-[#C9A84C]" />, value: "Girls", label: "Education Mission" },
+];
+
+export default function FounderSection() {
+  return (
+    <section id="founder" className="py-20 md:py-28 bg-[#FDF8F0]">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-14">
+          <span className="section-tag">Meet the Founder</span>
+          <h2 className="section-heading mt-4">
+            Visionary Leadership
+          </h2>
+          <div className="gold-divider mx-auto mt-4" />
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-14 items-center">
+          {/* LEFT: PROFILE */}
+          <div className="flex flex-col items-center lg:items-start">
+            {/* Avatar placeholder */}
+            <div className="relative mb-6">
+              <div className="w-48 h-48 rounded-2xl bg-gradient-to-br from-[#800000] to-[#5C0000] flex items-center justify-center shadow-xl border-4 border-white">
+                <div className="text-center">
+                  <div className="text-6xl font-bold text-[#C9A84C]" style={{ fontFamily: "var(--font-serif)" }}>AP</div>
+                  <div className="text-white/70 text-xs mt-1 font-medium">Founder</div>
+                </div>
+              </div>
+              <div className="absolute -bottom-3 -right-3 bg-[#C9A84C] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                M.Sc Mathematics
+              </div>
+            </div>
+
+            <div className="text-center lg:text-left space-y-1">
+              <h3
+                className="text-2xl font-bold text-[#800000]"
+                style={{ fontFamily: "var(--font-serif)" }}
+              >
+                Abhishek Pathak
+              </h3>
+              <p className="text-[#C9A84C] font-semibold text-sm uppercase tracking-wider">
+                Founder & Director
+              </p>
+              <p className="text-gray-500 text-sm">JEE Expert · Mathematics Specialist</p>
+            </div>
+
+            {/* ACHIEVEMENTS GRID */}
+            <div className="grid grid-cols-2 gap-3 mt-6 w-full max-w-sm">
+              {ACHIEVEMENTS.map((a) => (
+                <div
+                  key={a.label}
+                  className="card text-center py-4 px-3"
+                >
+                  <div className="flex justify-center mb-2">{a.icon}</div>
+                  <div
+                    className="text-lg font-bold text-[#800000]"
+                    style={{ fontFamily: "var(--font-serif)" }}
+                  >
+                    {a.value}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-0.5">{a.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT: BIO */}
+          <div className="space-y-6">
+            <div className="space-y-4 text-gray-600 leading-relaxed">
+              <p>
+                <strong className="text-gray-900">Abhishek Pathak</strong> is a highly accomplished
+                educator with over <strong>10 years of experience</strong> teaching Mathematics and
+                guiding students for JEE Main & Advanced. Holding an M.Sc in Mathematics, he brings
+                unparalleled depth, clarity, and passion to every classroom.
+              </p>
+              <p>
+                Having personally mentored <strong>5000+ students</strong> across Jharkhand and
+                beyond, Abhishek sir&apos;s teaching philosophy centers on building strong
+                fundamentals while developing problem-solving instincts — the exact skills that
+                make the difference in competitive exams.
+              </p>
+              <p>
+                Driven by a deep commitment to <strong>girls&apos; education</strong>, he founded
+                Ursuline Study Centre to create a world-class academic environment exclusively for
+                young women — ensuring they receive the same quality of coaching that was
+                historically inaccessible in many parts of Jharkhand.
+              </p>
+            </div>
+
+            {/* QUOTE BOX */}
+            <div className="bg-white rounded-xl border border-[#e8d9b8] p-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-[#C9A84C]" />
+              <div className="pl-4">
+                <p className="text-gray-700 italic text-base leading-relaxed mb-2">
+                  &ldquo;Every girl deserves access to world-class education. At USC, we don&apos;t
+                  just teach subjects — we build futures.&rdquo;
+                </p>
+                <p className="text-[#800000] font-medium text-sm italic">
+                  &ldquo;हर बेटी को बेहतरीन शिक्षा का हक है। USC में हम विषय नहीं, भविष्य बनाते हैं।&rdquo;
+                </p>
+                <p className="text-[#C9A84C] font-semibold text-xs mt-3">— Abhishek Pathak</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+              className="btn-primary"
+            >
+              Book a Counselling Session
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
