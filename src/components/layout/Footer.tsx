@@ -41,9 +41,11 @@ export default function Footer() {
           {/* BRAND */}
           <div className="space-y-4 lg:col-span-1">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#C9A84C]/20 border border-[#C9A84C]/40 flex items-center justify-center">
-                <GraduationCap size={20} className="text-[#C9A84C]" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="Ursuline Study Centre"
+                className="h-8 md:h-[30px] w-auto object-contain bg-white/95 rounded px-1.5 py-0.5"
+              />
               <div>
                 <div
                   className="font-bold text-white text-base"

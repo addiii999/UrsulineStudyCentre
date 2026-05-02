@@ -108,20 +108,11 @@ export default function Navbar() {
               onClick={() => scrollTo("/#hero")}
               className="flex items-center gap-3 group flex-shrink-0"
             >
-              <div className="w-10 h-10 rounded-full bg-[#800000] flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                <GraduationCap size={20} className="text-[#C9A84C]" />
-              </div>
-              <div className="hidden sm:block">
-                <div
-                  className="text-[#800000] font-bold text-base leading-tight"
-                  style={{ fontFamily: "var(--font-serif)" }}
-                >
-                  Ursuline Study Centre
-                </div>
-                <div className="text-[10px] text-gray-500 font-medium leading-tight">
-                  Under the guidance of Sr. Dr. Mary Grace
-                </div>
-              </div>
+              <img
+                src="/logo.png"
+                alt="Ursuline Study Centre"
+                className="h-10 md:h-12 w-auto object-contain"
+              />
             </button>
 
             {/* CENTER: NAV LINKS (Desktop) */}

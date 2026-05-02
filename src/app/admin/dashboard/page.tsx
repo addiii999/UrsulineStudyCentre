@@ -81,9 +81,11 @@ export default function AdminDashboardPage() {
       >
         {/* LOGO */}
         <div className="flex items-center gap-3 px-4 py-4 border-b border-white/10 min-h-[64px]">
-          <div className="w-8 h-8 rounded-lg bg-[#C9A84C]/20 border border-[#C9A84C]/30 flex items-center justify-center flex-shrink-0">
-            <GraduationCap size={16} className="text-[#C9A84C]" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="USC Logo"
+            className="h-8 w-auto object-contain bg-white/95 rounded px-1 py-0.5 flex-shrink-0"
+          />
           {sidebarOpen && (
             <div>
               <div className="text-white text-xs font-bold leading-tight" style={{ fontFamily: "var(--font-serif)" }}>

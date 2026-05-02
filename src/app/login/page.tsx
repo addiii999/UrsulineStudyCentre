@@ -67,9 +67,11 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-xl border border-[#f0ebe0] overflow-hidden">
           {/* HEADER */}
           <div className="bg-[#800000] px-8 pt-8 pb-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-3">
-              <GraduationCap size={28} className="text-[#C9A84C]" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="Ursuline Study Centre"
+              className="h-14 md:h-16 w-auto object-contain mx-auto mb-3 bg-white/95 rounded-md px-2 py-1 shadow-sm"
+            />
             <h1 className="text-white text-xl font-bold" style={{ fontFamily: "var(--font-serif)" }}>
               Ursuline Study Centre
             </h1>
