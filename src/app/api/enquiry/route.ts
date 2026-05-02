@@ -1,50 +1,100 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createAdminClient } from "@/lib/supabase";
+import { sendAdminNotification } from "@/lib/sendEmail";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { name, phone, class: cls, stream, message } = body;
 
-    if (!name || !phone || !cls) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    // ── Validation ────────────────────────────────────────────────────────────
+    if (!name?.trim() || !phone?.trim() || !cls?.trim()) {
+      return NextResponse.json(
+        { error: "Name, phone, and class are required." },
+        { status: 400 }
+      );
     }
 
-    const { data, error } = await supabase
+    if (!/^\d{10}$/.test(phone.trim())) {
+      return NextResponse.json(
+        { error: "Please enter a valid 10-digit phone number." },
+        { status: 400 }
+      );
+    }
+
+    // ── Save to Supabase (using service role to bypass RLS) ───────────────────
+    const adminClient = createAdminClient();
+    const { data, error } = await adminClient
       .from("enquiries")
       .insert([
         {
           name: name.trim(),
           phone: phone.trim(),
-          class: cls,
-          stream: stream || "",
-          message: message || "",
+          class: cls.trim(),
+          stream: (stream || "").trim(),
+          message: (message || "").trim(),
           status: "new",
         },
       ])
-      .select();
+      .select()
+      .single();
 
     if (error) {
-      console.error("Supabase error:", error);
-      return NextResponse.json({ error: "Failed to save enquiry" }, { status: 500 });
+      console.error("[Supabase] Insert error:", error.message, error.details);
+      return NextResponse.json(
+        { error: "Failed to save enquiry. Please try again." },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ success: true, data }, { status: 201 });
+    // ── Send Email Notification (non-blocking — never fails the request) ──────
+    const submittedAt = new Date().toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      dateStyle: "full",
+      timeStyle: "short",
+    });
+
+    sendAdminNotification({
+      name: name.trim(),
+      phone: phone.trim(),
+      studentClass: cls.trim(),
+      stream: (stream || "").trim(),
+      message: (message || "").trim(),
+      submittedAt,
+    }).catch((emailErr) => {
+      // Log but do NOT block the success response
+      console.error("[Email] Failed to send notification:", emailErr.message);
+    });
+
+    return NextResponse.json(
+      { success: true, id: data?.id },
+      { status: 201 }
+    );
   } catch (err) {
-    console.error("Internal error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("[API] Internal error:", err);
+    return NextResponse.json(
+      { error: "Internal server error. Please try again." },
+      { status: 500 }
+    );
   }
 }
 
 export async function GET() {
-  const { data, error } = await supabase
-    .from("enquiries")
-    .select("*")
-    .order("created_at", { ascending: false });
+  try {
+    const adminClient = createAdminClient();
+    const { data, error } = await adminClient
+      .from("enquiries")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      console.error("[Supabase] Fetch error:", error.message);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ enquiries: data ?? [] });
+  } catch (err) {
+    console.error("[API] GET error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  return NextResponse.json({ enquiries: data });
 }
