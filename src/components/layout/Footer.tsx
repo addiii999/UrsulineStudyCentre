@@ -171,18 +171,23 @@ export default function Footer() {
               Admin
             </Link>
           </p>
-          <p>
-            Powered by{" "}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span>Powered by</span>
             <a
               href="https://play.google.com"
               target="_blank"
               rel="noreferrer"
-              className="text-[#C9A84C] hover:underline"
+              className="inline-flex hover:opacity-80 transition-opacity"
             >
-              {SITE_CONFIG.poweredBy}
-            </a>{" "}
-            | Designed by {SITE_CONFIG.designer}
-          </p>
+              <img
+                src="/images/academic-origin.png"
+                alt="Academic Origin"
+                className="h-[18px] md:h-[20px] w-auto opacity-90"
+              />
+            </a>
+            <span className="mx-1 opacity-50">|</span>
+            <span>Designed by {SITE_CONFIG.designer}</span>
+          </div>
         </div>
       </div>
     </footer>

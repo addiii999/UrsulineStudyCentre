@@ -78,8 +78,13 @@ export default function Navbar() {
               {SITE_CONFIG.phone}
             </a>
             <span className="opacity-70">|</span>
-            <span className="opacity-75 text-[10px] tracking-wider">
-              Powered by {SITE_CONFIG.poweredBy}
+            <span className="opacity-75 text-[10px] tracking-wider flex items-center gap-1.5">
+              Powered by
+              <img
+                src="/images/academic-origin.png"
+                alt="Academic Origin"
+                className="h-[14px] w-auto opacity-90"
+              />
             </span>
           </div>
         </div>
