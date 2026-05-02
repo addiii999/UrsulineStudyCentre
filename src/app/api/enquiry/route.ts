@@ -1,16 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// In-memory store for demo purposes (replace with Supabase in production)
-const enquiries: Array<{
-  id: string;
-  name: string;
-  phone: string;
-  class: string;
-  stream: string;
-  message: string;
-  status: string;
-  created_at: string;
-}> = [];
+import { supabase } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,26 +10,41 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const enquiry = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      phone: phone.trim(),
-      class: cls,
-      stream: stream || "",
-      message: message || "",
-      status: "new",
-      created_at: new Date().toISOString(),
-    };
+    const { data, error } = await supabase
+      .from("enquiries")
+      .insert([
+        {
+          name: name.trim(),
+          phone: phone.trim(),
+          class: cls,
+          stream: stream || "",
+          message: message || "",
+          status: "new",
+        },
+      ])
+      .select();
 
-    enquiries.push(enquiry);
+    if (error) {
+      console.error("Supabase error:", error);
+      return NextResponse.json({ error: "Failed to save enquiry" }, { status: 500 });
+    }
 
-    return NextResponse.json({ success: true, id: enquiry.id }, { status: 201 });
-  } catch {
+    return NextResponse.json({ success: true, data }, { status: 201 });
+  } catch (err) {
+    console.error("Internal error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
 export async function GET() {
-  // Admin only - in production, add auth middleware
-  return NextResponse.json({ enquiries });
+  const { data, error } = await supabase
+    .from("enquiries")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ enquiries: data });
 }
