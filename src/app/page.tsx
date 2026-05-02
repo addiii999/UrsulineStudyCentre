@@ -13,6 +13,7 @@ import AdmissionSection from "@/components/sections/AdmissionSection";
 import FaqSection from "@/components/sections/FaqSection";
 import ContactSection from "@/components/sections/ContactSection";
 import FloatingWhatsApp from "@/components/ui/FloatingWhatsApp";
+import TrustBanner from "@/components/sections/TrustBanner";
 
 export default function HomePage() {
   return (
@@ -26,6 +27,7 @@ export default function HomePage() {
         <FacultySection />
         <WhyUsSection />
         <ResultsSection />
+        <TrustBanner />
         <YoutubeSection />
         <TestimonialsSection />
         <AdmissionSection />

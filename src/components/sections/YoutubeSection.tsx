@@ -4,7 +4,7 @@ import { YOUTUBE_VIDEOS, SITE_CONFIG } from "@/lib/constants";
 
 export default function YoutubeSection() {
   return (
-    <section id="youtube" className="py-20 md:py-28 bg-[#FDF8F0]">
+    <section id="youtube" className="py-20 md:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         {/* HEADER */}
         <div className="text-center mb-12">

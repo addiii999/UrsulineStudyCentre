@@ -17,29 +17,41 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center overflow-hidden bg-white"
+      className="relative min-h-screen flex items-center overflow-hidden bg-[#800000]"
     >
-      {/* DECORATIVE BACKGROUND */}
+      {/* DECORATIVE BACKGROUND LAYERS */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[55%] h-full bg-[#FDF8F0]" />
+        {/* Right cream panel */}
+        <div className="absolute top-0 right-0 w-[45%] h-full bg-[#FDF8F0]" />
+        {/* Diagonal separator */}
         <div
-          className="absolute bottom-0 left-0 w-full h-1 bg-[#C9A84C]"
-          style={{ opacity: 0.3 }}
+          className="absolute top-0 right-[45%] w-0 h-0 hidden lg:block"
+          style={{
+            borderTop: "100vh solid #800000",
+            borderRight: "80px solid transparent",
+          }}
         />
-        {/* Vertical Gold Line */}
-        <div className="absolute top-0 right-[55%] w-px h-full bg-gradient-to-b from-transparent via-[#C9A84C]/30 to-transparent hidden lg:block" />
-        {/* Decorative circles */}
-        <div className="absolute top-20 right-10 w-64 h-64 rounded-full border border-[#C9A84C]/10" />
-        <div className="absolute top-32 right-20 w-40 h-40 rounded-full border border-[#800000]/8" />
-        <div className="absolute bottom-20 right-5 w-32 h-32 rounded-full bg-[#C9A84C]/5" />
+        {/* Dot pattern on maroon */}
+        <div
+          className="absolute top-0 left-0 w-[55%] h-full opacity-[0.04]"
+          style={{
+            backgroundImage: `radial-gradient(circle, #C9A84C 1px, transparent 1px)`,
+            backgroundSize: "28px 28px",
+          }}
+        />
+        {/* Gold horizontal stripe at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C9A84C]/60 via-[#C9A84C] to-[#C9A84C]/60" />
+        {/* Decorative circles on cream panel */}
+        <div className="absolute top-16 right-8 w-72 h-72 rounded-full border border-[#C9A84C]/15" />
+        <div className="absolute bottom-16 right-12 w-40 h-40 rounded-full bg-[#C9A84C]/5 border border-[#C9A84C]/10" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-28 w-full">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* LEFT CONTENT */}
-          <div className="space-y-7">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 md:py-32 w-full">
+        <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
+          {/* LEFT CONTENT — on maroon */}
+          <div className="space-y-8">
             {/* BADGE */}
-            <div className="inline-flex items-center gap-2 bg-[#800000] text-white text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
+            <div className="inline-flex items-center gap-2 bg-white/10 border border-[#C9A84C]/40 text-[#C9A84C] text-xs font-semibold px-4 py-2 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] animate-pulse" />
               Limited Seats Available — {SITE_CONFIG.sessionYear} Session
             </div>
@@ -47,30 +59,30 @@ export default function HeroSection() {
             {/* HEADING */}
             <div>
               <h1
-                className="text-4xl md:text-5xl xl:text-6xl font-bold text-[#800000] leading-[1.1] mb-3"
+                className="text-5xl md:text-6xl xl:text-7xl font-bold text-white leading-[1.05] mb-4"
                 style={{ fontFamily: "var(--font-serif)" }}
               >
                 Ursuline
                 <br />
-                Study Centre
+                <span className="text-[#C9A84C]">Study Centre</span>
               </h1>
-              <p className="text-xs md:text-sm font-semibold text-[#C9A84C] tracking-[0.15em] uppercase">
+              <p className="text-xs md:text-sm font-semibold text-white/50 tracking-[0.18em] uppercase">
                 Under the Visionary Guidance of Sr. Dr. Mary Grace
               </p>
             </div>
 
             {/* TAGLINE */}
-            <div>
-              <p className="text-xl md:text-2xl font-semibold text-gray-800 leading-snug">
+            <div className="space-y-1">
+              <p className="text-xl md:text-2xl font-semibold text-white leading-snug">
                 {SITE_CONFIG.tagline}
               </p>
-              <p className="text-base text-[#800000]/70 font-medium mt-1">
+              <p className="text-base text-[#C9A84C] font-medium">
                 {SITE_CONFIG.taglineHindi}
               </p>
             </div>
 
             {/* DESCRIPTION */}
-            <p className="text-gray-600 text-base leading-relaxed max-w-lg">
+            <p className="text-white/70 text-base leading-relaxed max-w-md">
               Premium girls-only coaching in Ranchi for Classes 9–12 (JAC & CBSE), with dedicated
               preparation for JEE, NEET, and Board Examinations.
             </p>
@@ -79,7 +91,7 @@ export default function HeroSection() {
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => scrollTo("contact")}
-                className="btn-primary gap-2"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#C9A84C] text-white font-semibold text-sm rounded-lg border-2 border-[#C9A84C] hover:bg-[#A07830] hover:border-[#A07830] transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-[#C9A84C]/20"
               >
                 Book Free Counselling
                 <ArrowRight size={16} />
@@ -88,7 +100,7 @@ export default function HeroSection() {
                 href={SITE_CONFIG.playstoreLink}
                 target="_blank"
                 rel="noreferrer"
-                className="btn-secondary gap-2"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-transparent text-white font-semibold text-sm rounded-lg border-2 border-white/30 hover:border-white/60 hover:bg-white/10 transition-all duration-200"
               >
                 <Play size={15} fill="currentColor" />
                 Academic Origin App
@@ -98,7 +110,10 @@ export default function HeroSection() {
             {/* PILLS */}
             <div className="flex flex-wrap gap-2">
               {PILLS.map((pill) => (
-                <span key={pill.label} className="chip">
+                <span
+                  key={pill.label}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 border border-white/20 text-white/80 text-xs font-medium rounded-full"
+                >
                   {pill.icon}
                   {pill.label}
                 </span>
@@ -106,7 +121,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* RIGHT: STATS CARD */}
+          {/* RIGHT: STATS CARD — on cream panel */}
           <div className="hidden lg:block">
             <div className="relative">
               {/* MAIN CARD */}
@@ -161,7 +176,7 @@ export default function HeroSection() {
 
                 <button
                   onClick={() => scrollTo("contact")}
-                  className="btn-primary w-full justify-center mt-6"
+                  className="inline-flex items-center justify-center gap-2 w-full mt-6 px-6 py-3 bg-[#800000] text-white font-semibold text-sm rounded-lg border-2 border-[#800000] hover:bg-[#5C0000] transition-all duration-200"
                 >
                   Apply Now — Free Counselling
                 </button>

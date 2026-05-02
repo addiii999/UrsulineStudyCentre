@@ -3,7 +3,7 @@ import { FACULTY } from "@/lib/constants";
 
 export default function FacultySection() {
   return (
-    <section id="faculty" className="py-20 md:py-28 bg-[#FDF8F0]">
+    <section id="faculty" className="py-20 md:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         {/* HEADER */}
         <div className="text-center mb-12">
@@ -81,10 +81,11 @@ export default function FacultySection() {
           })}
         </div>
 
-        <div className="text-center mt-10 text-gray-500 text-sm">
-          <p>
+        <div className="text-center mt-10 space-y-1">
+          <p className="text-gray-500 text-sm">
             All faculty members are subject matter experts with a passion for girls&apos; education.
           </p>
+          <p className="text-[#800000]/60 text-sm font-medium">शिक्षा ही सशक्त भविष्य की नींव है</p>
         </div>
       </div>
     </section>

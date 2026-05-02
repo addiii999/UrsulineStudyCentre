@@ -3,7 +3,7 @@ import { TESTIMONIALS } from "@/lib/constants";
 
 export default function TestimonialsSection() {
   return (
-    <section id="testimonials" className="py-20 md:py-28 bg-white">
+    <section id="testimonials" className="py-20 md:py-28 bg-[#FDF8F0]">
       <div className="max-w-7xl mx-auto px-6">
         {/* HEADER */}
         <div className="text-center mb-12">
@@ -12,6 +12,7 @@ export default function TestimonialsSection() {
             What <span className="text-[#800000]">Parents & Students</span> Say
           </h2>
           <div className="gold-divider mx-auto mt-4" />
+          <p className="text-[#800000]/60 text-sm font-medium mt-3">आपकी बेटी का भविष्य सुरक्षित हाथों में</p>
         </div>
 
         {/* TESTIMONIAL GRID */}
