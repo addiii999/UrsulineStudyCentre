@@ -34,7 +34,7 @@ export const STATS = [
 export const COURSES = [
   {
     category: "Academic Streams",
-    icon: "📚",
+    icon: "stream",
     courses: [
       { name: "Science (PCM)", desc: "Physics, Chemistry, Mathematics for JEE aspirants" },
       { name: "Science (PCB)", desc: "Physics, Chemistry, Biology for NEET aspirants" },
@@ -44,7 +44,7 @@ export const COURSES = [
   },
   {
     category: "Competitive Exams",
-    icon: "🏆",
+    icon: "exam",
     courses: [
       { name: "JEE Main & Advanced", desc: "Structured preparation for IIT & NIT entrance" },
       { name: "NEET UG", desc: "Medical entrance with expert biology faculty" },
@@ -53,7 +53,7 @@ export const COURSES = [
   },
   {
     category: "Vocational Skills",
-    icon: "💼",
+    icon: "skill",
     courses: [
       { name: "AI & Machine Learning", desc: "Basics to advanced AI concepts" },
       { name: "Programming", desc: "Python, web development fundamentals" },
@@ -111,34 +111,34 @@ export const FACULTY = [
 
 export const WHY_CHOOSE_US = [
   {
-    icon: "🛡️",
+    icon: "shield",
     title: "Girls-Only Safe Campus",
     desc: "100% girls-only environment providing a secure, distraction-free learning space focused on academic excellence.",
   },
   {
-    icon: "📋",
+    icon: "book",
     title: "JAC & CBSE Expertise",
     desc: "Comprehensive coverage of both JAC and CBSE curricula, ensuring complete board exam preparation.",
   },
   {
-    icon: "👩‍🏫",
+    icon: "users",
     title: "Expert Faculty",
     desc: "Highly qualified teachers with deep subject expertise, many with IIT/AIIMS alumni background.",
   },
   {
-    icon: "🗣️",
+    icon: "languages",
     title: "Bilingual Teaching",
     desc: "Instruction in both English and Hindi, making complex concepts accessible to every student.",
   },
   {
-    icon: "💡",
+    icon: "lightbulb",
     title: "Academic + Vocational",
     desc: "Unique combination of board prep with future-ready vocational skills like AI, coding, and digital marketing.",
   },
   {
-    icon: "📍",
+    icon: "map",
     title: "Trusted Location",
-    desc: "Conveniently located on Purliya Road, near Ursuline Convent — a respected academic landmark in Ranchi.",
+    desc: "Conveniently located on Purliya Road, near Ursuline Convent - a respected academic landmark in Ranchi.",
   },
 ];
 
@@ -246,10 +246,10 @@ export const FAQS = [
 ];
 
 export const ADMISSION_STEPS = [
-  { step: "01", title: "Enquiry", desc: "Fill the online form or call us", icon: "📝" },
-  { step: "02", title: "Counselling", desc: "Free one-on-one academic counselling session", icon: "🗣️" },
-  { step: "03", title: "Documents", desc: "Submit mark sheets & identity proof", icon: "📂" },
-  { step: "04", title: "Payment", desc: "Complete fee payment & receive your study kit", icon: "✅" },
+  { step: "01", title: "Enquiry", desc: "Fill the online form or call us", icon: "form" },
+  { step: "02", title: "Counselling", desc: "Free one-on-one academic counselling session", icon: "chat" },
+  { step: "03", title: "Documents", desc: "Submit mark sheets & identity proof", icon: "docs" },
+  { step: "04", title: "Payment", desc: "Complete fee payment & receive your study kit", icon: "check" },
 ];
 
 export const FEE_TABLE = [

@@ -1,7 +1,20 @@
 "use client";
 import { useState } from "react";
+import { BookOpen, Trophy, Briefcase } from "lucide-react";
 import { COURSES } from "@/lib/constants";
 import clsx from "clsx";
+
+const TAB_ICONS: Record<string, React.ReactNode> = {
+  stream: <BookOpen size={15} />,
+  exam: <Trophy size={15} />,
+  skill: <Briefcase size={15} />,
+};
+
+const COURSE_ICON: Record<string, React.ReactNode> = {
+  stream: <BookOpen size={16} />,
+  exam: <Trophy size={16} />,
+  skill: <Briefcase size={16} />,
+};
 
 export default function CoursesSection() {
   const [activeTab, setActiveTab] = useState(0);
@@ -35,7 +48,7 @@ export default function CoursesSection() {
                   : "bg-[#FDF8F0] text-gray-600 border border-[#e8d9b8] hover:border-[#C9A84C] hover:text-[#800000]"
               )}
             >
-              <span>{cat.icon}</span>
+              <span>{TAB_ICONS[cat.icon] ?? <BookOpen size={15} />}</span>
               {cat.category}
             </button>
           ))}
@@ -50,8 +63,8 @@ export default function CoursesSection() {
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-lg bg-[#800000]/8 flex items-center justify-center flex-shrink-0 group-hover:bg-[#800000]/15 transition-colors">
-                  <span className="text-base">{COURSES[activeTab].icon}</span>
+                <div className="w-9 h-9 rounded-lg bg-[#800000]/8 flex items-center justify-center flex-shrink-0 group-hover:bg-[#800000]/15 transition-colors text-[#800000]">
+                  {COURSE_ICON[COURSES[activeTab].icon] ?? <BookOpen size={16} />}
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1.5 group-hover:text-[#800000] transition-colors">

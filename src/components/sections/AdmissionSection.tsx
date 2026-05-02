@@ -23,7 +23,6 @@ export default function AdmissionSection() {
           <div>
             <h3
               className="text-xl font-bold text-gray-900 mb-6"
-              style={{ fontFamily: "var(--font-serif)" }}
             >
               Admission Process
             </h3>
@@ -33,7 +32,7 @@ export default function AdmissionSection() {
                   {/* STEP INDICATOR */}
                   <div className="flex flex-col items-center flex-shrink-0">
                     <div className="w-12 h-12 rounded-full bg-[#800000] text-white flex items-center justify-center font-bold text-sm shadow-md">
-                      {step.icon}
+                      {step.step}
                     </div>
                     {i < ADMISSION_STEPS.length - 1 && (
                       <div className="w-px h-8 bg-[#e8d9b8] mt-2" />
@@ -66,7 +65,6 @@ export default function AdmissionSection() {
           <div>
             <h3
               className="text-xl font-bold text-gray-900 mb-6"
-              style={{ fontFamily: "var(--font-serif)" }}
             >
               Fee Structure
             </h3>
@@ -77,7 +75,7 @@ export default function AdmissionSection() {
                 style={{ backgroundImage: "radial-gradient(circle, #C9A84C 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
               <div className="relative z-10">
                 <p className="text-[#C9A84C] text-sm font-semibold uppercase tracking-wider mb-1">Annual Fee (All Streams)</p>
-                <p className="text-5xl font-bold" style={{ fontFamily: "var(--font-serif)" }}>₹15,000</p>
+                <p className="text-5xl font-bold">₹15,000</p>
                 <p className="text-white/60 text-sm mt-1">Per Academic Year</p>
               </div>
             </div>

@@ -160,15 +160,16 @@ export default function HeroSection() {
 
                 <div className="space-y-2.5">
                   {[
-                    "🛡️ 100% Girls-Only Safe Campus",
-                    "📋 JAC & CBSE Curriculum",
-                    "🗣️ Bilingual English + Hindi Teaching",
-                    "💻 Vocational + Academic Combo",
+                    "100% Girls-Only Safe Campus",
+                    "JAC & CBSE Curriculum",
+                    "Bilingual English + Hindi Teaching",
+                    "Vocational + Academic Combo",
                   ].map((item) => (
                     <div
                       key={item}
                       className="flex items-center gap-2.5 text-sm text-gray-700 bg-gray-50 rounded-lg px-3 py-2"
                     >
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] flex-shrink-0" />
                       <span>{item}</span>
                     </div>
                   ))}

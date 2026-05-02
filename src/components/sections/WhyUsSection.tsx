@@ -1,4 +1,14 @@
+import { Shield, BookOpen, Users, Languages, Lightbulb, MapPin } from "lucide-react";
 import { WHY_CHOOSE_US } from "@/lib/constants";
+
+const ICON_MAP: Record<string, React.ReactNode> = {
+  shield: <Shield size={20} />,
+  book: <BookOpen size={20} />,
+  users: <Users size={20} />,
+  languages: <Languages size={20} />,
+  lightbulb: <Lightbulb size={20} />,
+  map: <MapPin size={20} />,
+};
 
 export default function WhyUsSection() {
   return (
@@ -27,7 +37,7 @@ export default function WhyUsSection() {
           </span>
           <h2
             className="text-3xl md:text-4xl font-bold text-white mt-4"
-            style={{ fontFamily: "var(--font-serif)" }}
+            style={{ letterSpacing: "-0.02em" }}
           >
             The USC <span className="text-[#C9A84C]">Advantage</span>
           </h2>
@@ -50,20 +60,21 @@ export default function WhyUsSection() {
               {/* NUMBER */}
               <div
                 className="absolute top-4 right-4 text-5xl font-bold text-white/5 leading-none select-none"
-                style={{ fontFamily: "var(--font-serif)" }}
               >
                 {String(i + 1).padStart(2, "0")}
               </div>
 
               <div className="space-y-3">
-                <div className="text-3xl">{item.icon}</div>
+                {/* ICON */}
+                <div className="w-10 h-10 rounded-lg bg-[#C9A84C]/15 border border-[#C9A84C]/20 flex items-center justify-center text-[#C9A84C] group-hover:bg-[#C9A84C]/25 transition-colors">
+                  {ICON_MAP[item.icon] ?? <Shield size={20} />}
+                </div>
                 <h3
-                  className="font-bold text-white text-base group-hover:text-[#C9A84C] transition-colors"
-                  style={{ fontFamily: "var(--font-serif)" }}
+                  className="font-semibold text-white text-sm group-hover:text-[#C9A84C] transition-colors"
                 >
                   {item.title}
                 </h3>
-                <p className="text-white/60 text-sm leading-relaxed">{item.desc}</p>
+                <p className="text-white/58 text-sm leading-relaxed">{item.desc}</p>
               </div>
             </div>
           ))}

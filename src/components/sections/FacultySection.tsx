@@ -1,4 +1,4 @@
-import { BookOpen } from "lucide-react";
+import { BookOpen, GraduationCap, Star } from "lucide-react";
 import { FACULTY } from "@/lib/constants";
 
 export default function FacultySection() {
@@ -64,15 +64,15 @@ export default function FacultySection() {
 
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-[#C9A84C]">📚</span>
+                    <BookOpen size={14} className="text-[#C9A84C]" />
                     <span className="text-gray-700 text-sm font-medium">{member.subject}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <BookOpen size={14} className="text-gray-400" />
+                    <GraduationCap size={14} className="text-gray-400" />
                     <span className="text-gray-500 text-sm">{member.qualification}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[#C9A84C]">⭐</span>
+                    <Star size={14} className="text-[#C9A84C]" />
                     <span className="text-gray-500 text-sm">{member.experience} Experience</span>
                   </div>
                 </div>
