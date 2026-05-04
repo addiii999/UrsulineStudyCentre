@@ -106,13 +106,21 @@ export default function Navbar() {
             {/* LEFT: LOGO */}
             <button
               onClick={() => scrollTo("/#hero")}
-              className="flex items-center gap-3 group flex-shrink-0"
+              className="flex items-center gap-3 group flex-shrink-0 text-left"
             >
               <img
                 src="/logo.png"
                 alt="Ursuline Study Centre"
                 className="h-10 md:h-12 w-auto object-contain"
               />
+              <div className="flex flex-col leading-tight">
+                <span className="text-[16px] md:text-[19px] font-bold text-[#111] tracking-tight">
+                  Ursuline Study Centre
+                </span>
+                <span className="hidden sm:block text-[11px] md:text-[12px] text-[#666] font-medium mt-[3px] opacity-90">
+                  Under the Visionary Guidance of Sr. Dr. Mary Grace
+                </span>
+              </div>
             </button>
 
             {/* CENTER: NAV LINKS (Desktop) */}
