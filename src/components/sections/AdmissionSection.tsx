@@ -1,6 +1,7 @@
 "use client";
 import { ADMISSION_STEPS, FEE_TABLE } from "@/lib/constants";
 import { ArrowRight, CheckCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function AdmissionSection() {
   return (
@@ -52,13 +53,13 @@ export default function AdmissionSection() {
               ))}
             </div>
 
-            <button
-              onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-              className="btn-primary mt-8"
+            <Link
+              href="/apply"
+              className="btn-primary mt-8 inline-flex"
             >
               Begin Admission
               <ArrowRight size={16} />
-            </button>
+            </Link>
           </div>
 
           {/* RIGHT: FEE CARDS (mobile-first) */}
