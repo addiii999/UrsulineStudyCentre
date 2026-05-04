@@ -77,17 +77,6 @@ export default function Navbar() {
               <Phone size={11} className="icon-anim" />
               {SITE_CONFIG.phone}
             </a>
-            <span className="opacity-70 glow float-text">|</span>
-            <span className="opacity-80 text-[10px] tracking-wider flex items-center gap-2">
-              Powered by
-              <span className="bg-white rounded px-1.5 py-0.5 inline-flex items-center">
-                <img
-                  src="/images/academic-origin.png"
-                  alt="Academic Origin"
-                  className="h-[13px] w-auto"
-                />
-              </span>
-            </span>
           </div>
         </div>
       </div>
