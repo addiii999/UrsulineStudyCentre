@@ -28,7 +28,7 @@ export default function ResultsSection() {
             <span className="text-[#C9A84C]">Themselves</span>
           </h2>
           <p className="text-white/60 text-sm mt-3">
-            A legacy of academic excellence built over a decade.
+            A trusted legacy of academic excellence and proven results.
           </p>
         </div>
 
@@ -44,12 +44,21 @@ export default function ResultsSection() {
               >
                 {stat.value}
               </div>
-              <div className="text-white/70 text-sm font-medium">{stat.label}</div>
+              <div className="text-white/70 text-sm font-medium leading-snug">{stat.label}</div>
             </div>
           ))}
         </div>
 
-        <div className="text-center mt-12">
+        <div className="mt-12 bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 text-center max-w-4xl mx-auto flex flex-col items-center gap-5">
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-[#C9A84C]/30 text-white/90 text-[11px] md:text-xs font-semibold px-4 py-1.5 rounded-full tracking-wider uppercase">
+             Powered by Academic Origin
+          </div>
+          <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-2xl">
+            Ursuline Study Centre is built on the proven academic legacy of Academic Origin, a trusted institution with years of excellence in Board and competitive exam preparation.
+          </p>
+        </div>
+
+        <div className="text-center mt-12 pt-8 border-t border-white/10">
           <p className="text-white/50 text-sm italic">
             &ldquo;Our results are not just numbers — they are the dreams of thousands of girls
             fulfilled.&rdquo;

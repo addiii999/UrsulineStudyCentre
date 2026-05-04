@@ -26,9 +26,9 @@ export const SITE_CONFIG = {
 
 export const STATS = [
   { value: "95%", label: "Board Success Rate" },
-  { value: "2500+", label: "Students Mentored" },
-  { value: "50+", label: "JEE/NEET Selections" },
-  { value: "10+", label: "Years of Legacy" },
+  { value: "2500+", label: "Students Mentored (via Academic Origin)" },
+  { value: "50+", label: "Selections (Academic Origin Legacy)" },
+  { value: "10+", label: "Years of Teaching Excellence" },
 ];
 
 export const COURSES = [
