@@ -239,17 +239,18 @@
   /* ── Form inputs ─────────────────────────────────────── */
   .input-field {
     width: 100%;
-    padding: 0.7rem 1rem;
+    padding: 0.75rem 1rem;
     border: 1.5px solid #E5E5E5;
     border-radius: 8px;
     font-family: var(--font-sans);
-    font-size: 0.9rem;
+    font-size: 1rem; /* 16px - prevents iOS zoom */
     font-weight: 400;
     color: #111;
     background: #fff;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     outline: none;
     letter-spacing: 0;
+    min-height: 48px; /* 44px+ tap targets */
   }
 
   .input-field:focus {

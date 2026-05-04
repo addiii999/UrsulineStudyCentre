@@ -14,6 +14,7 @@ import FaqSection from "@/components/sections/FaqSection";
 import ContactSection from "@/components/sections/ContactSection";
 import FloatingWhatsApp from "@/components/ui/FloatingWhatsApp";
 import TrustBanner from "@/components/sections/TrustBanner";
+import MobileActionBar from "@/components/ui/MobileActionBar";
 
 export default function HomePage() {
   return (
@@ -36,6 +37,7 @@ export default function HomePage() {
       </main>
       <Footer />
       <FloatingWhatsApp />
+      <MobileActionBar />
     </>
   );
 }

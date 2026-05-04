@@ -49,7 +49,7 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-20 md:py-28 bg-[#FDF8F0]">
+    <section id="contact" className="py-20 md:py-28 pb-28 md:pb-28 bg-[#FDF8F0]">
       <div className="max-w-7xl mx-auto px-6">
         {/* HEADER */}
         <div className="text-center mb-14">
@@ -124,23 +124,26 @@ export default function ContactSection() {
                 <div>
                   <label className="label">Phone Number *</label>
                   <div className="flex">
-                    <span className="flex items-center px-3 bg-gray-50 border border-r-0 border-[#e8e0d0] rounded-l-lg text-gray-500 text-sm font-medium">
+                    <span className="flex items-center px-3 bg-gray-50 border border-r-0 border-[#e8e0d0] rounded-l-lg text-gray-500 text-sm font-medium min-h-[48px]">
                       +91
                     </span>
                     <input
                       name="phone"
-                      placeholder="95075 89503"
-                      className="input-field rounded-l-none"
+                      placeholder="10-digit mobile number"
+                      className="input-field rounded-l-none min-h-[48px] text-base"
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]{10}"
                       maxLength={10}
                       required
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="label">Class *</label>
-                    <select name="class" className="input-field" required defaultValue="">
+                    <select name="class" className="input-field min-h-[48px] text-base" required defaultValue="">
                       <option value="" disabled>Select Class</option>
                       {CLASSES.map((c) => (
                         <option key={c} value={c}>{c}</option>
@@ -149,7 +152,7 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <label className="label">Stream</label>
-                    <select name="stream" className="input-field" defaultValue="">
+                    <select name="stream" className="input-field min-h-[48px] text-base" defaultValue="">
                       <option value="">Select Stream</option>
                       {STREAMS.map((s) => (
                         <option key={s} value={s}>{s}</option>
@@ -162,16 +165,16 @@ export default function ContactSection() {
                   <label className="label">Message (Optional)</label>
                   <textarea
                     name="message"
-                    placeholder="Any specific queries or information you'd like to share..."
+                    placeholder="Any specific queries or information..."
                     rows={3}
-                    className="input-field resize-none"
+                    className="input-field resize-none text-base"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn-primary w-full justify-center mt-2"
+                  className="btn-primary w-full justify-center mt-2 min-h-[52px] text-base"
                 >
                   {loading ? (
                     <>

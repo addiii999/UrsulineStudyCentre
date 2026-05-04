@@ -61,13 +61,9 @@ export default function AdmissionSection() {
             </button>
           </div>
 
-          {/* RIGHT: FEE TABLE */}
+          {/* RIGHT: FEE CARDS (mobile-first) */}
           <div>
-            <h3
-              className="text-xl font-bold text-gray-900 mb-6"
-            >
-              Fee Structure
-            </h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Fee Structure</h3>
 
             {/* FEATURED FEE */}
             <div className="bg-[#800000] rounded-2xl p-6 mb-5 text-white text-center relative overflow-hidden">
@@ -80,31 +76,29 @@ export default function AdmissionSection() {
               </div>
             </div>
 
-            {/* STREAM TABLE */}
-            <div className="bg-[#FDF8F0] rounded-xl border border-[#e8d9b8] overflow-hidden">
-              <div className="grid grid-cols-3 bg-[#800000]/8 border-b border-[#e8d9b8] px-4 py-2.5">
-                <span className="text-xs font-bold text-gray-600 uppercase tracking-wide">Stream</span>
-                <span className="text-xs font-bold text-gray-600 uppercase tracking-wide text-center">Annual</span>
-                <span className="text-xs font-bold text-gray-600 uppercase tracking-wide text-right">Includes</span>
-              </div>
-              {FEE_TABLE.map((row, i) => (
+            {/* FEE CARDS — no horizontal scroll */}
+            <div className="space-y-3">
+              {FEE_TABLE.map((row) => (
                 <div
                   key={row.stream}
-                  className={`grid grid-cols-3 px-4 py-3 items-center ${i < FEE_TABLE.length - 1 ? "border-b border-[#f0ebe0]" : ""}`}
+                  className="flex items-center justify-between bg-[#FDF8F0] border border-[#e8d9b8] rounded-xl px-5 py-4 gap-3"
                 >
-                  <span className="text-sm font-semibold text-gray-800">{row.stream}</span>
-                  <span className="text-sm font-bold text-[#800000] text-center">{row.annual}</span>
-                  <div className="flex justify-end">
-                    <span className="flex items-center gap-1 text-xs text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
+                  <div className="min-w-0">
+                    <p className="font-bold text-gray-900 text-sm">{row.stream}</p>
+                    <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full mt-1.5">
                       <CheckCircle size={10} />
                       {row.includes}
                     </span>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-lg font-bold text-[#800000]">{row.annual}</p>
+                    <p className="text-xs text-gray-400">per year</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <p className="text-gray-400 text-xs mt-3">
+            <p className="text-gray-400 text-xs mt-4">
               * Vocational courses have separate pricing. Contact us for details.
             </p>
           </div>
