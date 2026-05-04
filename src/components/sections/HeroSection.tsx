@@ -59,36 +59,34 @@ export default function HeroSection() {
           </p>
         </div>
 
-        {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-          <button
-            onClick={() => scrollTo("contact")}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#C9A84C] text-[#800000] font-bold text-sm md:text-base rounded-lg border-2 border-[#C9A84C] hover:bg-white hover:border-white transition-all duration-300 shadow-[0_0_20px_rgba(201,168,76,0.2)] hover:-translate-y-1"
-          >
-            Book Free Counselling
-            <ArrowRight size={18} />
-          </button>
-          <button
-            onClick={() => scrollTo("courses")}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-white font-medium text-sm md:text-base rounded-lg border border-white/30 hover:border-white hover:bg-white/5 transition-all duration-300 hover:-translate-y-1"
-          >
-            Explore Courses
-          </button>
+        <div className="flex flex-col items-center gap-6 mt-2 w-full">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+            <button
+              onClick={() => scrollTo("contact")}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#C9A84C] text-[#800000] font-bold text-sm md:text-base rounded-lg border-2 border-[#C9A84C] hover:bg-white hover:border-white transition-all duration-300 shadow-[0_0_20px_rgba(201,168,76,0.2)] hover:-translate-y-1"
+            >
+              Book Free Counselling
+              <ArrowRight size={18} />
+            </button>
+            <button
+              onClick={() => scrollTo("courses")}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-white font-medium text-sm md:text-base rounded-lg border border-white/30 hover:border-white hover:bg-white/5 transition-all duration-300 hover:-translate-y-1"
+            >
+              Explore Courses
+            </button>
+          </div>
+          
           <a
             href={SITE_CONFIG.playstoreLink}
             target="_blank"
             rel="noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-medium text-sm md:text-base rounded-lg border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-300 hover:-translate-y-1"
+            className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-5 h-5"
-            >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
               <path d="M17.523 15.3414L5.34142 22.4283C4.85764 22.7099 4.25002 22.3614 4.25002 21.8021V2.19796C4.25002 1.63855 4.85764 1.29013 5.34142 1.57169L17.523 8.65863C17.9734 8.92095 17.9734 9.57908 17.523 9.8414L15.3414 11.1111L12.5 12L15.3414 12.8889L17.523 15.3414Z" />
               <path d="M19.4673 10.7483L18.4908 10.1802L16.2737 11.4705L16.2738 12.5295L18.4908 13.8198L19.4673 13.2517C20.1776 12.8383 20.1776 11.1617 19.4673 10.7483Z" />
             </svg>
-            Download App
+            <span className="underline underline-offset-4 decoration-white/30">Download Academic Origin App</span>
           </a>
         </div>
 

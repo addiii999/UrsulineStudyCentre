@@ -86,15 +86,15 @@ export default function CoursesSection() {
         </div>
 
         {/* BOTTOM CTA */}
-        <div className="text-center mt-12">
-          <p className="text-gray-500 text-sm mb-4">
-            Not sure which stream to choose? Our counsellors can help.
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-5 mt-14 pt-8 border-t border-gray-100">
+          <p className="text-gray-500 text-sm">
+            Not sure which stream to choose? Let our counsellors guide you.
           </p>
           <button
             onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-            className="btn-primary"
+            className="btn-primary px-8 py-3.5 shadow-lg"
           >
-            Get Free Academic Counselling
+            Enquire About Admission
           </button>
         </div>
       </div>

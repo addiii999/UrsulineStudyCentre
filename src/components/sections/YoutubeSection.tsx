@@ -61,59 +61,29 @@ export default function YoutubeSection() {
     <section id="youtube" className="py-20 md:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-6">
 
-        {/* HEADER */}
-        <div className="text-center mb-10">
-          <span className="section-tag">Video Resources</span>
-          <h2 className="section-heading mt-4">
-            Academic Origin{" "}
-            <span className="text-[#800000]">Learning Videos</span>
-          </h2>
-          <div className="gold-divider mx-auto mt-4" />
-          <p className="section-subheading mx-auto mt-4">
-            Free educational content - JEE, NEET, Board prep and more.
-            Click any video to watch on YouTube.
-          </p>
-        </div>
-
-        {/* CHANNEL + APP STRIP */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center flex-wrap mb-10">
-
-          {/* YouTube channel button — white icons on red bg */}
+        {/* HEADER & MAIN CTA - Left Aligned for Layout Variety */}
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-10">
+          <div className="text-left">
+            <span className="section-tag">Video Resources</span>
+            <h2 className="section-heading mt-4">
+              Academic Origin{" "}
+              <span className="text-[#800000]">Learning Videos</span>
+            </h2>
+            <div className="gold-divider mt-4" />
+            <p className="section-subheading mt-4">
+              Free educational content - JEE, NEET, Board prep and more. Click any video to watch on YouTube.
+            </p>
+          </div>
           <a
             href={SITE_CONFIG.youtubeChannel}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2.5 px-5 py-3 bg-[#FF0000] text-white font-semibold text-sm rounded-xl hover:bg-[#CC0000] transition-all duration-200 hover:-translate-y-0.5 shadow-md shadow-red-200"
+            className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#FF0000] text-white font-bold text-sm rounded-lg hover:bg-[#CC0000] transition-all duration-300 shadow-[0_4px_14px_rgba(255,0,0,0.3)] hover:-translate-y-1"
           >
-            {/* YouTube logo: white background + red play triangle (inverted for red button) */}
-            <YouTubeIcon size={22} white={true} />
-            Visit Academic Origin Channel
-            <ExternalLink size={14} className="opacity-70" />
+            <YouTubeIcon size={20} white={true} />
+            Visit Channel
+            <ExternalLink size={16} className="opacity-70 ml-1" />
           </a>
-
-          {/* Play Store button */}
-          <a
-            href={SITE_CONFIG.playstoreLink}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2.5 px-5 py-3 bg-white text-gray-800 font-semibold text-sm rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
-          >
-            <PlayStoreIcon size={22} />
-            Download on Play Store
-            <ExternalLink size={14} className="opacity-40" />
-          </a>
-
-          {/* WhatsApp — white icon on green bg */}
-          <a
-            href={`https://wa.me/${SITE_CONFIG.whatsapp}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2.5 px-5 py-3 bg-[#25D366] text-white font-semibold text-sm rounded-xl hover:bg-[#1ebe5a] transition-all duration-200 hover:-translate-y-0.5 shadow-md shadow-green-200"
-          >
-            <WhatsAppIcon size={20} />
-            Chat on WhatsApp
-          </a>
-
         </div>
 
         {/* VIDEO GRID */}

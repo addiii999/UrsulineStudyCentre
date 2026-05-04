@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { FAQS } from "@/lib/constants";
 import clsx from "clsx";
 
@@ -44,13 +44,11 @@ export default function FaqSection() {
                 >
                   {faq.q}
                 </span>
-                <ChevronDown
-                  size={18}
-                  className={clsx(
-                    "text-[#C9A84C] flex-shrink-0 transition-transform duration-200",
-                    open === i && "rotate-180"
-                  )}
-                />
+                {open === i ? (
+                  <Minus size={18} className="text-[#C9A84C] flex-shrink-0 transition-all duration-200" />
+                ) : (
+                  <Plus size={18} className="text-[#C9A84C] flex-shrink-0 transition-all duration-200" />
+                )}
               </button>
               {open === i && (
                 <div className="px-6 pb-5">
