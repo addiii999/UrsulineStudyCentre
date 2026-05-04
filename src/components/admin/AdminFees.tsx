@@ -51,7 +51,7 @@ export default function AdminFees() {
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
           <IndianRupee size={16} className="text-[#C9A84C]" />
-          <h3 className="font-bold text-sm text-gray-900">Fee Structure — 2026-27</h3>
+          <h3 className="font-bold text-sm text-gray-900">Fee Structure - 2026-27</h3>
         </div>
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-200">

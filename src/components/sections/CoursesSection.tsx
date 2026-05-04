@@ -30,7 +30,7 @@ export default function CoursesSection() {
           </h2>
           <div className="gold-divider mx-auto mt-4" />
           <p className="section-subheading mx-auto mt-4">
-            From board prep to competitive exams and vocational skills — a complete academic
+            From board prep to competitive exams and vocational skills - a complete academic
             ecosystem for the modern girl student.
           </p>
         </div>

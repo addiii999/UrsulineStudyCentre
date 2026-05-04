@@ -30,7 +30,7 @@ export default function TrustBanner() {
               Limited seats. Apply early to secure your daughter&apos;s future.
             </p>
             <p className="text-[#C9A84C]/70 text-sm mt-0.5 font-medium">
-              सीमित सीटें — अभी आवेदन करें
+              सीमित सीटें - अभी आवेदन करें
             </p>
           </div>
           <div className="flex flex-wrap gap-3 justify-center md:justify-end">

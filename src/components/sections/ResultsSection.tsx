@@ -60,10 +60,10 @@ export default function ResultsSection() {
 
         <div className="text-center mt-12 pt-8 border-t border-white/10">
           <p className="text-white/50 text-sm italic">
-            &ldquo;Our results are not just numbers — they are the dreams of thousands of girls
+            &ldquo;Our results are not just numbers - they are the dreams of thousands of girls
             fulfilled.&rdquo;
           </p>
-          <p className="text-[#C9A84C] text-xs mt-2">— Abhishek Pathak, Founder</p>
+          <p className="text-[#C9A84C] text-xs mt-2">- Abhishek Pathak, Founder</p>
         </div>
       </div>
     </section>

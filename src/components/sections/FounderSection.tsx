@@ -85,13 +85,13 @@ export default function FounderSection() {
               <p>
                 Having personally mentored <strong>5000+ students</strong> across Jharkhand and
                 beyond, Abhishek sir&apos;s teaching philosophy centers on building strong
-                fundamentals while developing problem-solving instincts — the exact skills that
+                fundamentals while developing problem-solving instincts - the exact skills that
                 make the difference in competitive exams.
               </p>
               <p>
                 Driven by a deep commitment to <strong>girls&apos; education</strong>, he founded
                 Ursuline Study Centre to create a world-class academic environment exclusively for
-                young women — ensuring they receive the same quality of education that was
+                young women - ensuring they receive the same quality of education that was
                 historically inaccessible in many parts of Jharkhand.
               </p>
             </div>
@@ -102,12 +102,12 @@ export default function FounderSection() {
               <div className="pl-4">
                 <p className="text-gray-700 italic text-base leading-relaxed mb-2">
                   &ldquo;Every girl deserves access to world-class education. At USC, we don&apos;t
-                  just teach subjects — we build futures.&rdquo;
+                  just teach subjects - we build futures.&rdquo;
                 </p>
                 <p className="text-[#800000] font-medium text-sm italic">
                   &ldquo;हर बेटी को बेहतरीन शिक्षा का हक है। USC में हम विषय नहीं, भविष्य बनाते हैं।&rdquo;
                 </p>
-                <p className="text-[#C9A84C] font-semibold text-xs mt-3">— Abhishek Pathak</p>
+                <p className="text-[#C9A84C] font-semibold text-xs mt-3">- Abhishek Pathak</p>
               </div>
             </div>
 

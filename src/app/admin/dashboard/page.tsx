@@ -153,7 +153,7 @@ export default function AdminDashboardPage() {
               <h1 className="font-bold text-gray-900 text-sm" style={{ fontFamily: "var(--font-serif)" }}>
                 {currentNav?.label}
               </h1>
-              <p className="text-gray-400 text-xs">Ursuline Study Centre — Admin Panel</p>
+              <p className="text-gray-400 text-xs">Ursuline Study Centre - Admin Panel</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

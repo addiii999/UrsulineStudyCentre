@@ -39,7 +39,7 @@ export default function StudentDashboardPage() {
               Welcome back, Student! 👋
             </h2>
             <p className="text-white/70 text-sm mt-1">
-              Ursuline Study Centre — 2026-27 Session
+              Ursuline Study Centre - 2026-27 Session
             </p>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function StudentDashboardPage() {
           <div className="divide-y divide-gray-50">
             {[
               { title: "Welcome to USC 2026-27 Session!", date: "Today", type: "Important" },
-              { title: "JEE Mock Test — 10th May 2026", date: "Yesterday", type: "Test" },
+              { title: "JEE Mock Test - 10th May 2026", date: "Yesterday", type: "Test" },
               { title: "Fee Payment Reminder", date: "3 days ago", type: "Admin" },
             ].map((n) => (
               <div key={n.title} className="px-5 py-3.5 flex items-center justify-between">

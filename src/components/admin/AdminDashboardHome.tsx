@@ -31,7 +31,7 @@ export default function AdminDashboardHome() {
             Welcome back, Admin 👋
           </h2>
           <p className="text-white/70 text-sm mt-1">
-            Ursuline Study Centre — {new Date().toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+            Ursuline Study Centre - {new Date().toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
           </p>
         </div>
       </div>

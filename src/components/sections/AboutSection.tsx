@@ -40,8 +40,8 @@ export default function AboutSection() {
                 for JEE, NEET, and CLAT.
               </p>
               <p>
-                Our bilingual (English + Hindi) teaching methodology ensures that every student —
-                regardless of their language background — grasps every concept with clarity and
+                Our bilingual (English + Hindi) teaching methodology ensures that every student -
+                regardless of their language background - grasps every concept with clarity and
                 confidence. We combine strong academic foundations with future-ready vocational
                 skills.
               </p>
@@ -70,7 +70,7 @@ export default function AboutSection() {
                   Our Mission
                 </div>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                  To empower every girl with knowledge, discipline, and confidence — creating leaders
+                  To empower every girl with knowledge, discipline, and confidence - creating leaders
                   who will shape the future of Jharkhand and India.
                 </p>
               </div>
