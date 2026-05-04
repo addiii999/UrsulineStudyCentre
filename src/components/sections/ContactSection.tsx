@@ -1,49 +1,48 @@
 "use client";
-import { useState } from "react";
-import { Send, Phone, MapPin, Mail, MessageCircle, Loader2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { Send, Phone, MapPin, Mail, MessageCircle, Loader2, CheckCircle2 } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
-import toast from "react-hot-toast";
 
 const CLASSES = ["Class 9", "Class 10", "Class 11", "Class 12", "Other"];
 const STREAMS = ["Science (PCM)", "Science (PCB)", "Commerce", "Humanities", "Not Sure Yet"];
 
 export default function ContactSection() {
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    class: "",
-    stream: "",
-    message: "",
-  });
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!form.name || !form.phone || !form.class) {
-      toast.error("Please fill all required fields");
+    const form = e.currentTarget;
+
+    // Basic client-side validation
+    const name = (form.elements.namedItem("name") as HTMLInputElement)?.value?.trim();
+    const phone = (form.elements.namedItem("phone") as HTMLInputElement)?.value?.trim();
+    const cls = (form.elements.namedItem("class") as HTMLSelectElement)?.value;
+
+    if (!name || !phone || !cls) {
+      alert("Please fill all required fields.");
       return;
     }
+
     setLoading(true);
+
     try {
-      const res = await fetch("/api/enquiry", {
+      const data = new FormData(form);
+      const res = await fetch("https://formsubmit.co/ursulinestudycentre@gmail.com", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: data,
+        headers: { Accept: "application/json" },
       });
+
       if (res.ok) {
-        toast.success("Enquiry submitted! We'll contact you within 24 hours.");
-        setForm({ name: "", phone: "", class: "", stream: "", message: "" });
+        setSubmitted(true);
+        formRef.current?.reset();
       } else {
-        toast.error("Failed to submit. Please try again.");
+        alert("Something went wrong. Please try again or contact us on WhatsApp.");
       }
     } catch {
-      toast.error("Network error. Please try again.");
+      alert("Network error. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -73,95 +72,125 @@ export default function ContactSection() {
             >
               Send an Enquiry
             </h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="label">Full Name *</label>
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                  className="input-field"
-                  required
-                />
+
+            {/* SUCCESS STATE */}
+            {submitted ? (
+              <div className="flex flex-col items-center justify-center py-10 text-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center">
+                  <CheckCircle2 size={32} className="text-green-500" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900 text-base">Enquiry Submitted!</h4>
+                  <p className="text-gray-500 text-sm mt-1 max-w-xs mx-auto">
+                    Thank you! Our team will contact you within 24 hours. Check your email for confirmation.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  className="btn-secondary text-sm py-2"
+                >
+                  Submit Another Enquiry
+                </button>
               </div>
-              <div>
-                <label className="label">Phone Number *</label>
-                <div className="flex">
-                  <span className="flex items-center px-3 bg-gray-50 border border-r-0 border-[#e8e0d0] rounded-l-lg text-gray-500 text-sm font-medium">
-                    +91
-                  </span>
+            ) : (
+              <form
+                ref={formRef}
+                onSubmit={handleSubmit}
+                className="space-y-4"
+              >
+                {/* ── FormSubmit hidden config ── */}
+                <input type="hidden" name="_captcha" value="false" />
+                <input type="hidden" name="_subject" value="New Enquiry - Ursuline Study Centre" />
+                <input type="hidden" name="_template" value="table" />
+                <input
+                  type="hidden"
+                  name="_autoresponse"
+                  value="Thank you for contacting Ursuline Study Centre. Our team will reach out to you within 24 hours. For urgent queries, WhatsApp us at +91 95075 89503."
+                />
+                {/* Honeypot anti-spam */}
+                <input type="text" name="_honey" style={{ display: "none" }} />
+
+                {/* FIELDS */}
+                <div>
+                  <label className="label">Full Name *</label>
                   <input
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    placeholder="95075 89503"
-                    className="input-field rounded-l-none"
-                    maxLength={10}
+                    name="name"
+                    placeholder="Enter your full name"
+                    className="input-field"
                     required
                   />
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+
                 <div>
-                  <label className="label">Class *</label>
-                  <select
-                    name="class"
-                    value={form.class}
-                    onChange={handleChange}
-                    className="input-field"
-                    required
-                  >
-                    <option value="">Select Class</option>
-                    {CLASSES.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
+                  <label className="label">Phone Number *</label>
+                  <div className="flex">
+                    <span className="flex items-center px-3 bg-gray-50 border border-r-0 border-[#e8e0d0] rounded-l-lg text-gray-500 text-sm font-medium">
+                      +91
+                    </span>
+                    <input
+                      name="phone"
+                      placeholder="95075 89503"
+                      className="input-field rounded-l-none"
+                      maxLength={10}
+                      required
+                    />
+                  </div>
                 </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">Class *</label>
+                    <select name="class" className="input-field" required defaultValue="">
+                      <option value="" disabled>Select Class</option>
+                      {CLASSES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="label">Stream</label>
+                    <select name="stream" className="input-field" defaultValue="">
+                      <option value="">Select Stream</option>
+                      {STREAMS.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 <div>
-                  <label className="label">Stream</label>
-                  <select
-                    name="stream"
-                    value={form.stream}
-                    onChange={handleChange}
-                    className="input-field"
-                  >
-                    <option value="">Select Stream</option>
-                    {STREAMS.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
+                  <label className="label">Message (Optional)</label>
+                  <textarea
+                    name="message"
+                    placeholder="Any specific queries or information you'd like to share..."
+                    rows={3}
+                    className="input-field resize-none"
+                  />
                 </div>
-              </div>
-              <div>
-                <label className="label">Message (Optional)</label>
-                <textarea
-                  name="message"
-                  value={form.message}
-                  onChange={handleChange}
-                  placeholder="Any specific queries or information you'd like to share..."
-                  rows={3}
-                  className="input-field resize-none"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary w-full justify-center mt-2"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Send size={15} />
-                    Submit Enquiry
-                  </>
-                )}
-              </button>
-            </form>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-primary w-full justify-center mt-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={15} />
+                      Submit Enquiry
+                    </>
+                  )}
+                </button>
+
+                <p className="text-center text-xs text-gray-400 mt-1">
+                  Your data is safe. We'll never share your information.
+                </p>
+              </form>
+            )}
           </div>
 
           {/* RIGHT: INFO + MAP */}
