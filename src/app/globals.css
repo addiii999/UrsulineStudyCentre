@@ -21,6 +21,49 @@
   --font-serif: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
 }
 
+/* Premium Top Bar Animations */
+/* Gradient background shift */
+.gradient-anim {
+  background: linear-gradient(270deg, #800000, #a00000, #800000);
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease infinite;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+/* Float text subtle */
+.float-text {
+  display: inline-block;
+  animation: floatText 4s ease-in-out infinite;
+}
+@keyframes floatText {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+/* Glow for separators */
+.glow {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+/* Icon hover micro animation */
+.icon-anim {
+  transition: transform 0.3s ease;
+}
+.icon-anim:hover {
+  transform: scale(1.1) rotate(3deg);
+}
+/* Reduce animation intensity on mobile */
+@media (max-width: 640px) {
+  .gradient-anim { animation-duration: 12s; }
+  .float-text { animation-duration: 6s; }
+  .glow { animation-duration: 3s; }
+}
+
 @layer base {
   * {
     box-sizing: border-box;
