@@ -60,11 +60,11 @@ export default function Navbar() {
       <div className="bg-[#800000] text-white text-xs py-2 px-4 hidden md:block gradient-anim">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <span className="flex items-center gap-1.5 opacity-90 float-text">
-              <MapPin size={11} className="icon-anim" />
+            <span className="flex items-center gap-1.5 opacity-90">
+              <MapPin size={11} className="icon-anim float-text" />
               {SITE_CONFIG.address}
             </span>
-            <span className="opacity-70 glow">|</span>
+            <span className="opacity-70 glow float-text">|</span>
             <span className="text-[#E5C97A] font-semibold">
               100% Girls-Only Premium Coaching
             </span>
@@ -77,7 +77,7 @@ export default function Navbar() {
               <Phone size={11} className="icon-anim" />
               {SITE_CONFIG.phone}
             </a>
-            <span className="opacity-70 glow">|</span>
+            <span className="opacity-70 glow float-text">|</span>
             <span className="opacity-80 text-[10px] tracking-wider flex items-center gap-2">
               Powered by
               <span className="bg-white rounded px-1.5 py-0.5 inline-flex items-center">
