@@ -77,6 +77,14 @@ export default function Navbar() {
               <Phone size={11} className="icon-anim" />
               {SITE_CONFIG.phone}
             </a>
+            <span className="opacity-40 glow hidden sm:inline">|</span>
+            <a
+              href={`tel:${SITE_CONFIG.phone2}`}
+              className="hidden sm:flex items-center gap-2 hover:text-white transition-colors"
+            >
+              <Phone size={14} className="text-[#E5C97A]" />
+              {SITE_CONFIG.phone2}
+            </a>
             <span className="opacity-70 glow float-text">|</span>
             <span className="opacity-80 text-[10px] tracking-wider flex items-center gap-2">
               Powered by

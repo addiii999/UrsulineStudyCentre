@@ -41,6 +41,13 @@ export default function TrustBanner() {
               <Phone size={15} />
               {SITE_CONFIG.phone}
             </a>
+            <a
+              href={`tel:${SITE_CONFIG.phone2}`}
+              className="px-4 py-2 bg-white text-[#800000] rounded-lg font-bold text-sm shadow-md hover:bg-[#FDF8F0] transition-colors flex items-center gap-2 border border-white/20"
+            >
+              <Phone size={14} className="text-[#C9A84C]" />
+              {SITE_CONFIG.phone2}
+            </a>
             <button
               onClick={() =>
                 document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })

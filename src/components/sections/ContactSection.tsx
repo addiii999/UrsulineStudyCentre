@@ -105,7 +105,7 @@ export default function ContactSection() {
                 <input
                   type="hidden"
                   name="_autoresponse"
-                  value="Thank you for contacting Ursuline Study Centre. Our team will reach out to you within 24 hours. For urgent queries, WhatsApp us at +91 95075 89503."
+                  value={`Thank you for contacting Ursuline Study Centre. Our team will reach out to you within 24 hours. For urgent queries, WhatsApp us at ${SITE_CONFIG.phone} or ${SITE_CONFIG.phone2}.`}
                 />
                 {/* Honeypot anti-spam */}
                 <input type="text" name="_honey" style={{ display: "none" }} />
@@ -223,6 +223,10 @@ export default function ContactSection() {
                   <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Phone</p>
                   <a href={`tel:${SITE_CONFIG.phone}`} className="text-gray-700 text-sm hover:text-[#800000] transition-colors">
                     {SITE_CONFIG.phone}
+                  </a>
+                  <span className="text-gray-300">|</span>
+                  <a href={`tel:${SITE_CONFIG.phone2}`} className="text-gray-700 text-sm hover:text-[#800000] transition-colors">
+                    {SITE_CONFIG.phone2}
                   </a>
                 </div>
               </div>

@@ -153,6 +153,13 @@ export default function Footer() {
                 {SITE_CONFIG.phone}
               </a>
               <a
+                href={`tel:${SITE_CONFIG.phone2}`}
+                className="flex items-center gap-3 text-white/60 text-sm hover:text-[#C9A84C] transition-colors"
+              >
+                <Phone size={14} className="text-[#C9A84C] flex-shrink-0" />
+                {SITE_CONFIG.phone2}
+              </a>
+              <a
                 href={`mailto:${SITE_CONFIG.email}`}
                 className="flex items-center gap-3 text-white/60 text-sm hover:text-[#C9A84C] transition-colors"
               >
@@ -183,7 +190,7 @@ export default function Footer() {
               />
             </span>
             <span className="mx-1 opacity-50">|</span>
-            <span>Designed by {SITE_CONFIG.designer}</span>
+            <span>Designed by {SITE_CONFIG.designer} ({SITE_CONFIG.designerPhone})</span>
           </div>
         </div>
       </div>
