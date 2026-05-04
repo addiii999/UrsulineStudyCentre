@@ -91,7 +91,7 @@ export default function FounderSection() {
               <p>
                 Driven by a deep commitment to <strong>girls&apos; education</strong>, he founded
                 Ursuline Study Centre to create a world-class academic environment exclusively for
-                young women — ensuring they receive the same quality of coaching that was
+                young women — ensuring they receive the same quality of education that was
                 historically inaccessible in many parts of Jharkhand.
               </p>
             </div>

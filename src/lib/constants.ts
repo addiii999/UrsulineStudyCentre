@@ -213,7 +213,7 @@ export const YOUTUBE_VIDEOS = [
 export const FAQS = [
   {
     q: "Is Ursuline Study Centre exclusively for girls?",
-    a: "Yes, Ursuline Study Centre is a 100% girls-only premium coaching institute. This ensures a safe, focused, and empowering academic environment for all our students.",
+    a: "Yes, Ursuline Study Centre is a 100% girls-only premium educational institution. This ensures a safe, focused, and empowering academic environment for all our students.",
   },
   {
     q: "Which boards do you cover?",
@@ -229,7 +229,7 @@ export const FAQS = [
   },
   {
     q: "Do you offer vocational courses alongside academics?",
-    a: "Yes! We offer a unique combination of academic coaching with vocational skills including AI, Programming, DCA, Tally, and Social Media Marketing.",
+    a: "Yes! We offer a unique combination of academic excellence with vocational skills including AI, Programming, DCA, Tally, and Social Media Marketing.",
   },
   {
     q: "What is the medium of instruction?",

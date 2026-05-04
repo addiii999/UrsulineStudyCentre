@@ -158,7 +158,7 @@ export async function sendStudentAutoReply(
           </div>
         </div>
         <div class="footer">
-          <p>Ursuline Study Centre · 100% Girls-Only Premium Coaching</p>
+          <p>Ursuline Study Centre · 100% Girls-Only Premium Institution</p>
         </div>
       </div>
     </body>

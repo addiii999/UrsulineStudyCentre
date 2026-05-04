@@ -53,11 +53,11 @@ export default function Footer() {
                 >
                   Ursuline Study Centre
                 </div>
-                <div className="text-[10px] text-white/50">Premium Girls Coaching</div>
+                <div className="text-[10px] text-white/50">Premium Girls Institution</div>
               </div>
             </div>
             <p className="text-white/60 text-sm leading-relaxed">
-              Empowering girls with world-class education. Premium coaching for Classes 9–12 with
+              Empowering girls with world-class education. Premium education for Classes 9–12 with
               JEE, NEET and Board preparation under expert guidance.
             </p>
             <div className="flex items-center gap-3">

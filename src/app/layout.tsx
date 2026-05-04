@@ -16,19 +16,19 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_APP_URL || "https://ursulinstudycentre.in"
   ),
   title: {
-    default: "Ursuline Study Centre | Premium Girls Coaching in Ranchi",
+    default: "Ursuline Study Centre | Premium Girls Educational Institution in Ranchi",
     template: "%s | Ursuline Study Centre",
   },
   description:
-    "Ursuline Study Centre - Premium girls-only coaching institute in Ranchi for Classes 9-12, JEE, NEET & Board preparation (JAC & CBSE). Under the visionary guidance of Sr. Dr. Mary Grace.",
+    "Ursuline Study Centre - Premium girls-only educational institution in Ranchi for Classes 9-12, JEE, NEET & Board preparation (JAC & CBSE). Under the visionary guidance of Sr. Dr. Mary Grace.",
   keywords:
-    "ursuline study centre, girls coaching ranchi, jee neet coaching ranchi, jac cbse coaching, ursuline convent ranchi, coaching institute ranchi",
+    "ursuline study centre, girls education ranchi, jee neet preparation ranchi, jac cbse education, ursuline convent ranchi, educational institution ranchi",
   authors: [{ name: "Ursuline Study Centre" }],
   creator: "Academic Origin",
   openGraph: {
-    title: "Ursuline Study Centre | Premium Girls Coaching in Ranchi",
+    title: "Ursuline Study Centre | Premium Girls Educational Institution in Ranchi",
     description:
-      "Premium girls-only coaching in Ranchi. JAC & CBSE, JEE, NEET. Empowering Girls. Building Futures.",
+      "Premium girls-only educational institution in Ranchi. JAC & CBSE, JEE, NEET. Empowering Girls. Building Futures.",
     url: "https://ursulinstudycentre.in",
     siteName: "Ursuline Study Centre",
     locale: "en_IN",
@@ -36,9 +36,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ursuline Study Centre | Premium Girls Coaching in Ranchi",
+    title: "Ursuline Study Centre | Premium Girls Educational Institution in Ranchi",
     description:
-      "Premium girls-only coaching in Ranchi. Classes 9-12, JEE, NEET. 95% board results.",
+      "Premium girls-only educational institution in Ranchi. Classes 9-12, JEE, NEET. 95% board results.",
   },
   robots: {
     index: true,

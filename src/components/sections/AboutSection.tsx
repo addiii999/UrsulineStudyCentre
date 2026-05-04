@@ -28,14 +28,14 @@ export default function AboutSection() {
             <div className="space-y-4 text-gray-600 leading-relaxed">
               <p>
                 <strong className="text-gray-900">Ursuline Study Centre</strong> is a premium,
-                girls-only academic coaching institute located in the heart of Ranchi, Jharkhand.
+                girls-only academic educational institution located in the heart of Ranchi, Jharkhand.
                 Established in {SITE_CONFIG.founded} under the visionary guidance of{" "}
                 <strong className="text-[#800000]">Sr. Dr. Mary Grace</strong>, we are committed
                 to providing world-class education to young girls of Jharkhand.
               </p>
               <p>
                 Situated at the Ursuline Convent Campus on Dr. Camil Bulcke Path, our institute offers a
-                safe, disciplined, and nurturing academic environment. We specialize in coaching for
+                safe, disciplined, and nurturing academic environment. We specialize in preparation for
                 Classes 9–12 covering both JAC and CBSE curricula, alongside rigorous preparation
                 for JEE, NEET, and CLAT.
               </p>
@@ -83,7 +83,7 @@ export default function AboutSection() {
                   Our Vision
                 </div>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                  To be Ranchi&apos;s most trusted and premium girls-only coaching institute, known
+                  To be Ranchi&apos;s most trusted and premium girls-only educational institution, known
                   for academic excellence, character building, and career guidance.
                 </p>
               </div>

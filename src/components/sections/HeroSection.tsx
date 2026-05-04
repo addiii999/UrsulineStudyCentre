@@ -55,7 +55,7 @@ export default function HeroSection() {
             Empowering Girls. Building Futures.
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-white/70 leading-relaxed font-light">
-            Girls-only coaching for Classes 9–12 (JAC & CBSE) with JEE/NEET preparation.
+            Girls-only educational institution for Classes 9–12 (JAC & CBSE) with JEE/NEET preparation.
           </p>
         </div>
 
