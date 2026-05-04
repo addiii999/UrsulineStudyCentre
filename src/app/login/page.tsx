@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { GraduationCap, Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff, ShieldCheck, ClipboardList, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import clsx from "clsx";
 
@@ -149,81 +149,50 @@ export default function LoginPage() {
               </form>
             )}
 
-            {/* STUDENT SIGNUP */}
+            {/* STUDENT SIGNUP — full admission form redirect */}
             {tab === "student-signup" && (
-              <form onSubmit={handleStudentSignup} className="space-y-4">
-                <div>
-                  <label className="label">Full Name</label>
-                  <div className="relative">
-                    <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                      value={signupForm.name}
-                      onChange={(e) => setSignupForm((p) => ({ ...p, name: e.target.value }))}
-                      placeholder="Your full name"
-                      className="input-field pl-9"
-                      required
-                    />
+              <div className="space-y-5">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-[#800000]/8 flex items-center justify-center mx-auto mb-4">
+                    <ClipboardList size={30} className="text-[#800000]" />
                   </div>
+                  <h3 className="font-bold text-gray-900 text-lg">Admission Application</h3>
+                  <p className="text-gray-500 text-sm mt-1 leading-relaxed">
+                    New student? Fill our complete admission form to apply for the 2026-27 session.
+                  </p>
                 </div>
-                <div>
-                  <label className="label">Phone Number</label>
-                  <div className="relative">
-                    <Phone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                      value={signupForm.phone}
-                      onChange={(e) => setSignupForm((p) => ({ ...p, phone: e.target.value }))}
-                      placeholder="+91 XXXXX XXXXX"
-                      className="input-field pl-9"
-                      required
-                    />
-                  </div>
+
+                <div className="bg-[#FDF8F0] border border-[#e8d9b8] rounded-xl p-4 space-y-2">
+                  {[
+                    "Basic & Parent Details",
+                    "Education Qualification",
+                    "Course & Stream Selection",
+                    "Vocational Course Choice",
+                    "Address Information",
+                  ].map((item) => (
+                    <div key={item} className="flex items-center gap-2 text-sm text-gray-700">
+                      <CheckCircle size={14} className="text-[#800000] flex-shrink-0" />
+                      {item}
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <label className="label">Email Address</label>
-                  <div className="relative">
-                    <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="email"
-                      value={signupForm.email}
-                      onChange={(e) => setSignupForm((p) => ({ ...p, email: e.target.value }))}
-                      placeholder="you@example.com"
-                      className="input-field pl-9"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="label">Create Password</label>
-                  <div className="relative">
-                    <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type={showPass ? "text" : "password"}
-                      value={signupForm.password}
-                      onChange={(e) => setSignupForm((p) => ({ ...p, password: e.target.value }))}
-                      placeholder="Min. 8 characters"
-                      className="input-field pl-9 pr-10"
-                      minLength={8}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPass((p) => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    >
-                      {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
-                    </button>
-                  </div>
-                </div>
-                <button type="submit" disabled={loading} className="btn-primary w-full justify-center mt-1">
-                  {loading ? "Creating account..." : <>Create Account <ArrowRight size={15} /></>}
-                </button>
+
+                <Link
+                  href="/apply"
+                  className="btn-primary w-full justify-center text-base py-3.5"
+                >
+                  <ClipboardList size={18} />
+                  Fill Admission Form
+                  <ArrowRight size={16} />
+                </Link>
+
                 <p className="text-center text-xs text-gray-500">
                   Already have an account?{" "}
                   <button type="button" onClick={() => setTab("student-login")} className="text-[#800000] font-semibold hover:underline">
-                    Login
+                    Login here
                   </button>
                 </p>
-              </form>
+              </div>
             )}
 
             {/* ADMIN */}
