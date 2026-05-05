@@ -1,20 +1,34 @@
 "use client";
+import { useState, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
-import { SITE_CONFIG } from "@/lib/constants";
 
 export default function HeroSection() {
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
+  const [admissionsOpen, setAdmissionsOpen] = useState(true);
+  const [playStoreLink, setPlayStoreLink] = useState("https://play.google.com/store/apps/details?id=com.vefytech.academicorigin");
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings) {
+          if (data.settings.admissionsOpen !== undefined) {
+            setAdmissionsOpen(data.settings.admissionsOpen === "true");
+          }
+          if (data.settings.playStoreLink) {
+            setPlayStoreLink(data.settings.playStoreLink);
+          }
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <section
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#800000]"
     >
-      {/* BACKGROUND LAYERS — clean, minimal */}
+      {/* BACKGROUND LAYERS */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Subtle dot pattern */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -22,24 +36,21 @@ export default function HeroSection() {
             backgroundSize: "32px 32px",
           }}
         />
-        {/* Very soft radial glow behind text to ensure contrast & premium feel */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[800px] h-[600px] md:h-[800px] rounded-full bg-[#C9A84C]/5 blur-[100px]" />
-        
-        {/* Thin bottom border for elegance */}
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C]/30 to-transparent" />
       </div>
 
-      {/* CORE CONTENT - Focused & Clean */}
       <div className="relative z-10 w-full max-w-4xl mx-auto px-6 py-20 text-center flex flex-col items-center">
         
-        {/* SMALL BADGE */}
-        <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-white/90 text-xs md:text-sm font-medium px-5 py-2 rounded-full mb-10 backdrop-blur-sm tracking-wide">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] animate-pulse" />
-          Admissions Open - 2026–27
-        </div>
+        {/* ADMISSIONS BADGE */}
+        {admissionsOpen && (
+          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-white/90 text-xs md:text-sm font-medium px-5 py-2 rounded-full mb-10 backdrop-blur-sm tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] animate-pulse" />
+            Admissions Open
+          </div>
+        )}
 
-        {/* MAIN HEADING & SUBLINE */}
-        <div className="space-y-5 mb-10">
+        <div className="space-y-5 mb-10 mt-4">
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-bold text-white tracking-tight leading-[1.05]">
             Ursuline{" "}
             <span className="text-[#C9A84C]">Study Centre</span>
@@ -49,7 +60,6 @@ export default function HeroSection() {
           </p>
         </div>
 
-        {/* CORE TAGLINE & DESCRIPTION */}
         <div className="space-y-6 max-w-2xl mx-auto mb-12">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-white/95 tracking-wide">
             Empowering Girls. Building Futures.
@@ -61,23 +71,23 @@ export default function HeroSection() {
 
         <div className="flex flex-col items-center gap-6 mt-2 w-full">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-            <button
-              onClick={() => scrollTo("contact")}
+            <a
+              href="#contact"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#C9A84C] text-[#800000] font-bold text-sm md:text-base rounded-lg border-2 border-[#C9A84C] hover:bg-white hover:border-white transition-all duration-300 shadow-[0_0_20px_rgba(201,168,76,0.2)] hover:-translate-y-1"
             >
               Book Free Counselling
               <ArrowRight size={18} />
-            </button>
-            <button
-              onClick={() => scrollTo("courses")}
+            </a>
+            <a
+              href="#courses"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-white font-medium text-sm md:text-base rounded-lg border border-white/30 hover:border-white hover:bg-white/5 transition-all duration-300 hover:-translate-y-1"
             >
               Explore Courses
-            </button>
+            </a>
           </div>
           
           <a
-            href={SITE_CONFIG.playstoreLink}
+            href={playStoreLink}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
@@ -89,7 +99,6 @@ export default function HeroSection() {
             <span className="underline underline-offset-4 decoration-white/30">Download Academic Origin App</span>
           </a>
         </div>
-
       </div>
     </section>
   );

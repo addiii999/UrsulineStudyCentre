@@ -59,6 +59,18 @@ export default function ApplyPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [settings, setSettings] = useState(SITE_CONFIG);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings && Object.keys(data.settings).length > 0) {
+          setSettings(prev => ({ ...prev, ...data.settings }));
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const [sameAddress, setSameAddress] = useState(false);
 
@@ -142,7 +154,7 @@ export default function ApplyPage() {
       `Hi! I just submitted my admission form at Ursuline Study Centre.\n\n` +
       `Name: ${form.fullName}\nDate of Birth: ${form.dob}\nCourse: ${form.course}\nClass: ${form.presentClass}\nContact: +91${form.presentPhone}\n\nPlease confirm my application.`
     );
-    window.open(`https://wa.me/${SITE_CONFIG.whatsapp}?text=${msg}`, "_blank");
+    window.open(`https://wa.me/${settings.whatsapp}?text=${msg}`, "_blank");
   };
 
   if (submitted) {

@@ -1,8 +1,27 @@
 "use client";
-import { useState } from "react";
-import { BookOpen, Trophy, Briefcase } from "lucide-react";
-import { COURSES } from "@/lib/constants";
+import { useState, useEffect } from "react";
+import { BookOpen, Trophy, Briefcase, Loader2 } from "lucide-react";
 import clsx from "clsx";
+
+interface Course {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  is_active: boolean;
+}
+
+interface GroupedCourses {
+  category: string;
+  icon: string;
+  courses: Course[];
+}
+
+const CATEGORY_ICONS: Record<string, string> = {
+  "Academic": "stream",
+  "Competitive": "exam",
+  "Vocational": "skill",
+};
 
 const TAB_ICONS: Record<string, React.ReactNode> = {
   stream: <BookOpen size={15} />,
@@ -18,6 +37,48 @@ const COURSE_ICON: Record<string, React.ReactNode> = {
 
 export default function CoursesSection() {
   const [activeTab, setActiveTab] = useState(0);
+  const [groupedCourses, setGroupedCourses] = useState<GroupedCourses[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch("/api/courses", { cache: "no-store" });
+        const data = await res.json();
+        const courses: Course[] = data.courses?.filter((c: Course) => c.is_active) ?? [];
+        
+        // Group by category
+        const groups: Record<string, Course[]> = {};
+        courses.forEach(c => {
+          if (!groups[c.category]) groups[c.category] = [];
+          groups[c.category].push(c);
+        });
+
+        const formattedGroups = Object.keys(groups).map(cat => ({
+          category: cat,
+          icon: CATEGORY_ICONS[cat] || "stream",
+          courses: groups[cat]
+        }));
+
+        setGroupedCourses(formattedGroups);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="courses" className="py-20 md:py-28 bg-white flex justify-center">
+        <Loader2 size={30} className="animate-spin text-[#800000]" />
+      </section>
+    );
+  }
+
+  if (groupedCourses.length === 0) return null;
 
   return (
     <section id="courses" className="py-20 md:py-28 bg-white">
@@ -36,54 +97,58 @@ export default function CoursesSection() {
         </div>
 
         {/* TABS */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {COURSES.map((cat, idx) => (
-            <button
-              key={cat.category}
-              onClick={() => setActiveTab(idx)}
-              className={clsx(
-                "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200",
-                activeTab === idx
-                  ? "bg-[#800000] text-white shadow-md"
-                  : "bg-[#FDF8F0] text-gray-600 border border-[#e8d9b8] hover:border-[#C9A84C] hover:text-[#800000]"
-              )}
-            >
-              <span>{TAB_ICONS[cat.icon] ?? <BookOpen size={15} />}</span>
-              {cat.category}
-            </button>
-          ))}
-        </div>
+        {groupedCourses.length > 1 && (
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            {groupedCourses.map((cat, idx) => (
+              <button
+                key={cat.category}
+                onClick={() => setActiveTab(idx)}
+                className={clsx(
+                  "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200",
+                  activeTab === idx
+                    ? "bg-[#800000] text-white shadow-md"
+                    : "bg-[#FDF8F0] text-gray-600 border border-[#e8d9b8] hover:border-[#C9A84C] hover:text-[#800000]"
+                )}
+              >
+                <span>{TAB_ICONS[cat.icon] ?? <BookOpen size={15} />}</span>
+                {cat.category}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* COURSE CARDS */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {COURSES[activeTab].courses.map((course, i) => (
-            <div
-              key={course.name}
-              className="card group cursor-default"
-              style={{ animationDelay: `${i * 80}ms` }}
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-lg bg-[#800000]/8 flex items-center justify-center flex-shrink-0 group-hover:bg-[#800000]/15 transition-colors text-[#800000]">
-                  {COURSE_ICON[COURSES[activeTab].icon] ?? <BookOpen size={16} />}
+        {groupedCourses[activeTab] && (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {groupedCourses[activeTab].courses.map((course, i) => (
+              <div
+                key={course.id}
+                className="card group cursor-default"
+                style={{ animationDelay: `${i * 80}ms` }}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-[#800000]/8 flex items-center justify-center flex-shrink-0 group-hover:bg-[#800000]/15 transition-colors text-[#800000]">
+                    {COURSE_ICON[groupedCourses[activeTab].icon] ?? <BookOpen size={16} />}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1.5 group-hover:text-[#800000] transition-colors">
+                      {course.name}
+                    </h3>
+                    <p className="text-gray-500 text-xs leading-relaxed">{course.description}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1.5 group-hover:text-[#800000] transition-colors">
-                    {course.name}
-                  </h3>
-                  <p className="text-gray-500 text-xs leading-relaxed">{course.desc}</p>
+                <div className="mt-4 pt-3 border-t border-gray-100">
+                  <button
+                    onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                    className="text-[#C9A84C] text-xs font-semibold hover:text-[#800000] transition-colors"
+                  >
+                    Enquire Now →
+                  </button>
                 </div>
               </div>
-              <div className="mt-4 pt-3 border-t border-gray-100">
-                <button
-                  onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-                  className="text-[#C9A84C] text-xs font-semibold hover:text-[#800000] transition-colors"
-                >
-                  Enquire Now →
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* BOTTOM CTA */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-5 mt-14 pt-8 border-t border-gray-100">

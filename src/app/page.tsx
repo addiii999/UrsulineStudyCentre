@@ -15,10 +15,12 @@ import ContactSection from "@/components/sections/ContactSection";
 import FloatingWhatsApp from "@/components/ui/FloatingWhatsApp";
 import TrustBanner from "@/components/sections/TrustBanner";
 import MobileActionBar from "@/components/ui/MobileActionBar";
+import AnnouncementBanner from "@/components/layout/AnnouncementBanner";
 
 export default function HomePage() {
   return (
     <>
+      <AnnouncementBanner />
       <Navbar />
       <main>
         <HeroSection />

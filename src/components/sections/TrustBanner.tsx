@@ -1,8 +1,16 @@
-"use client";
 import { ArrowRight, Phone } from "lucide-react";
-import { SITE_CONFIG } from "@/lib/constants";
+import { getGlobalSettings } from "@/lib/settings";
 
-export default function TrustBanner() {
+export const revalidate = 0;
+
+export default async function TrustBanner() {
+  const settings = await getGlobalSettings();
+
+  // If admissions are closed, don't show the banner
+  if (settings.admissionsOpen === "false" || settings.admissionsOpen === false) {
+    return null;
+  }
+
   return (
     <section className="py-14 bg-[#5C0000] relative overflow-hidden">
       {/* Subtle pattern */}
@@ -35,28 +43,26 @@ export default function TrustBanner() {
           </div>
           <div className="flex flex-wrap gap-3 justify-center md:justify-end">
             <a
-              href={`tel:${SITE_CONFIG.phone}`}
+              href={`tel:${settings.phone}`}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 border border-white/25 text-white text-sm font-semibold rounded-lg hover:bg-white/20 transition-all"
             >
               <Phone size={15} />
-              {SITE_CONFIG.phone}
+              {settings.phone}
             </a>
             <a
-              href={`tel:${SITE_CONFIG.phone2}`}
+              href={`tel:${settings.phone2}`}
               className="px-4 py-2 bg-white text-[#800000] rounded-lg font-bold text-sm shadow-md hover:bg-[#FDF8F0] transition-colors flex items-center gap-2 border border-white/20"
             >
               <Phone size={14} className="text-[#C9A84C]" />
-              {SITE_CONFIG.phone2}
+              {settings.phone2}
             </a>
-            <button
-              onClick={() =>
-                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
-              }
+            <a
+              href="#contact"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#C9A84C] text-white text-sm font-semibold rounded-lg hover:bg-[#A07830] transition-all shadow-lg shadow-[#C9A84C]/20"
             >
               Book Free Counselling
               <ArrowRight size={15} />
-            </button>
+            </a>
           </div>
         </div>
       </div>

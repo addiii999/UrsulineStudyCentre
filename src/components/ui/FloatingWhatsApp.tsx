@@ -1,9 +1,30 @@
+"use client";
+import { useState, useEffect } from "react";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export default function FloatingWhatsApp() {
+  const [isVisible, setIsVisible] = useState(false);
+  const [settings, setSettings] = useState(SITE_CONFIG);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings && Object.keys(data.settings).length > 0) {
+          setSettings(prev => ({ ...prev, ...data.settings }));
+        }
+      })
+      .catch(console.error);
+
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <a
-      href={`https://wa.me/${SITE_CONFIG.whatsapp}?text=Hello! I'm interested in admission at Ursuline Study Centre.`}
+      href={`https://wa.me/${settings.whatsapp}?text=Hello! I'm interested in admission at Ursuline Study Centre.`}
       target="_blank"
       rel="noreferrer"
       aria-label="Chat on WhatsApp"

@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
-import { Plus, Trash2, Check, X, Megaphone, Bell, AlertTriangle, Info, Calendar } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Trash2, Check, X, Megaphone, Bell, AlertTriangle, Info, Calendar, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 type AnnType = "info" | "success" | "warning";
-interface Announcement { id: string; title: string; message: string; type: AnnType; expiresAt: string; isActive: boolean; }
+interface Announcement { id: string; title: string; message: string; type: AnnType; expires_at: string; is_active: boolean; }
 
 const TYPE_CONFIG = {
   info: { label: "Info", icon: <Info size={14} />, bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
@@ -11,24 +12,78 @@ const TYPE_CONFIG = {
   warning: { label: "Urgent", icon: <AlertTriangle size={14} />, bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
 };
 
-const DEFAULT: Announcement[] = [
-  { id: "1", title: "Admissions Open — 2026-27 Session", message: "Limited seats available. Apply now to secure your daughter's future!", type: "success", expiresAt: "2026-07-31", isActive: true },
-];
-
 export default function AdminAnnouncements() {
-  const [items, setItems] = useState<Announcement[]>(DEFAULT);
+  const [items, setItems] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [adding, setAdding] = useState(false);
-  const [newItem, setNewItem] = useState<Partial<Announcement>>({ type: "info", isActive: true });
+  const [newItem, setNewItem] = useState<Partial<Announcement>>({ type: "info", is_active: true });
 
   const today = new Date().toISOString().split("T")[0];
+  const isExpired = (a: Announcement) => a.expires_at && a.expires_at < today;
 
-  const isExpired = (a: Announcement) => a.expiresAt && a.expiresAt < today;
-  const deleteItem = (id: string) => setItems((p) => p.filter((a) => a.id !== id));
-  const toggleActive = (id: string) => setItems((p) => p.map((a) => a.id === id ? { ...a, isActive: !a.isActive } : a));
-  const addItem = () => {
+  const fetchAnnouncements = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/announcements");
+      const data = await res.json();
+      setItems(data.announcements ?? []);
+    } catch {
+      toast.error("Failed to load announcements");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchAnnouncements(); }, []);
+
+  const deleteItem = async (id: string) => {
+    if (!confirm("Delete this announcement?")) return;
+    try {
+      const res = await fetch(`/api/announcements?id=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      toast.success("Deleted");
+      setItems(items.filter((a) => a.id !== id));
+    } catch {
+      toast.error("Failed to delete");
+    }
+  };
+
+  const toggleActive = async (ann: Announcement) => {
+    const newState = !ann.is_active;
+    setItems(items.map((a) => a.id === ann.id ? { ...a, is_active: newState } : a));
+    try {
+      const res = await fetch("/api/announcements", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: ann.id, is_active: newState }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      toast.error("Failed to update status");
+      setItems(items.map((a) => a.id === ann.id ? { ...a, is_active: !newState } : a));
+    }
+  };
+
+  const addItem = async () => {
     if (!newItem.title?.trim() || !newItem.message?.trim()) return;
-    setItems((p) => [...p, { id: Date.now().toString(), title: newItem.title!, message: newItem.message!, type: newItem.type as AnnType || "info", expiresAt: newItem.expiresAt || "", isActive: true }]);
-    setNewItem({ type: "info", isActive: true }); setAdding(false);
+    setSaving(true);
+    try {
+      const res = await fetch("/api/announcements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newItem),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Added successfully");
+      fetchAnnouncements();
+      setNewItem({ type: "info", is_active: true });
+      setAdding(false);
+    } catch {
+      toast.error("Failed to add announcement");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -69,47 +124,59 @@ export default function AdminAnnouncements() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1"><Calendar size={12} /> Expiry Date</label>
-              <input type="date" value={newItem.expiresAt || ""} onChange={(e) => setNewItem({ ...newItem, expiresAt: e.target.value })} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-[#800000] focus:outline-none" />
+              <input type="date" value={newItem.expires_at || ""} onChange={(e) => setNewItem({ ...newItem, expires_at: e.target.value })} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-[#800000] focus:outline-none" />
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={addItem} className="flex items-center gap-1.5 bg-[#800000] text-white px-4 py-2 rounded-xl text-xs font-semibold"><Check size={13} /> Publish</button>
-            <button onClick={() => { setAdding(false); setNewItem({ type: "info" }); }} className="flex items-center gap-1.5 border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-xs font-semibold"><X size={13} /> Cancel</button>
+            <button onClick={addItem} disabled={saving} className="flex items-center gap-1.5 bg-[#800000] text-white px-4 py-2 rounded-xl text-xs font-semibold">
+              {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} Publish
+            </button>
+            <button onClick={() => { setAdding(false); setNewItem({ type: "info" }); }} disabled={saving} className="flex items-center gap-1.5 border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-xs font-semibold"><X size={13} /> Cancel</button>
           </div>
         </div>
       )}
 
-      <div className="space-y-3">
-        {items.map((ann) => {
-          const cfg = TYPE_CONFIG[ann.type];
-          const expired = isExpired(ann);
-          return (
-            <div key={ann.id} className={`bg-white rounded-xl border shadow-sm p-5 ${expired ? "opacity-50" : ""}`}>
-              <div className="flex items-start gap-3">
-                <div className={`w-8 h-8 rounded-lg ${cfg.bg} ${cfg.text} flex items-center justify-center flex-shrink-0`}>{cfg.icon}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-bold text-gray-900 text-sm">{ann.title}</p>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${cfg.bg} ${cfg.text} ${cfg.border}`}>{cfg.label}</span>
-                    {expired && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200">Expired</span>}
+      {loading ? (
+        <div className="py-10 text-center text-gray-400 flex flex-col items-center">
+          <Loader2 size={24} className="animate-spin mb-2" />
+          Loading announcements...
+        </div>
+      ) : items.length === 0 ? (
+        <div className="text-center py-12 text-gray-400 text-sm bg-white rounded-xl border border-dashed border-gray-200">
+          No announcements yet. Add one above.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {items.map((ann) => {
+            const cfg = TYPE_CONFIG[ann.type] || TYPE_CONFIG.info;
+            const expired = isExpired(ann);
+            return (
+              <div key={ann.id} className={`bg-white rounded-xl border shadow-sm p-5 ${expired ? "opacity-50" : ""}`}>
+                <div className="flex items-start gap-3">
+                  <div className={`w-8 h-8 rounded-lg ${cfg.bg} ${cfg.text} flex items-center justify-center flex-shrink-0`}>{cfg.icon}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-bold text-gray-900 text-sm">{ann.title}</p>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${cfg.bg} ${cfg.text} ${cfg.border}`}>{cfg.label}</span>
+                      {expired && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200">Expired</span>}
+                    </div>
+                    <p className="text-gray-500 text-sm mt-1">{ann.message}</p>
+                    {ann.expires_at && <p className="text-gray-400 text-xs mt-1.5 flex items-center gap-1"><Calendar size={11} /> Expires: {new Date(ann.expires_at).toLocaleDateString("en-IN")}</p>}
                   </div>
-                  <p className="text-gray-500 text-sm mt-1">{ann.message}</p>
-                  {ann.expiresAt && <p className="text-gray-400 text-xs mt-1.5 flex items-center gap-1"><Calendar size={11} /> Expires: {new Date(ann.expiresAt).toLocaleDateString("en-IN")}</p>}
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {!expired && (
-                    <button onClick={() => toggleActive(ann.id)} className={`text-xs px-2.5 py-1 rounded-full font-semibold border transition-colors ${ann.isActive ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
-                      {ann.isActive ? "Live" : "Paused"}
-                    </button>
-                  )}
-                  <button onClick={() => deleteItem(ann.id)} className="p-1.5 hover:bg-red-50 rounded-lg text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {!expired && (
+                      <button onClick={() => toggleActive(ann)} className={`text-xs px-2.5 py-1 rounded-full font-semibold border transition-colors ${ann.is_active ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
+                        {ann.is_active ? "Live" : "Paused"}
+                      </button>
+                    )}
+                    <button onClick={() => deleteItem(ann.id)} className="p-1.5 hover:bg-red-50 rounded-lg text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-        {items.length === 0 && <div className="text-center py-12 text-gray-400 text-sm">No announcements yet. Add one above.</div>}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

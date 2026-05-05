@@ -1,8 +1,19 @@
 import { Star, Quote } from "lucide-react";
-import { TESTIMONIALS } from "@/lib/constants";
+import { supabase } from "@/lib/supabase";
 
-export default function TestimonialsSection() {
-  if (!TESTIMONIALS || TESTIMONIALS.length === 0) {
+export const revalidate = 0;
+
+export default async function TestimonialsSection() {
+  const { data: testimonialsData } = await supabase
+    .from("testimonials")
+    .select("*")
+    .eq("is_visible", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  const testimonials = testimonialsData ?? [];
+
+  if (testimonials.length === 0) {
     return null;
   }
 
@@ -21,17 +32,14 @@ export default function TestimonialsSection() {
 
         {/* TESTIMONIAL GRID */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((t, i) => {
+          {testimonials.map((t) => {
             const initials = t.name
-              .split(" ")
-              .map((w) => w[0])
-              .join("")
-              .slice(0, 2)
-              .toUpperCase();
+              ? t.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
+              : "";
 
             return (
               <div
-                key={t.name}
+                key={t.id}
                 className="card flex flex-col gap-4 relative"
               >
                 {/* QUOTE ICON */}
@@ -39,7 +47,7 @@ export default function TestimonialsSection() {
 
                 {/* STARS */}
                 <div className="flex gap-0.5">
-                  {Array.from({ length: t.rating }).map((_, si) => (
+                  {Array.from({ length: t.rating || 5 }).map((_, si) => (
                     <Star
                       key={si}
                       size={14}
@@ -50,7 +58,7 @@ export default function TestimonialsSection() {
 
                 {/* REVIEW */}
                 <p className="text-gray-600 text-sm leading-relaxed flex-1">
-                  &ldquo;{t.review}&rdquo;
+                  &ldquo;{t.quote}&rdquo;
                 </p>
 
                 {/* AUTHOR */}
@@ -60,7 +68,7 @@ export default function TestimonialsSection() {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
-                    <p className="text-gray-400 text-xs">{t.role}</p>
+                    <p className="text-gray-400 text-xs">{t.student_class}</p>
                   </div>
                 </div>
               </div>

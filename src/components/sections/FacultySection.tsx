@@ -1,7 +1,21 @@
 import { BookOpen, GraduationCap, Star } from "lucide-react";
-import { FACULTY } from "@/lib/constants";
+import { supabase } from "@/lib/supabase";
 
-export default function FacultySection() {
+// Add revalidate to ensure it fetches fresh data, or no-store
+export const revalidate = 0;
+
+export default async function FacultySection() {
+  const { data: facultyData } = await supabase
+    .from("faculty")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  const faculty = facultyData ?? [];
+
+  if (faculty.length === 0) return null;
+
   return (
     <section id="faculty" className="py-20 md:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -20,10 +34,10 @@ export default function FacultySection() {
 
         {/* FACULTY CARDS */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FACULTY.map((member, i) => {
+          {faculty.map((member, i) => {
             const initials = member.name
               .split(" ")
-              .map((w) => w[0])
+              .map((w: string) => w[0])
               .join("")
               .slice(0, 2)
               .toUpperCase();
@@ -37,7 +51,7 @@ export default function FacultySection() {
             ];
 
             return (
-              <div key={member.name} className="card group">
+              <div key={member.id} className="card group">
                 <div className="flex items-start gap-4">
                   {/* AVATAR */}
                   <div
@@ -73,7 +87,7 @@ export default function FacultySection() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Star size={14} className="text-[#C9A84C]" />
-                    <span className="text-gray-500 text-sm">{member.experience} Experience</span>
+                    <span className="text-gray-500 text-sm">{member.experience}</span>
                   </div>
                 </div>
               </div>

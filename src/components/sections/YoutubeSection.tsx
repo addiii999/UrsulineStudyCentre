@@ -1,7 +1,8 @@
-"use client";
-import { useEffect, useState } from "react";
 import { ExternalLink } from "lucide-react";
-import { SITE_CONFIG } from "@/lib/constants";
+import { supabase } from "@/lib/supabase";
+import { getGlobalSettings } from "@/lib/settings";
+
+export const revalidate = 0;
 
 // ── Official YouTube SVG icon (white — for use on colored backgrounds) ───────
 const YouTubeIcon = ({ size = 20, white = false }: { size?: number; white?: boolean }) => (
@@ -14,54 +15,24 @@ const YouTubeIcon = ({ size = 20, white = false }: { size?: number; white?: bool
   </svg>
 );
 
-// ── Official Google Play icon ─────────────────────────────────────────────────
-const PlayStoreIcon = ({ size = 20 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 512 512">
-    <path d="M48 59.49v393l.16.16 204-196.76L48 59.49z" fill="#32BBFF" />
-    <path d="M400 256l-67.92-38.19L252.08 256l79.98 74.24L400 256z" fill="#32BBFF" />
-    <path d="M48 59.49L252.08 256 332.08 180 103.64 48.84A56.27 56.27 0 0 0 48 59.49z" fill="#32BBFF" />
-    <path d="M48 452.51a56.27 56.27 0 0 0 55.64 10.65L332.08 332 252.08 256z" fill="#32BBFF" />
-    <path d="M332.08 332L400 256l-67.92-38.19-80.08 74.24z" fill="#00EE76" />
-    <path d="M48 452.51a56.27 56.27 0 0 0 55.64 10.65L332.08 332l-80-75.76z" fill="#00EE76" />
-    <path d="M103.64 48.84L332.08 180 252.08 256 48 59.49a56.27 56.27 0 0 1 55.64-10.65z" fill="#FFD500" />
-    <path d="M400 256l-67.92 76L447.6 295a56 56 0 0 0 0-78z" fill="#FF3A44" />
-    <path d="M332.08 180L400 256l47.6-37a56 56 0 0 0-115.52-39z" fill="#FF3A44" />
-  </svg>
-);
+export default async function YoutubeSection() {
+  const settings = await getGlobalSettings();
+  
+  const { data: videosData } = await supabase
+    .from("videos")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false })
+    .limit(4);
 
-// ── Official WhatsApp SVG icon (white — for use on green background) ──────────
-const WhatsAppIcon = ({ size = 20 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="white">
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-  </svg>
-);
-
-interface Video {
-  id: string;
-  video_id: string;
-  title: string | null;
-  thumbnail: string;
-  is_active: boolean;
-  sort_order: number;
-}
-
-export default function YoutubeSection() {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/videos?limit=4")
-      .then((r) => r.json())
-      .then((d) => setVideos(d.videos ?? []))
-      .catch(() => setVideos([]))
-      .finally(() => setLoading(false));
-  }, []);
+  const videos = videosData ?? [];
 
   return (
     <section id="youtube" className="py-20 md:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-6">
 
-        {/* HEADER & MAIN CTA - Left Aligned for Layout Variety */}
+        {/* HEADER & MAIN CTA */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-10">
           <div className="text-left">
             <span className="section-tag">Video Resources</span>
@@ -75,7 +46,7 @@ export default function YoutubeSection() {
             </p>
           </div>
           <a
-            href={SITE_CONFIG.youtubeChannel}
+            href={settings.youtubeChannel}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#FF0000] text-white font-bold text-sm rounded-lg hover:bg-[#CC0000] transition-all duration-300 shadow-[0_4px_14px_rgba(255,0,0,0.3)] hover:-translate-y-1"
@@ -87,19 +58,7 @@ export default function YoutubeSection() {
         </div>
 
         {/* VIDEO GRID */}
-        {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-xl overflow-hidden border border-gray-100 bg-gray-50 animate-pulse">
-                <div className="aspect-video bg-gray-200" />
-                <div className="p-3 space-y-2">
-                  <div className="h-3 bg-gray-200 rounded w-3/4" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : videos.length === 0 ? (
+        {videos.length === 0 ? (
           <div className="text-center py-16 text-gray-400">
             <YouTubeIcon size={40} />
             <p className="mt-3 text-sm">No videos added yet. Check back soon!</p>
@@ -117,14 +76,10 @@ export default function YoutubeSection() {
                 {/* THUMBNAIL */}
                 <div className="relative aspect-video bg-gray-100 overflow-hidden">
                   <img
-                    src={video.thumbnail}
+                    src={video.thumbnail || `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`}
                     alt={video.title ?? "YouTube video"}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`;
-                    }}
                   />
                   {/* PLAY OVERLAY */}
                   <div className="absolute inset-0 bg-black/15 group-hover:bg-black/35 transition-colors flex items-center justify-center">

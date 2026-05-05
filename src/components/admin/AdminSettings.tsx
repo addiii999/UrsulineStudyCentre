@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
-import { Pencil, Check, X, Settings, Phone, Mail, MessageCircle, MapPin, Play, Smartphone, ToggleLeft, ToggleRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Pencil, Check, X, Settings, Phone, Mail, MessageCircle, MapPin, Play, Smartphone, ToggleLeft, ToggleRight, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface SiteSettings {
   phone: string; phone2: string; email: string; whatsapp: string;
@@ -22,21 +23,71 @@ const INIT: SiteSettings = {
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<SiteSettings>(INIT);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [editingField, setEditingField] = useState<keyof SiteSettings | null>(null);
   const [draftValue, setDraftValue] = useState("");
-  const [saved, setSaved] = useState(false);
+
+  const fetchSettings = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/settings");
+      const data = await res.json();
+      if (data.settings && Object.keys(data.settings).length > 0) {
+        setSettings({ ...INIT, ...data.settings, admissionsOpen: data.settings.admissionsOpen === "true" });
+      }
+    } catch {
+      toast.error("Failed to load settings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchSettings(); }, []);
 
   const startEdit = (key: keyof SiteSettings) => {
     if (key === "admissionsOpen") return;
     setEditingField(key);
     setDraftValue(String(settings[key]));
   };
-  const saveField = () => {
+
+  const saveField = async () => {
     if (!editingField) return;
-    setSettings((p) => ({ ...p, [editingField]: draftValue }));
-    setEditingField(null);
+    setSaving(true);
+    try {
+      const updates = { [editingField]: draftValue };
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      if (!res.ok) throw new Error();
+      setSettings((p) => ({ ...p, ...updates }));
+      toast.success("Updated");
+      setEditingField(null);
+    } catch {
+      toast.error("Failed to update");
+    } finally {
+      setSaving(false);
+    }
   };
-  const saveAll = () => { setSaved(true); setTimeout(() => setSaved(false), 2500); };
+
+  const toggleAdmissions = async () => {
+    const newState = !settings.admissionsOpen;
+    setSettings((p) => ({ ...p, admissionsOpen: newState }));
+    try {
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ admissionsOpen: String(newState) }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(newState ? "Admissions Opened" : "Admissions Closed");
+    } catch {
+      toast.error("Failed to update");
+      setSettings((p) => ({ ...p, admissionsOpen: !newState }));
+    }
+  };
 
   const FIELDS: { key: keyof SiteSettings; label: string; icon: React.ReactNode; hint?: string }[] = [
     { key: "phone", label: "Primary Phone", icon: <Phone size={15} className="text-[#800000]" />, hint: "Format: +91 XXXXX XXXXX" },
@@ -49,16 +100,22 @@ export default function AdminSettings() {
     { key: "youtubeChannel", label: "YouTube Channel URL", icon: <Play size={15} className="text-[#800000]" /> },
   ];
 
+  if (loading) {
+    return (
+      <div className="py-20 flex flex-col items-center text-gray-400">
+        <Loader2 size={30} className="animate-spin mb-3" />
+        <p>Loading settings...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-gray-900">Website Settings</h2>
-          <p className="text-gray-500 text-sm mt-0.5">Control all contact details and external links</p>
+          <p className="text-gray-500 text-sm mt-0.5">Control all contact details and external links globally</p>
         </div>
-        <button onClick={saveAll} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${saved ? "bg-green-500 text-white" : "bg-[#800000] text-white hover:bg-[#600000]"}`}>
-          {saved ? <><Check size={16} /> Saved!</> : <><Settings size={16} /> Save Changes</>}
-        </button>
       </div>
 
       {/* ADMISSIONS TOGGLE */}
@@ -69,7 +126,7 @@ export default function AdminSettings() {
             <p className="text-gray-500 text-xs mt-0.5">Controls the "Admission Open / Closed" badge across the website</p>
           </div>
           <button
-            onClick={() => setSettings((p) => ({ ...p, admissionsOpen: !p.admissionsOpen }))}
+            onClick={toggleAdmissions}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all border-2 ${settings.admissionsOpen ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}
           >
             {settings.admissionsOpen ? <><ToggleRight size={18} /> Admissions OPEN</> : <><ToggleLeft size={18} /> Admissions CLOSED</>}
@@ -98,8 +155,10 @@ export default function AdminSettings() {
                           autoFocus
                           className="flex-1 border-2 border-[#800000]/30 rounded-xl px-3 py-2 text-sm focus:border-[#800000] focus:outline-none"
                         />
-                        <button onClick={saveField} className="p-2 bg-[#800000] text-white rounded-xl hover:bg-[#600000]"><Check size={14} /></button>
-                        <button onClick={() => setEditingField(null)} className="p-2 border border-gray-200 text-gray-500 rounded-xl hover:bg-gray-50"><X size={14} /></button>
+                        <button onClick={saveField} disabled={saving} className="p-2 bg-[#800000] text-white rounded-xl hover:bg-[#600000]">
+                          {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                        </button>
+                        <button onClick={() => setEditingField(null)} disabled={saving} className="p-2 border border-gray-200 text-gray-500 rounded-xl hover:bg-gray-50"><X size={14} /></button>
                       </div>
                     ) : (
                       <p className="text-sm font-medium text-gray-800 mt-0.5 truncate">{String(settings[f.key])}</p>
@@ -114,10 +173,6 @@ export default function AdminSettings() {
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-        ⚠️ <strong>Note:</strong> Changes here update the admin view only. To permanently sync these to the live website, ask your developer to connect this to the database (Supabase key-value store).
       </div>
     </div>
   );

@@ -1,7 +1,18 @@
-import { STATS } from "@/lib/constants";
+import { supabase } from "@/lib/supabase";
 
-export default function ResultsSection() {
-  if (!STATS || STATS.length === 0) {
+export const revalidate = 0;
+
+export default async function ResultsSection() {
+  const { data: statsData } = await supabase
+    .from("results")
+    .select("*")
+    .eq("is_visible", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  const stats = statsData ?? [];
+
+  if (stats.length === 0) {
     return null;
   }
 
@@ -37,13 +48,16 @@ export default function ResultsSection() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {STATS.map((stat, i) => (
+          {stats.map((stat) => (
             <div
-              key={stat.label}
-              className="text-center p-6 rounded-2xl bg-white/8 border border-white/10 hover:bg-white/12 transition-colors"
+              key={stat.id}
+              className="text-center p-6 rounded-2xl bg-white/8 border border-white/10 hover:bg-white/12 transition-colors relative"
             >
+              <span className="absolute top-2 right-3 text-[9px] uppercase tracking-wider font-bold text-white/30 border border-white/10 px-2 py-0.5 rounded-full">
+                {stat.source}
+              </span>
               <div
-                className="text-4xl md:text-5xl font-bold text-[#C9A84C] mb-2"
+                className="text-4xl md:text-5xl font-bold text-[#C9A84C] mb-2 mt-2"
                 style={{ fontFamily: "var(--font-serif)" }}
               >
                 {stat.value}

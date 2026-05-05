@@ -10,7 +10,19 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
+  const [settings, setSettings] = useState(SITE_CONFIG);
   const tickingRef = useRef(false);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings && Object.keys(data.settings).length > 0) {
+          setSettings(prev => ({ ...prev, ...data.settings }));
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const handleScroll = useCallback(() => {
     if (!tickingRef.current) {
@@ -62,7 +74,7 @@ export default function Navbar() {
           <div className="flex items-center gap-6">
             <span className="flex items-center gap-1.5 opacity-90">
               <MapPin size={11} className="icon-anim float-text" />
-              {SITE_CONFIG.address}
+              {settings.address}
             </span>
             <span className="opacity-70 glow float-text">|</span>
             <span className="text-[#E5C97A] font-semibold">
@@ -71,19 +83,19 @@ export default function Navbar() {
           </div>
           <div className="flex items-center gap-6">
             <a
-              href={`tel:${SITE_CONFIG.phone}`}
+              href={`tel:${settings.phone}`}
               className="flex items-center gap-1.5 hover:text-[#E5C97A] transition-colors"
             >
               <Phone size={11} className="icon-anim" />
-              {SITE_CONFIG.phone}
+              {settings.phone}
             </a>
             <span className="opacity-40 glow hidden sm:inline">|</span>
             <a
-              href={`tel:${SITE_CONFIG.phone2}`}
+              href={`tel:${settings.phone2}`}
               className="hidden sm:flex items-center gap-2 hover:text-white transition-colors"
             >
               <Phone size={14} className="text-[#E5C97A]" />
-              {SITE_CONFIG.phone2}
+              {settings.phone2}
             </a>
             <span className="opacity-70 glow float-text">|</span>
             <span className="opacity-80 text-[10px] tracking-wider flex items-center gap-2">

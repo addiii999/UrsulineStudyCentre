@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import { Phone, MessageCircle, CalendarCheck } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
 
@@ -7,6 +8,18 @@ const WA_PREFILL = encodeURIComponent(
 );
 
 export default function MobileActionBar() {
+  const [settings, setSettings] = useState(SITE_CONFIG);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings && Object.keys(data.settings).length > 0) {
+          setSettings(prev => ({ ...prev, ...data.settings }));
+        }
+      })
+      .catch(console.error);
+  }, []);
   const scrollToContact = () => {
     document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -16,7 +29,7 @@ export default function MobileActionBar() {
       <div className="grid grid-cols-3 h-[62px]">
         {/* CALL */}
         <a
-          href={`tel:${SITE_CONFIG.phone}`}
+          href={`tel:${settings.phone}`}
           className="flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-[#800000] hover:bg-[#800000]/5 transition-colors active:bg-gray-100"
         >
           <div className="w-8 h-8 rounded-full bg-[#800000]/8 flex items-center justify-center">
@@ -43,7 +56,7 @@ export default function MobileActionBar() {
 
         {/* WHATSAPP */}
         <a
-          href={`https://wa.me/${SITE_CONFIG.whatsapp}?text=${WA_PREFILL}`}
+          href={`https://wa.me/${settings.whatsapp}?text=${WA_PREFILL}`}
           target="_blank"
           rel="noreferrer"
           className="flex flex-col items-center justify-center gap-1 text-gray-600 hover:text-[#25D366] hover:bg-green-50 transition-colors active:bg-gray-100"

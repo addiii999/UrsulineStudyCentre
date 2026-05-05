@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Send, Phone, MapPin, Mail, MessageCircle, Loader2, CheckCircle2 } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
 
@@ -9,7 +9,19 @@ const STREAMS = ["Science (PCM)", "Science (PCB)", "Commerce", "Humanities", "No
 export default function ContactSection() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [settings, setSettings] = useState(SITE_CONFIG);
   const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings && Object.keys(data.settings).length > 0) {
+          setSettings(prev => ({ ...prev, ...data.settings }));
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -105,7 +117,7 @@ export default function ContactSection() {
                 <input
                   type="hidden"
                   name="_autoresponse"
-                  value={`Thank you for contacting Ursuline Study Centre. Our team will reach out to you within 24 hours. For urgent queries, WhatsApp us at ${SITE_CONFIG.phone} or ${SITE_CONFIG.phone2}.`}
+                  value={`Thank you for contacting Ursuline Study Centre. Our team will reach out to you within 24 hours. For urgent queries, WhatsApp us at ${settings.phone} or ${settings.phone2}.`}
                 />
                 {/* Honeypot anti-spam */}
                 <input type="text" name="_honey" style={{ display: "none" }} />
@@ -212,7 +224,7 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Address</p>
-                  <p className="text-gray-700 text-sm mt-0.5">{SITE_CONFIG.address}</p>
+                  <p className="text-gray-700 text-sm mt-0.5">{settings.address}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -221,12 +233,12 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Phone</p>
-                  <a href={`tel:${SITE_CONFIG.phone}`} className="text-gray-700 text-sm hover:text-[#800000] transition-colors">
-                    {SITE_CONFIG.phone}
+                  <a href={`tel:${settings.phone}`} className="text-gray-700 text-sm hover:text-[#800000] transition-colors">
+                    {settings.phone}
                   </a>
                   <span className="text-gray-300">|</span>
-                  <a href={`tel:${SITE_CONFIG.phone2}`} className="text-gray-700 text-sm hover:text-[#800000] transition-colors">
-                    {SITE_CONFIG.phone2}
+                  <a href={`tel:${settings.phone2}`} className="text-gray-700 text-sm hover:text-[#800000] transition-colors">
+                    {settings.phone2}
                   </a>
                 </div>
               </div>
@@ -236,13 +248,13 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Email</p>
-                  <a href={`mailto:${SITE_CONFIG.email}`} className="text-gray-700 text-sm hover:text-[#800000] transition-colors">
-                    {SITE_CONFIG.email}
+                  <a href={`mailto:${settings.email}`} className="text-gray-700 text-sm hover:text-[#800000] transition-colors">
+                    {settings.email}
                   </a>
                 </div>
               </div>
               <a
-                href={`https://wa.me/${SITE_CONFIG.whatsapp}`}
+                href={`https://wa.me/${settings.whatsapp}`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2 bg-[#25D366] text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#1ebe5a] transition-colors w-full justify-center"
@@ -255,7 +267,7 @@ export default function ContactSection() {
             {/* MAP */}
             <div className="rounded-2xl overflow-hidden border border-[#f0ebe0] shadow-sm h-56">
               <iframe
-                src={SITE_CONFIG.mapEmbed}
+                src={settings.mapEmbed}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
-import { Plus, Edit2, Trash2, ToggleLeft, ToggleRight, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Edit2, Trash2, ToggleLeft, ToggleRight, X, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface Course {
   id: string;
@@ -10,55 +11,94 @@ interface Course {
   is_active: boolean;
 }
 
-const INITIAL_COURSES: Course[] = [
-  { id: "1", name: "Science (PCM)", category: "Academic", description: "Physics, Chemistry, Mathematics", is_active: true },
-  { id: "2", name: "Science (PCB)", category: "Academic", description: "Physics, Chemistry, Biology", is_active: true },
-  { id: "3", name: "Commerce", category: "Academic", description: "Accountancy, Business Studies, Economics", is_active: true },
-  { id: "4", name: "Humanities", category: "Academic", description: "History, Geography, Political Science", is_active: true },
-  { id: "5", name: "JEE", category: "Competitive", description: "JEE Main & Advanced preparation", is_active: true },
-  { id: "6", name: "NEET", category: "Competitive", description: "Medical entrance preparation", is_active: true },
-  { id: "7", name: "DCA", category: "Vocational", description: "Diploma in Computer Applications", is_active: true },
-];
-
 const CATEGORIES = ["Academic", "Competitive", "Vocational"];
 
 export default function AdminCourses() {
-  const [courses, setCourses] = useState<Course[]>(INITIAL_COURSES);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", category: "Academic", description: "" });
 
-  const handleSubmit = () => {
-    if (!form.name) return;
-    if (editId) {
-      setCourses((prev) =>
-        prev.map((c) => (c.id === editId ? { ...c, ...form } : c))
-      );
-      setEditId(null);
-    } else {
-      setCourses((prev) => [
-        ...prev,
-        { id: Date.now().toString(), ...form, is_active: true },
-      ]);
+  const fetchCourses = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/courses");
+      const data = await res.json();
+      setCourses(data.courses ?? []);
+    } catch {
+      toast.error("Failed to load courses");
+    } finally {
+      setLoading(false);
     }
-    setForm({ name: "", category: "Academic", description: "" });
-    setShowForm(false);
+  };
+
+  useEffect(() => { fetchCourses(); }, []);
+
+  const handleSubmit = async () => {
+    if (!form.name) return;
+    setSaving(true);
+    try {
+      if (editId) {
+        const res = await fetch("/api/courses", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: editId, ...form }),
+        });
+        if (!res.ok) throw new Error();
+        toast.success("Course updated");
+      } else {
+        const res = await fetch("/api/courses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...form, is_active: true }),
+        });
+        if (!res.ok) throw new Error();
+        toast.success("Course added");
+      }
+      fetchCourses();
+      setForm({ name: "", category: "Academic", description: "" });
+      setShowForm(false);
+    } catch {
+      toast.error("Failed to save course");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleEdit = (c: Course) => {
-    setForm({ name: c.name, category: c.category, description: c.description });
+    setForm({ name: c.name, category: c.category, description: c.description || "" });
     setEditId(c.id);
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Delete this course?")) setCourses((prev) => prev.filter((c) => c.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this course?")) return;
+    try {
+      const res = await fetch(`/api/courses?id=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      toast.success("Course deleted");
+      setCourses(courses.filter(c => c.id !== id));
+    } catch {
+      toast.error("Failed to delete course");
+    }
   };
 
-  const toggleActive = (id: string) => {
-    setCourses((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, is_active: !c.is_active } : c))
-    );
+  const toggleActive = async (course: Course) => {
+    const newActiveState = !course.is_active;
+    setCourses(courses.map(c => c.id === course.id ? { ...c, is_active: newActiveState } : c));
+    try {
+      const res = await fetch("/api/courses", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: course.id, is_active: newActiveState }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      toast.error("Failed to update status");
+      setCourses(courses.map(c => c.id === course.id ? { ...c, is_active: !newActiveState } : c));
+    }
   };
 
   return (
@@ -102,8 +142,11 @@ export default function AdminCourses() {
             </div>
           </div>
           <div className="flex gap-2 mt-4">
-            <button onClick={handleSubmit} className="btn-primary text-sm py-1.5">{editId ? "Update" : "Add Course"}</button>
-            <button onClick={() => setShowForm(false)} className="btn-secondary text-sm py-1.5">Cancel</button>
+            <button onClick={handleSubmit} disabled={saving} className="btn-primary text-sm py-1.5 flex items-center gap-2">
+              {saving ? <Loader2 size={14} className="animate-spin" /> : null}
+              {editId ? "Update" : "Add Course"}
+            </button>
+            <button onClick={() => setShowForm(false)} disabled={saving} className="btn-secondary text-sm py-1.5">Cancel</button>
           </div>
         </div>
       )}
@@ -121,32 +164,47 @@ export default function AdminCourses() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {courses.map((course) => (
-              <tr key={course.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="px-5 py-3 font-semibold text-gray-900">{course.name}</td>
-                <td className="px-4 py-3">
-                  <span className="maroon-chip text-[10px]">{course.category}</span>
-                </td>
-                <td className="px-4 py-3 text-gray-500 text-xs hidden md:table-cell">{course.description}</td>
-                <td className="px-4 py-3 text-center">
-                  <button onClick={() => toggleActive(course.id)}>
-                    {course.is_active
-                      ? <ToggleRight size={22} className="text-green-500 mx-auto" />
-                      : <ToggleLeft size={22} className="text-gray-300 mx-auto" />}
-                  </button>
-                </td>
-                <td className="px-5 py-3">
-                  <div className="flex items-center gap-2 justify-end">
-                    <button onClick={() => handleEdit(course)} className="p-1.5 rounded-lg text-gray-400 hover:text-[#800000] hover:bg-gray-100 transition-colors">
-                      <Edit2 size={14} />
-                    </button>
-                    <button onClick={() => handleDelete(course.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="px-5 py-10 text-center text-gray-400">
+                  <Loader2 size={24} className="animate-spin mx-auto mb-2" />
+                  Loading courses...
                 </td>
               </tr>
-            ))}
+            ) : courses.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-5 py-10 text-center text-gray-400">
+                  No courses found. Add a course to get started.
+                </td>
+              </tr>
+            ) : (
+              courses.map((course) => (
+                <tr key={course.id} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="px-5 py-3 font-semibold text-gray-900">{course.name}</td>
+                  <td className="px-4 py-3">
+                    <span className="maroon-chip text-[10px]">{course.category}</span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-500 text-xs hidden md:table-cell">{course.description}</td>
+                  <td className="px-4 py-3 text-center">
+                    <button onClick={() => toggleActive(course)}>
+                      {course.is_active
+                        ? <ToggleRight size={22} className="text-green-500 mx-auto" />
+                        : <ToggleLeft size={22} className="text-gray-300 mx-auto" />}
+                    </button>
+                  </td>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-2 justify-end">
+                      <button onClick={() => handleEdit(course)} className="p-1.5 rounded-lg text-gray-400 hover:text-[#800000] hover:bg-gray-100 transition-colors">
+                        <Edit2 size={14} />
+                      </button>
+                      <button onClick={() => handleDelete(course.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

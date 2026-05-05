@@ -2,8 +2,21 @@
 import Link from "next/link";
 import { GraduationCap, MapPin, Phone, Mail, Play, MessageCircle } from "lucide-react";
 import { SITE_CONFIG, NAV_LINKS, MORE_LINKS } from "@/lib/constants";
+import { useState, useEffect } from "react";
 
 export default function Footer() {
+  const [settings, setSettings] = useState(SITE_CONFIG);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings && Object.keys(data.settings).length > 0) {
+          setSettings(prev => ({ ...prev, ...data.settings }));
+        }
+      })
+      .catch(console.error);
+  }, []);
   const scrollTo = (href: string) => {
     if (href.startsWith("/#")) {
       const id = href.replace("/#", "");
@@ -21,10 +34,10 @@ export default function Footer() {
             className="text-2xl font-bold text-[#C9A84C]"
             style={{ fontFamily: "var(--font-serif)" }}
           >
-            {SITE_CONFIG.motto}
+            {settings.motto}
           </p>
           <a
-            href={`https://wa.me/${SITE_CONFIG.whatsapp}`}
+            href={`https://wa.me/${settings.whatsapp}`}
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-2 bg-[#25D366] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#1ebe5a] transition-colors"
@@ -62,7 +75,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-3">
               <a
-                href={SITE_CONFIG.youtubeChannel}
+                href={settings.youtubeChannel}
                 target="_blank"
                 rel="noreferrer"
                 className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#C9A84C]/20 transition-colors"
@@ -71,7 +84,7 @@ export default function Footer() {
                 <Play size={15} className="text-[#C9A84C]" />
               </a>
               <a
-                href={`https://wa.me/${SITE_CONFIG.whatsapp}`}
+                href={`https://wa.me/${settings.whatsapp}`}
                 target="_blank"
                 rel="noreferrer"
                 className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#C9A84C]/20 transition-colors"
@@ -143,28 +156,28 @@ export default function Footer() {
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <MapPin size={15} className="text-[#C9A84C] mt-0.5 flex-shrink-0" />
-                <span className="text-white/60 text-sm">{SITE_CONFIG.address}</span>
+                <span className="text-white/60 text-sm">{settings.address}</span>
               </div>
               <a
-                href={`tel:${SITE_CONFIG.phone}`}
+                href={`tel:${settings.phone}`}
                 className="flex items-center gap-3 text-white/60 text-sm hover:text-[#C9A84C] transition-colors"
               >
                 <Phone size={14} className="text-[#C9A84C] flex-shrink-0" />
-                {SITE_CONFIG.phone}
+                {settings.phone}
               </a>
               <a
-                href={`tel:${SITE_CONFIG.phone2}`}
+                href={`tel:${settings.phone2}`}
                 className="flex items-center gap-3 text-white/60 text-sm hover:text-[#C9A84C] transition-colors"
               >
                 <Phone size={14} className="text-[#C9A84C] flex-shrink-0" />
-                {SITE_CONFIG.phone2}
+                {settings.phone2}
               </a>
               <a
-                href={`mailto:${SITE_CONFIG.email}`}
+                href={`mailto:${settings.email}`}
                 className="flex items-center gap-3 text-white/60 text-sm hover:text-[#C9A84C] transition-colors"
               >
                 <Mail size={14} className="text-[#C9A84C] flex-shrink-0" />
-                {SITE_CONFIG.email}
+                {settings.email}
               </a>
             </div>
           </div>
@@ -190,7 +203,7 @@ export default function Footer() {
               />
             </span>
             <span className="mx-1 opacity-50">|</span>
-            <span>Designed by {SITE_CONFIG.designer} ({SITE_CONFIG.designerPhone})</span>
+            <span>Designed by {settings.designer} ({settings.designerPhone})</span>
           </div>
         </div>
       </div>
