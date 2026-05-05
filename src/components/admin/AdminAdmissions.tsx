@@ -12,13 +12,7 @@ interface Student {
   applied_date: string;
 }
 
-const SAMPLE_STUDENTS: Student[] = [
-  { id: "1", name: "Riya Sharma", phone: "9507589xxx", class: "Class 11", stream: "PCM", admission_status: "pending", applied_date: "2026-05-01" },
-  { id: "2", name: "Priya Gupta", phone: "9876543xxx", class: "Class 9", stream: "—", admission_status: "approved", applied_date: "2026-04-28" },
-  { id: "3", name: "Anjali Singh", phone: "8765432xxx", class: "Class 12", stream: "PCB", admission_status: "approved", applied_date: "2026-04-25" },
-  { id: "4", name: "Kavya Verma", phone: "7654321xxx", class: "Class 10", stream: "—", admission_status: "pending", applied_date: "2026-05-02" },
-  { id: "5", name: "Simran Mehta", phone: "6543210xxx", class: "Class 11", stream: "Commerce", admission_status: "rejected", applied_date: "2026-04-20" },
-];
+const SAMPLE_STUDENTS: Student[] = [];
 
 const STATUS_CONFIG = {
   pending: { color: "bg-yellow-50 text-yellow-700 border-yellow-200", icon: <Clock size={12} /> },

@@ -1,6 +1,10 @@
 import { STATS } from "@/lib/constants";
 
 export default function ResultsSection() {
+  if (!STATS || STATS.length === 0) {
+    return null;
+  }
+
   return (
     <section id="results" className="py-20 md:py-28 bg-[#800000] relative overflow-hidden">
       {/* DECORATIVE */}

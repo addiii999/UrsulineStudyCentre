@@ -4,10 +4,7 @@ import { Plus, Pencil, Trash2, Check, X, Star, Quote } from "lucide-react";
 
 interface Testimonial { id: string; name: string; studentClass: string; quote: string; rating: number; isVisible: boolean; }
 
-const DEFAULT: Testimonial[] = [
-  { id: "1", name: "Riya Sharma", studentClass: "Class 12 (PCM)", quote: "The teaching quality here is unmatched. I improved my scores by 30% in 3 months!", rating: 5, isVisible: true },
-  { id: "2", name: "Priya Gupta", studentClass: "Class 11 (Commerce)", quote: "A safe and focused environment that helped me build real confidence.", rating: 5, isVisible: true },
-];
+const DEFAULT: Testimonial[] = [];
 
 export default function AdminTestimonials() {
   const [items, setItems] = useState<Testimonial[]>(DEFAULT);

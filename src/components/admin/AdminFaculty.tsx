@@ -67,7 +67,7 @@ export default function AdminFaculty() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {[
-              { key: "name", label: "Full Name", placeholder: "Dr. Jane Doe" },
+              { key: "name", label: "Full Name", placeholder: "e.g. Dr. A. Singh" },
               { key: "subject", label: "Subject", placeholder: "Mathematics" },
               { key: "qualification", label: "Qualification", placeholder: "M.Sc, B.Ed" },
               { key: "experience", label: "Experience", placeholder: "8 Years" },

@@ -2,6 +2,10 @@ import { Star, Quote } from "lucide-react";
 import { TESTIMONIALS } from "@/lib/constants";
 
 export default function TestimonialsSection() {
+  if (!TESTIMONIALS || TESTIMONIALS.length === 0) {
+    return null;
+  }
+
   return (
     <section id="testimonials" className="py-20 md:py-28 bg-[#FDF8F0]">
       <div className="max-w-7xl mx-auto px-6">

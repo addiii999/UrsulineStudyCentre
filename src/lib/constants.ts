@@ -26,12 +26,7 @@ export const SITE_CONFIG = {
   sessionYear: "2026-27",
 };
 
-export const STATS = [
-  { value: "95%", label: "Board Success Rate" },
-  { value: "2500+", label: "Students Mentored (via Academic Origin)" },
-  { value: "50+", label: "Selections (Academic Origin Legacy)" },
-  { value: "10+", label: "Years of Teaching Excellence" },
-];
+export const STATS: { value: string; label: string; }[] = [];
 
 export const COURSES = [
   {
@@ -81,34 +76,6 @@ export const FACULTY = [
     experience: "20+ Years",
     role: "Visionary Principal",
   },
-  {
-    name: "Priya Sharma",
-    subject: "Physics",
-    qualification: "M.Sc Physics, B.Ed",
-    experience: "8 Years",
-    role: "Senior Faculty",
-  },
-  {
-    name: "Dr. Anjali Singh",
-    subject: "Biology & NEET",
-    qualification: "M.Sc Biology, Ph.D",
-    experience: "12 Years",
-    role: "Senior Faculty",
-  },
-  {
-    name: "Rekha Verma",
-    subject: "Chemistry",
-    qualification: "M.Sc Chemistry",
-    experience: "7 Years",
-    role: "Faculty",
-  },
-  {
-    name: "Suman Kumari",
-    subject: "English & CLAT",
-    qualification: "MA English, LLB",
-    experience: "6 Years",
-    role: "Faculty",
-  },
 ];
 
 export const WHY_CHOOSE_US = [
@@ -144,73 +111,9 @@ export const WHY_CHOOSE_US = [
   },
 ];
 
-export const TESTIMONIALS = [
-  {
-    name: "Priya Gupta",
-    role: "Parent of Class 12 Student",
-    review:
-      "Ursuline Study Centre has transformed my daughter's academics. The faculty is exceptionally dedicated and the environment is perfect for girls to focus on studies without any distractions.",
-    rating: 5,
-  },
-  {
-    name: "Simran Mehta",
-    role: "Class 11 Student (PCM)",
-    review:
-      "Sir's teaching style makes even the toughest JEE problems feel approachable. I've improved my scores dramatically in just 3 months. This institute truly cares about our success.",
-    rating: 5,
-  },
-  {
-    name: "Ananya Verma",
-    role: "Parent of Class 9 Student",
-    review:
-      "Excellent institute! The bilingual teaching approach is wonderful. My daughter now understands concepts deeply in both Hindi and English. Highly recommended for serious students.",
-    rating: 5,
-  },
-  {
-    name: "Ritu Kumari",
-    role: "Class 12 Student (PCB)",
-    review:
-      "The NEET preparation here is outstanding. Dr. Anjali Ma'am explains biology in such a unique way that I never forget the concepts. The study material is comprehensive and well-organized.",
-    rating: 5,
-  },
-  {
-    name: "Seema Devi",
-    role: "Parent of Class 10 Student",
-    review:
-      "Safe, clean, and academically excellent. As a parent, I feel completely secure sending my daughter here. The regular tests and feedback keep us well-informed about her progress.",
-    rating: 5,
-  },
-  {
-    name: "Kavya Sharma",
-    role: "Class 11 Student (Commerce)",
-    review:
-      "The commerce faculty is brilliant. They connect every topic to real-world business scenarios. The additional vocational courses in Tally have given me a practical edge already.",
-    rating: 5,
-  },
-];
+export const TESTIMONIALS = [];
 
-export const YOUTUBE_VIDEOS = [
-  {
-    id: "dQw4w9WgXcQ",
-    title: "How to Score 95% in JAC Board Exam | Preparation Strategy",
-    thumbnail: `https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg`,
-  },
-  {
-    id: "jNQXAC9IVRw",
-    title: "JEE Mathematics Tricks | Quadratic Equations Made Easy",
-    thumbnail: `https://img.youtube.com/vi/jNQXAC9IVRw/maxresdefault.jpg`,
-  },
-  {
-    id: "9bZkp7q19f0",
-    title: "NEET Biology | Human Physiology Complete Revision",
-    thumbnail: `https://img.youtube.com/vi/9bZkp7q19f0/maxresdefault.jpg`,
-  },
-  {
-    id: "CevxZvSJLk8",
-    title: "Study Tips for Class 10 Board Exams | Time Management",
-    thumbnail: `https://img.youtube.com/vi/CevxZvSJLk8/maxresdefault.jpg`,
-  },
-];
+export const YOUTUBE_VIDEOS: { id: string; title: string; thumbnail: string; }[] = [];
 
 export const FAQS = [
   {

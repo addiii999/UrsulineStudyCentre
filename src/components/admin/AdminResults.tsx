@@ -4,12 +4,7 @@ import { Pencil, Check, X, Trophy, Info } from "lucide-react";
 
 interface Stat { id: string; label: string; value: string; source: "USC" | "Academic Origin" | "Both"; isVisible: boolean; }
 
-const DEFAULT_STATS: Stat[] = [
-  { id: "1", label: "Students Mentored", value: "2500+", source: "Academic Origin", isVisible: true },
-  { id: "2", label: "Years of Teaching Excellence", value: "10+", source: "Academic Origin", isVisible: true },
-  { id: "3", label: "JEE/NEET Selections", value: "50+", source: "Academic Origin", isVisible: true },
-  { id: "4", label: "Board Pass Rate", value: "95%", source: "USC", isVisible: true },
-];
+const DEFAULT_STATS: Stat[] = [];
 
 const SOURCE_COLORS = {
   USC: "bg-[#800000]/10 text-[#800000] border-[#800000]/20",

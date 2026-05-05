@@ -1,12 +1,7 @@
 import { IndianRupee, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { FEE_TABLE } from "@/lib/constants";
 
-const FEE_RECORDS = [
-  { id: "1", student: "Priya Gupta", stream: "Science (PCM)", amount: 15000, date: "2026-04-28", receipt: "USC-001", status: "paid" },
-  { id: "2", student: "Anjali Singh", stream: "Science (PCB)", amount: 15000, date: "2026-04-25", receipt: "USC-002", status: "paid" },
-  { id: "3", student: "Kavya Verma", stream: "Humanities", amount: 15000, date: "—", receipt: "—", status: "pending" },
-  { id: "4", student: "Simran Mehta", stream: "Commerce", amount: 15000, date: "2026-04-15", receipt: "USC-003", status: "overdue" },
-];
+const FEE_RECORDS: any[] = [];
 
 const STATUS = {
   paid: { color: "bg-green-50 text-green-700 border-green-200", icon: <CheckCircle size={12} /> },
@@ -87,23 +82,31 @@ export default function AdminFees() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {FEE_RECORDS.map((r) => {
-              const sc = STATUS[r.status as keyof typeof STATUS];
-              return (
-                <tr key={r.id} className="hover:bg-gray-50/50">
-                  <td className="px-4 py-3 font-semibold text-gray-900">{r.student}</td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">{r.stream}</td>
-                  <td className="px-4 py-3 font-bold text-gray-800">₹{r.amount.toLocaleString("en-IN")}</td>
-                  <td className="px-4 py-3 text-gray-400 text-xs">{r.date}</td>
-                  <td className="px-4 py-3 text-gray-400 text-xs font-mono">{r.receipt}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border capitalize ${sc.color}`}>
-                      {sc.icon} {r.status}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
+            {FEE_RECORDS.length > 0 ? (
+              FEE_RECORDS.map((r) => {
+                const sc = STATUS[r.status as keyof typeof STATUS];
+                return (
+                  <tr key={r.id} className="hover:bg-gray-50/50">
+                    <td className="px-4 py-3 font-semibold text-gray-900">{r.student}</td>
+                    <td className="px-4 py-3 text-gray-500 text-xs">{r.stream}</td>
+                    <td className="px-4 py-3 font-bold text-gray-800">₹{r.amount.toLocaleString("en-IN")}</td>
+                    <td className="px-4 py-3 text-gray-400 text-xs">{r.date}</td>
+                    <td className="px-4 py-3 text-gray-400 text-xs font-mono">{r.receipt}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border capitalize ${sc.color}`}>
+                        {sc.icon} {r.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center text-gray-400 text-sm">
+                  No payment records found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

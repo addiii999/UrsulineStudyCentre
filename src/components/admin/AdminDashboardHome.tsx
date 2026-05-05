@@ -1,17 +1,13 @@
 import { Users, BookOpen, MessageSquare, TrendingUp, GraduationCap, Play } from "lucide-react";
 
 const STATS = [
-  { label: "Total Enquiries", value: "24", icon: <MessageSquare size={18} className="text-[#C9A84C]" />, change: "+3 this week" },
+  { label: "Total Enquiries", value: "0", icon: <MessageSquare size={18} className="text-[#C9A84C]" />, change: "No data yet" },
   { label: "Active Courses", value: "12", icon: <BookOpen size={18} className="text-[#C9A84C]" />, change: "All Streams" },
-  { label: "Faculty Members", value: "6", icon: <Users size={18} className="text-[#C9A84C]" />, change: "All Active" },
-  { label: "Admitted Students", value: "47", icon: <GraduationCap size={18} className="text-[#C9A84C]" />, change: "2026-27 Session" },
+  { label: "Faculty Members", value: "2", icon: <Users size={18} className="text-[#C9A84C]" />, change: "Active" },
+  { label: "Admitted Students", value: "0", icon: <GraduationCap size={18} className="text-[#C9A84C]" />, change: "2026-27 Session" },
 ];
 
-const RECENT_ENQUIRIES = [
-  { name: "Riya Sharma", phone: "9507589xxx", class: "Class 11", stream: "PCM", status: "new", date: "Today" },
-  { name: "Priya Gupta", phone: "9876543xxx", class: "Class 9", stream: "—", status: "contacted", date: "Yesterday" },
-  { name: "Anjali Singh", phone: "8765432xxx", class: "Class 12", stream: "PCB", status: "admitted", date: "2 days ago" },
-];
+const RECENT_ENQUIRIES: any[] = [];
 
 const STATUS_COLORS: Record<string, string> = {
   new: "bg-blue-50 text-blue-700 border-blue-200",
@@ -63,20 +59,26 @@ export default function AdminDashboardHome() {
           <span className="text-xs text-gray-400">Last 7 days</span>
         </div>
         <div className="divide-y divide-gray-50">
-          {RECENT_ENQUIRIES.map((e) => (
-            <div key={e.name} className="px-5 py-3 flex items-center gap-4">
-              <div className="w-8 h-8 rounded-full bg-[#800000] flex items-center justify-center flex-shrink-0">
-                <span className="text-[#C9A84C] text-xs font-bold">{e.name[0]}</span>
+          {RECENT_ENQUIRIES.length > 0 ? (
+            RECENT_ENQUIRIES.map((e) => (
+              <div key={e.name} className="px-5 py-3 flex items-center gap-4">
+                <div className="w-8 h-8 rounded-full bg-[#800000] flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#C9A84C] text-xs font-bold">{e.name[0]}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900 text-sm">{e.name}</p>
+                  <p className="text-gray-400 text-xs">{e.class} · {e.stream} · {e.date}</p>
+                </div>
+                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[e.status]}`}>
+                  {e.status}
+                </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 text-sm">{e.name}</p>
-                <p className="text-gray-400 text-xs">{e.class} · {e.stream} · {e.date}</p>
-              </div>
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[e.status]}`}>
-                {e.status}
-              </span>
+            ))
+          ) : (
+            <div className="px-5 py-8 text-center text-gray-500 text-sm">
+              No recent enquiries found.
             </div>
-          ))}
+          )}
         </div>
         <div className="px-5 py-3 border-t border-gray-100">
           <button className="text-[#800000] text-xs font-semibold hover:underline flex items-center gap-1">
