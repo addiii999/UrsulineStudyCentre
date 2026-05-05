@@ -46,9 +46,18 @@ export default function AdminEnquiries() {
   };
 
   const updateStatus = async (id: string, status: Enquiry["status"]) => {
-    // For now, updating local state. In a real app, you'd send a PATCH/PUT request.
-    setEnquiries((prev) => prev.map((e) => (e.id === id ? { ...e, status } : e)));
-    toast.success(`Status updated to ${status}`);
+    try {
+      const res = await fetch("/api/enquiry/admin", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      setEnquiries((prev) => prev.map((e) => (e.id === id ? { ...e, status } : e)));
+      toast.success(`Status updated to ${status}`);
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
   };
 
   const filtered = enquiries.filter((e) => {

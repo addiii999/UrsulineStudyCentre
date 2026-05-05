@@ -1,13 +1,6 @@
-import { Users, BookOpen, MessageSquare, TrendingUp, GraduationCap, Play } from "lucide-react";
-
-const STATS = [
-  { label: "Total Enquiries", value: "0", icon: <MessageSquare size={18} className="text-[#C9A84C]" />, change: "No data yet" },
-  { label: "Active Courses", value: "12", icon: <BookOpen size={18} className="text-[#C9A84C]" />, change: "All Streams" },
-  { label: "Faculty Members", value: "2", icon: <Users size={18} className="text-[#C9A84C]" />, change: "Active" },
-  { label: "Admitted Students", value: "0", icon: <GraduationCap size={18} className="text-[#C9A84C]" />, change: "2026-27 Session" },
-];
-
-const RECENT_ENQUIRIES: any[] = [];
+"use client";
+import { useState, useEffect } from "react";
+import { Users, BookOpen, MessageSquare, TrendingUp, GraduationCap, Play, Loader2 } from "lucide-react";
 
 const STATUS_COLORS: Record<string, string> = {
   new: "bg-blue-50 text-blue-700 border-blue-200",
@@ -17,6 +10,55 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function AdminDashboardHome() {
+  const [stats, setStats] = useState({
+    enquiries: 0,
+    courses: 0,
+    faculty: 0,
+    students: 0,
+    recentEnquiries: [] as any[]
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [enqRes, stuRes, crsRes, facRes] = await Promise.all([
+          fetch("/api/enquiry"),
+          fetch("/api/students"),
+          fetch("/api/courses"),
+          fetch("/api/faculty")
+        ]);
+        
+        const [enq, stu, crs, fac] = await Promise.all([
+          enqRes.json().catch(() => ({})),
+          stuRes.json().catch(() => ({})),
+          crsRes.json().catch(() => ({})),
+          facRes.json().catch(() => ({}))
+        ]);
+
+        setStats({
+          enquiries: enq.enquiries?.length || 0,
+          students: stu.students?.filter((s:any) => s.admission_status === 'enrolled').length || 0,
+          courses: crs.courses?.length || 0,
+          faculty: fac.faculty?.length || 0,
+          recentEnquiries: (enq.enquiries || []).slice(0, 5)
+        });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  const STATS_CARDS = [
+    { label: "Total Enquiries", value: loading ? "..." : stats.enquiries, icon: <MessageSquare size={18} className="text-[#C9A84C]" />, change: "All Time" },
+    { label: "Active Courses", value: loading ? "..." : stats.courses, icon: <BookOpen size={18} className="text-[#C9A84C]" />, change: "All Streams" },
+    { label: "Faculty Members", value: loading ? "..." : stats.faculty, icon: <Users size={18} className="text-[#C9A84C]" />, change: "Active" },
+    { label: "Enrolled Students", value: loading ? "..." : stats.students, icon: <GraduationCap size={18} className="text-[#C9A84C]" />, change: "Current Session" },
+  ];
+
   return (
     <div className="space-y-6">
       {/* WELCOME */}
@@ -34,7 +76,7 @@ export default function AdminDashboardHome() {
 
       {/* STATS GRID */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATS.map((s) => (
+        {STATS_CARDS.map((s) => (
           <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-400 text-xs font-medium">{s.label}</span>
@@ -59,17 +101,21 @@ export default function AdminDashboardHome() {
           <span className="text-xs text-gray-400">Last 7 days</span>
         </div>
         <div className="divide-y divide-gray-50">
-          {RECENT_ENQUIRIES.length > 0 ? (
-            RECENT_ENQUIRIES.map((e) => (
-              <div key={e.name} className="px-5 py-3 flex items-center gap-4">
+          {loading ? (
+            <div className="px-5 py-8 flex justify-center items-center text-gray-500 text-sm">
+              <Loader2 size={16} className="animate-spin mr-2" /> Loading...
+            </div>
+          ) : stats.recentEnquiries.length > 0 ? (
+            stats.recentEnquiries.map((e) => (
+              <div key={e.id || e.name} className="px-5 py-3 flex items-center gap-4">
                 <div className="w-8 h-8 rounded-full bg-[#800000] flex items-center justify-center flex-shrink-0">
                   <span className="text-[#C9A84C] text-xs font-bold">{e.name[0]}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 text-sm">{e.name}</p>
-                  <p className="text-gray-400 text-xs">{e.class} · {e.stream} · {e.date}</p>
+                  <p className="text-gray-400 text-xs">{e.class} · {e.stream} · {new Date(e.created_at).toLocaleDateString()}</p>
                 </div>
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[e.status]}`}>
+                <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border capitalize ${STATUS_COLORS[e.status] || "bg-gray-50 text-gray-700"}`}>
                   {e.status}
                 </span>
               </div>

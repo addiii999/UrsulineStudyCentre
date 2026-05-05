@@ -131,6 +131,40 @@ export default function ApplyPage() {
     if (!validate()) return;
     setLoading(true);
     try {
+      // 1. Save to Supabase Database
+      const dbPayload = {
+        full_name: form.fullName.trim(),
+        dob: form.dob,
+        aadhaar_last4: form.aadhaar.slice(-4),
+        mother_name: form.motherName.trim(),
+        father_name: form.fatherName.trim(),
+        prev_board: form.prevBoard,
+        prev_school: form.prevSchool.trim(),
+        prev_year: form.prevYear,
+        prev_marks: form.prevMarks,
+        present_class: form.presentClass,
+        present_board: form.presentBoard,
+        present_school: form.presentSchool.trim(),
+        present_year: form.presentYear,
+        course: form.course,
+        vocational: form.vocational,
+        present_village: form.presentVillage.trim(),
+        present_district: form.presentDistrict.trim(),
+        present_ps: form.presentPS.trim(),
+        present_phone: form.presentPhone,
+        permanent_village: form.permanentVillage.trim(),
+        permanent_district: form.permanentDistrict.trim(),
+        permanent_ps: form.permanentPS.trim(),
+        permanent_phone: form.permanentPhone,
+      };
+
+      await fetch("/api/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dbPayload),
+      }).catch(err => console.error("DB Save Error:", err));
+
+      // 2. Send Email via FormSubmit
       const data = new FormData();
       data.append("_subject", `New Admission Application - ${form.fullName}`);
       data.append("_captcha", "false");
