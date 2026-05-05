@@ -15,6 +15,11 @@ import {
   Menu,
   X,
   Bell,
+  HelpCircle,
+  Star,
+  Megaphone,
+  Trophy,
+  Settings,
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -26,25 +31,61 @@ import AdminVideos from "@/components/admin/AdminVideos";
 import AdminAdmissions from "@/components/admin/AdminAdmissions";
 import AdminFees from "@/components/admin/AdminFees";
 import AdminEnquiries from "@/components/admin/AdminEnquiries";
+import AdminFAQ from "@/components/admin/AdminFAQ";
+import AdminTestimonials from "@/components/admin/AdminTestimonials";
+import AdminAnnouncements from "@/components/admin/AdminAnnouncements";
+import AdminResults from "@/components/admin/AdminResults";
+import AdminSettings from "@/components/admin/AdminSettings";
 
 type AdminSection =
   | "dashboard"
-  | "courses"
-  | "faculty"
-  | "videos"
-  | "admissions"
-  | "fees"
-  | "enquiries";
+  | "courses" | "faculty" | "videos" | "testimonials" | "results" | "faq"
+  | "admissions" | "fees" | "enquiries"
+  | "announcements"
+  | "settings";
 
-const NAV_ITEMS: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
-  { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={16} /> },
-  { id: "courses", label: "Courses", icon: <BookOpen size={16} /> },
-  { id: "faculty", label: "Faculty", icon: <Users size={16} /> },
-  { id: "videos", label: "Videos", icon: <Play size={16} /> },
-  { id: "admissions", label: "Admissions", icon: <ClipboardList size={16} /> },
-  { id: "fees", label: "Fees", icon: <CreditCard size={16} /> },
-  { id: "enquiries", label: "Enquiries", icon: <MessageSquare size={16} /> },
+type NavGroup = { label: string; items: { id: AdminSection; label: string; icon: React.ReactNode }[] };
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Overview",
+    items: [{ id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={16} /> }],
+  },
+  {
+    label: "Content",
+    items: [
+      { id: "courses", label: "Courses", icon: <BookOpen size={16} /> },
+      { id: "faculty", label: "Faculty", icon: <Users size={16} /> },
+      { id: "videos", label: "Videos", icon: <Play size={16} /> },
+      { id: "testimonials", label: "Testimonials", icon: <Star size={16} /> },
+      { id: "results", label: "Results", icon: <Trophy size={16} /> },
+      { id: "faq", label: "FAQ", icon: <HelpCircle size={16} /> },
+    ],
+  },
+  {
+    label: "Students & Leads",
+    items: [
+      { id: "enquiries", label: "Enquiries", icon: <MessageSquare size={16} /> },
+      { id: "admissions", label: "Admissions", icon: <ClipboardList size={16} /> },
+      { id: "fees", label: "Fees", icon: <CreditCard size={16} /> },
+    ],
+  },
+  {
+    label: "Promotions",
+    items: [
+      { id: "announcements", label: "Announcements", icon: <Megaphone size={16} /> },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { id: "settings", label: "Settings", icon: <Settings size={16} /> },
+    ],
+  },
 ];
+
+// Flat list for label lookup
+const ALL_NAV_ITEMS = NAV_GROUPS.flatMap((g) => g.items);
 
 export default function AdminDashboardPage() {
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
@@ -60,6 +101,11 @@ export default function AdminDashboardPage() {
       case "admissions": return <AdminAdmissions />;
       case "fees": return <AdminFees />;
       case "enquiries": return <AdminEnquiries />;
+      case "faq": return <AdminFAQ />;
+      case "testimonials": return <AdminTestimonials />;
+      case "announcements": return <AdminAnnouncements />;
+      case "results": return <AdminResults />;
+      case "settings": return <AdminSettings />;
       default: return <AdminDashboardHome />;
     }
   };
@@ -68,7 +114,7 @@ export default function AdminDashboardPage() {
     router.push("/login");
   };
 
-  const currentNav = NAV_ITEMS.find((n) => n.id === activeSection);
+  const currentNav = ALL_NAV_ITEMS.find((n) => n.id === activeSection);
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -96,23 +142,34 @@ export default function AdminDashboardPage() {
           )}
         </div>
 
-        {/* NAV ITEMS */}
-        <nav className="flex-1 py-4 space-y-0.5 px-2 overflow-y-auto">
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveSection(item.id)}
-              title={!sidebarOpen ? item.label : undefined}
-              className={clsx(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150",
-                activeSection === item.id
-                  ? "bg-[#C9A84C]/20 text-[#C9A84C] font-semibold"
-                  : "text-white/60 hover:text-white hover:bg-white/5"
+        {/* NAV GROUPS */}
+        <nav className="flex-1 py-3 overflow-y-auto">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label} className="mb-1">
+              {sidebarOpen && (
+                <p className="text-white/25 text-[9px] font-bold uppercase tracking-widest px-4 pt-3 pb-1.5">
+                  {group.label}
+                </p>
               )}
-            >
-              <span className="flex-shrink-0">{item.icon}</span>
-              {sidebarOpen && <span>{item.label}</span>}
-            </button>
+              <div className="space-y-0.5 px-2">
+                {group.items.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveSection(item.id)}
+                    title={!sidebarOpen ? item.label : undefined}
+                    className={clsx(
+                      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150",
+                      activeSection === item.id
+                        ? "bg-[#C9A84C]/20 text-[#C9A84C] font-semibold"
+                        : "text-white/60 hover:text-white hover:bg-white/5"
+                    )}
+                  >
+                    <span className="flex-shrink-0">{item.icon}</span>
+                    {sidebarOpen && <span>{item.label}</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
 
