@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle2, Send, MessageCircle, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -59,6 +59,41 @@ export default function ApplyPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+
+  const [sameAddress, setSameAddress] = useState(false);
+
+  const handleSameAddressChange = (checked: boolean) => {
+    setSameAddress(checked);
+    if (checked) {
+      setForm((p) => ({
+        ...p,
+        permanentVillage: p.presentVillage,
+        permanentDistrict: p.presentDistrict,
+        permanentPS: p.presentPS,
+        permanentPhone: p.presentPhone,
+      }));
+    } else {
+      setForm((p) => ({
+        ...p,
+        permanentVillage: "",
+        permanentDistrict: "",
+        permanentPS: "",
+        permanentPhone: "",
+      }));
+    }
+  };
+
+  useEffect(() => {
+    if (sameAddress) {
+      setForm((p) => ({
+        ...p,
+        permanentVillage: p.presentVillage,
+        permanentDistrict: p.presentDistrict,
+        permanentPS: p.presentPS,
+        permanentPhone: p.presentPhone,
+      }));
+    }
+  }, [sameAddress, form.presentVillage, form.presentDistrict, form.presentPS, form.presentPhone]);
 
   const set = (k: keyof FormData, v: string | boolean) =>
     setForm((p) => ({ ...p, [k]: v }));
@@ -322,25 +357,34 @@ export default function ApplyPage() {
               </div>
             </div>
 
-            <p className="text-xs font-bold text-[#800000] uppercase tracking-widest mb-4">Permanent Address</p>
+            <div className="flex sm:items-center justify-between flex-col sm:flex-row gap-3 mb-4">
+              <p className="text-xs font-bold text-[#800000] uppercase tracking-widest">Permanent Address</p>
+              <label className="flex items-center gap-2 cursor-pointer group w-fit">
+                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors flex-shrink-0 ${sameAddress ? "bg-[#800000] border-[#800000]" : "border-gray-400 group-hover:border-[#800000]"}`}>
+                  {sameAddress && <CheckCircle2 size={12} className="text-white" />}
+                </div>
+                <input type="checkbox" checked={sameAddress} onChange={(e) => handleSameAddressChange(e.target.checked)} className="hidden" />
+                <span className="text-sm font-medium text-gray-700 select-none">Same as Present Address</span>
+              </label>
+            </div>
             <div className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label="Village / City">
-                  <input value={form.permanentVillage} onChange={(e) => set("permanentVillage", e.target.value)} className={inp} placeholder="Village or City name" />
+                  <input disabled={sameAddress} value={form.permanentVillage} onChange={(e) => set("permanentVillage", e.target.value)} className={`${inp} ${sameAddress ? "bg-gray-50 opacity-70 cursor-not-allowed" : ""}`} placeholder="Village or City name" />
                 </Field>
                 <Field label="District">
-                  <input value={form.permanentDistrict} onChange={(e) => set("permanentDistrict", e.target.value)} className={inp} placeholder="District name" />
+                  <input disabled={sameAddress} value={form.permanentDistrict} onChange={(e) => set("permanentDistrict", e.target.value)} className={`${inp} ${sameAddress ? "bg-gray-50 opacity-70 cursor-not-allowed" : ""}`} placeholder="District name" />
                 </Field>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label="P.S. (Police Station)">
-                  <input value={form.permanentPS} onChange={(e) => set("permanentPS", e.target.value)} className={inp} placeholder="Nearest police station" />
+                  <input disabled={sameAddress} value={form.permanentPS} onChange={(e) => set("permanentPS", e.target.value)} className={`${inp} ${sameAddress ? "bg-gray-50 opacity-70 cursor-not-allowed" : ""}`} placeholder="Nearest police station" />
                 </Field>
                 <Field label="Contact Number">
                   <div className="flex">
-                    <span className="flex items-center px-3 bg-gray-50 border-2 border-r-0 border-gray-200 rounded-l-xl text-gray-500 text-sm font-medium min-h-[48px]">+91</span>
-                    <input value={form.permanentPhone} onChange={(e) => set("permanentPhone", e.target.value.replace(/\D/g, "").slice(0, 10))}
-                      className={inp + " rounded-l-none border-l-0"} placeholder="10-digit number" inputMode="numeric" />
+                    <span className={`flex items-center px-3 border-2 border-r-0 border-gray-200 rounded-l-xl text-gray-500 text-sm font-medium min-h-[48px] ${sameAddress ? "bg-gray-100" : "bg-gray-50"}`}>+91</span>
+                    <input disabled={sameAddress} value={form.permanentPhone} onChange={(e) => set("permanentPhone", e.target.value.replace(/\D/g, "").slice(0, 10))}
+                      className={`${inp} rounded-l-none border-l-0 ${sameAddress ? "bg-gray-50 opacity-70 cursor-not-allowed" : ""}`} placeholder="10-digit number" inputMode="numeric" />
                   </div>
                 </Field>
               </div>
