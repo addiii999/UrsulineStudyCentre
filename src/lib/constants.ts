@@ -111,7 +111,7 @@ export const WHY_CHOOSE_US = [
   },
 ];
 
-export const TESTIMONIALS = [];
+export const TESTIMONIALS: { name: string; role: string; review: string; rating: number }[] = [];
 
 export const YOUTUBE_VIDEOS: { id: string; title: string; thumbnail: string; }[] = [];
 
