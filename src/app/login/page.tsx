@@ -22,6 +22,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     await new Promise((r) => setTimeout(r, 800));
+    document.cookie = "student_session=true; path=/; max-age=86400; SameSite=Lax";
     toast.success("Logged in successfully!");
     router.push("/student/dashboard");
     setLoading(false);
@@ -41,6 +42,7 @@ export default function LoginPage() {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 800));
     if (adminForm.username === "admin" && adminForm.password === "usc@admin2026") {
+      document.cookie = "admin_session=true; path=/; max-age=86400; SameSite=Lax";
       toast.success("Welcome, Admin!");
       router.push("/admin/dashboard");
     } else {
