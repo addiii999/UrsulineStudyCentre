@@ -75,6 +75,7 @@ const ALL_NAV_ITEMS = NAV_GROUPS.flatMap((g) => g.items);
 export default function AdminDashboardPage() {
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showNotifications, setShowNotifications] = useState(false);
   const router = useRouter();
 
   const renderContent = () => {
@@ -238,19 +239,70 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Right: bell + avatar */}
-          <div className="flex items-center gap-2.5">
-            <button className="relative p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all duration-150">
-              <Bell size={15} />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#C9A84C] rounded-full ring-1 ring-white" />
-            </button>
-            <div className="flex items-center gap-2.5 pl-1">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+          <div className="flex items-center gap-3">
+            {/* Notifications */}
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className={clsx(
+                  "relative p-2 rounded-xl transition-all duration-200",
+                  showNotifications ? "bg-gray-100 text-[#800000]" : "text-gray-400 hover:bg-gray-50 hover:text-gray-700"
+                )}
+                title="Notifications"
+              >
+                <Bell size={16} />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#C9A84C] rounded-full ring-2 ring-white" />
+              </button>
+
+              {/* Notification Dropdown */}
+              {showNotifications && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+                  <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 z-50 overflow-hidden transform origin-top-right transition-all">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50 bg-gray-50/50">
+                      <h3 className="font-bold text-[13px] text-gray-900">Notifications</h3>
+                      <span className="bg-[#800000]/10 text-[#800000] text-[10px] font-bold px-2 py-0.5 rounded-full">2 New</span>
+                    </div>
+                    <div className="max-h-[300px] overflow-y-auto">
+                      <div
+                        onClick={() => { setActiveSection("enquiries"); setShowNotifications(false); }}
+                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-50 last:border-0"
+                      >
+                        <p className="text-[12px] font-semibold text-gray-800">New Admission Enquiry</p>
+                        <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">Priya Sharma asked about Science (PCM) batch timings.</p>
+                        <p className="text-[9px] text-[#C9A84C] font-semibold mt-1.5">Just now</p>
+                      </div>
+                      <div
+                        onClick={() => { setActiveSection("settings"); setShowNotifications(false); }}
+                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-50 last:border-0"
+                      >
+                        <p className="text-[12px] font-semibold text-gray-800">System Update</p>
+                        <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">Admin panel was successfully updated to v2.0.</p>
+                        <p className="text-[9px] text-gray-400 font-semibold mt-1.5">2 hours ago</p>
+                      </div>
+                    </div>
+                    <div
+                      onClick={() => setShowNotifications(false)}
+                      className="px-4 py-2.5 border-t border-gray-50 text-center text-[11px] font-semibold text-gray-500 hover:text-[#800000] hover:bg-gray-50 cursor-pointer transition-colors"
+                    >
+                      Mark all as read
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="h-6 w-px bg-gray-200/60" />
+
+            {/* Profile */}
+            <div className="flex items-center gap-2.5 pl-1 cursor-pointer group">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm transition-transform group-hover:scale-105"
                 style={{ background: "linear-gradient(135deg, #800000 0%, #5c0000 100%)" }}>
                 <GraduationCap size={15} className="text-[#C9A84C]" />
               </div>
               <div className="hidden sm:block leading-tight">
-                <p className="text-[12px] font-semibold text-gray-800">Admin</p>
-                <p className="text-[10px] text-gray-400">ursulinestudycentre</p>
+                <p className="text-[12.5px] font-bold text-gray-800 group-hover:text-[#800000] transition-colors">Admin</p>
+                <p className="text-[10px] font-medium text-gray-400">ursulinestudycentre</p>
               </div>
             </div>
           </div>
