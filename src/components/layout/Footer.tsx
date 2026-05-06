@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { GraduationCap, MapPin, Phone, Mail, Play, MessageCircle } from "lucide-react";
 import { SITE_CONFIG, NAV_LINKS, MORE_LINKS } from "@/lib/constants";
@@ -54,9 +55,11 @@ export default function Footer() {
           {/* BRAND */}
           <div className="space-y-4 lg:col-span-1">
             <div className="flex items-center gap-3">
-              <img
+              <Image
                 src="/logo.png"
                 alt="Ursuline Study Centre"
+                width={30}
+                height={30}
                 className="h-8 md:h-[30px] w-auto object-contain bg-white/95 rounded px-1.5 py-0.5"
               />
               <div>

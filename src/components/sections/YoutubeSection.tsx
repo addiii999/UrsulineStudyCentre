@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getGlobalSettings } from "@/lib/settings";
@@ -75,12 +76,17 @@ export default async function YoutubeSection() {
               >
                 {/* THUMBNAIL */}
                 <div className="relative aspect-video bg-gray-100 overflow-hidden">
-                  <img
-                    src={video.thumbnail || `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`}
-                    alt={video.title ?? "YouTube video"}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={video.thumbnail || `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`}
+                      alt={video.title ?? "YouTube video"}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      quality={70}
+                    />
+                  </div>
                   {/* PLAY OVERLAY */}
                   <div className="absolute inset-0 bg-black/15 group-hover:bg-black/35 transition-colors flex items-center justify-center">
                     <div className="w-12 h-12 rounded-full bg-[#FF0000] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">

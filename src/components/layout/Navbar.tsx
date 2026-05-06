@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Menu, X, ChevronDown, Phone, MapPin, GraduationCap } from "lucide-react";
@@ -128,10 +129,13 @@ export default function Navbar() {
               onClick={() => scrollTo("/#hero")}
               className="flex items-center gap-3 group flex-shrink-0 text-left"
             >
-              <img
+              <Image
                 src="/logo.png"
                 alt="Ursuline Study Centre"
+                width={48}
+                height={48}
                 className="h-10 md:h-12 w-auto object-contain"
+                priority
               />
               <div className="flex flex-col leading-tight">
                 <span className="text-[16px] md:text-[19px] font-bold text-[#111] tracking-tight">

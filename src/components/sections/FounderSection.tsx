@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { Award, Users, BookOpen, Target, ArrowRight } from "lucide-react";
 
 const ACHIEVEMENTS = [
@@ -23,16 +24,20 @@ export default function FounderSection() {
         <div className="grid lg:grid-cols-2 gap-14 items-center">
           {/* LEFT: PROFILE */}
           <div className="flex flex-col items-center lg:items-start">
-            {/* Founder Photo */}
+            {/* Founder Photo — next/image for automatic WebP + correct sizing */}
             <div className="relative mb-8 group">
               {/* Decorative background blur */}
               <div className="absolute -inset-2 bg-gradient-to-tr from-[#800000]/20 to-[#C9A84C]/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
               <div className="relative w-64 md:w-[22rem] aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl border-4 border-white transition-transform duration-500 group-hover:-translate-y-1">
-                <img
+                <Image
                   src="/images/founder.png"
                   alt="Abhishek Pathak - Founder, Ursuline Study Centre"
-                  className="w-full h-full object-cover object-[center_top_10%] transition-transform duration-700 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 768px) 256px, 352px"
+                  className="object-cover object-[center_top_10%] transition-transform duration-700 group-hover:scale-105"
+                  quality={75}
+                  priority
                 />
               </div>
               <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-[#C9A84C] to-[#b39542] text-white text-sm font-bold px-5 py-2.5 rounded-full shadow-lg border-2 border-white transform transition-transform duration-500 group-hover:scale-105">
@@ -48,7 +53,7 @@ export default function FounderSection() {
                 Abhishek Pathak
               </h3>
               <p className="text-[#C9A84C] font-semibold text-sm uppercase tracking-wider">
-                Founder & Director
+                Founder &amp; Director
               </p>
               <p className="text-gray-500 text-sm">JEE Expert · Mathematics Specialist</p>
             </div>
@@ -79,7 +84,7 @@ export default function FounderSection() {
               <p>
                 <strong className="text-gray-900">Abhishek Pathak</strong> is a highly accomplished
                 educator with over <strong>10 years of experience</strong> teaching Mathematics and
-                guiding students for JEE Main & Advanced. Holding an M.Sc in Mathematics, he brings
+                guiding students for JEE Main &amp; Advanced. Holding an M.Sc in Mathematics, he brings
                 unparalleled depth, clarity, and passion to every classroom.
               </p>
               <p>

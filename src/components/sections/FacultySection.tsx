@@ -1,6 +1,6 @@
+import Image from "next/image";
 import { BookOpen, GraduationCap, Star } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-
 import { unstable_noStore as noStore } from "next/cache";
 
 export default async function FacultySection() {
@@ -53,14 +53,19 @@ export default async function FacultySection() {
             return (
               <div key={member.id} className="card group">
                 <div className="flex items-start gap-4">
-                  {/* AVATAR */}
+                  {/* AVATAR — Next/Image with lazy loading + skeleton */}
                   {member.image_url ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img 
-                      src={member.image_url} 
-                      alt={member.name} 
-                      className="w-14 h-14 rounded-xl object-cover shadow-md border border-gray-100 flex-shrink-0" 
-                    />
+                    <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 shadow-md border border-gray-100 bg-gray-100 relative">
+                      <Image
+                        src={member.image_url}
+                        alt={member.name}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                        loading={i < 3 ? "eager" : "lazy"}
+                        quality={75}
+                      />
+                    </div>
                   ) : (
                     <div
                       className={`w-14 h-14 rounded-xl bg-gradient-to-br ${colors[i % colors.length]} flex items-center justify-center flex-shrink-0 shadow-md`}
