@@ -54,13 +54,22 @@ export default async function FacultySection() {
               <div key={member.id} className="card group">
                 <div className="flex items-start gap-4">
                   {/* AVATAR */}
-                  <div
-                    className={`w-14 h-14 rounded-xl bg-gradient-to-br ${colors[i % colors.length]} flex items-center justify-center flex-shrink-0 shadow-md`}
-                  >
-                    <span className="text-white text-lg font-bold" style={{ fontFamily: "var(--font-serif)" }}>
-                      {initials}
-                    </span>
-                  </div>
+                  {member.image_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img 
+                      src={member.image_url} 
+                      alt={member.name} 
+                      className="w-14 h-14 rounded-xl object-cover shadow-md border border-gray-100 flex-shrink-0" 
+                    />
+                  ) : (
+                    <div
+                      className={`w-14 h-14 rounded-xl bg-gradient-to-br ${colors[i % colors.length]} flex items-center justify-center flex-shrink-0 shadow-md`}
+                    >
+                      <span className="text-white text-lg font-bold" style={{ fontFamily: "var(--font-serif)" }}>
+                        {initials}
+                      </span>
+                    </div>
+                  )}
 
                   {/* INFO */}
                   <div className="min-w-0">
