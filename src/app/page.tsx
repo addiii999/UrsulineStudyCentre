@@ -17,6 +17,8 @@ import TrustBanner from "@/components/sections/TrustBanner";
 import MobileActionBar from "@/components/ui/MobileActionBar";
 import AnnouncementBanner from "@/components/layout/AnnouncementBanner";
 
+export const revalidate = 0;
+
 export default function HomePage() {
   return (
     <>

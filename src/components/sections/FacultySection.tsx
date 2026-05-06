@@ -1,10 +1,10 @@
 import { BookOpen, GraduationCap, Star } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-// Add revalidate to ensure it fetches fresh data, or no-store
-export const revalidate = 0;
+import { unstable_noStore as noStore } from "next/cache";
 
 export default async function FacultySection() {
+  noStore();
   const { data: facultyData } = await supabase
     .from("faculty")
     .select("*")
