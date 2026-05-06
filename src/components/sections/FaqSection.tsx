@@ -36,7 +36,7 @@ export default function FaqSection() {
 
   if (loading) {
     return (
-      <section id="faq" className="py-20 md:py-28 bg-[#FDF8F0] flex justify-center">
+      <section id="faq" className="py-14 md:py-20 bg-[#FDF8F0] flex justify-center">
         <Loader2 size={30} className="animate-spin text-[#800000]" />
       </section>
     );
@@ -45,7 +45,7 @@ export default function FaqSection() {
   if (faqs.length === 0) return null;
 
   return (
-    <section id="faq" className="py-20 md:py-28 bg-[#FDF8F0]">
+    <section id="faq" className="py-14 md:py-20 bg-[#FDF8F0]">
       <div className="max-w-4xl mx-auto px-6">
         {/* HEADER */}
         <div className="text-center mb-12">

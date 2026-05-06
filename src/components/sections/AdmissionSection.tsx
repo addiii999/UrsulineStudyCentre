@@ -5,10 +5,10 @@ import Link from "next/link";
 
 export default function AdmissionSection() {
   return (
-    <section id="admission" className="py-20 md:py-28 bg-white">
+    <section id="admission" className="py-14 md:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         {/* HEADER */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-10">
           <span className="section-tag">Admission</span>
           <h2 className="section-heading mt-4">
             Start Your <span className="text-[#800000]">Journey Today</span>
@@ -19,7 +19,7 @@ export default function AdmissionSection() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-14">
+        <div className="grid lg:grid-cols-2 gap-10">
           {/* LEFT: STEPS */}
           <div>
             <h3

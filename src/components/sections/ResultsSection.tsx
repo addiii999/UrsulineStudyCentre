@@ -17,7 +17,7 @@ export default async function ResultsSection() {
   }
 
   return (
-    <section id="results" className="py-20 md:py-28 bg-[#800000] relative overflow-hidden">
+    <section id="results" className="py-14 md:py-20 bg-[#800000] relative overflow-hidden">
       {/* DECORATIVE */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-white/3" />
@@ -31,7 +31,7 @@ export default async function ResultsSection() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <div className="text-center mb-14">
+        <div className="text-center mb-8">
           <span className="inline-flex items-center gap-2 bg-white/10 border border-[#C9A84C]/40 text-[#C9A84C] text-xs font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider">
             Our Results
           </span>
@@ -67,7 +67,7 @@ export default async function ResultsSection() {
           ))}
         </div>
 
-        <div className="mt-12 bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 text-center max-w-4xl mx-auto flex flex-col items-center gap-5">
+        <div className="mt-8 bg-white/5 border border-white/10 rounded-2xl p-5 md:p-6 text-center max-w-4xl mx-auto flex flex-col items-center gap-4">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-[#C9A84C]/30 text-white/90 text-[11px] md:text-xs font-semibold px-4 py-1.5 rounded-full tracking-wider uppercase">
              Powered by Academic Origin
           </div>
@@ -76,7 +76,7 @@ export default async function ResultsSection() {
           </p>
         </div>
 
-        <div className="text-center mt-12 pt-8 border-t border-white/10">
+        <div className="text-center mt-8 pt-6 border-t border-white/10">
           <p className="text-white/50 text-sm italic">
             &ldquo;Our results are not just numbers - they are the dreams of thousands of girls
             fulfilled.&rdquo;

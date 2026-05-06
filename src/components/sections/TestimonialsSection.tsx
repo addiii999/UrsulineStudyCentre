@@ -18,7 +18,7 @@ export default async function TestimonialsSection() {
   }
 
   return (
-    <section id="testimonials" className="py-20 md:py-28 bg-[#FDF8F0]">
+    <section id="testimonials" className="py-14 md:py-20 bg-[#FDF8F0]">
       <div className="max-w-7xl mx-auto px-6">
         {/* HEADER */}
         <div className="text-center mb-12">

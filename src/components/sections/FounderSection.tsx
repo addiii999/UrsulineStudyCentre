@@ -11,9 +11,9 @@ const ACHIEVEMENTS = [
 
 export default function FounderSection() {
   return (
-    <section id="founder" className="py-20 md:py-28 bg-[#FDF8F0]">
+    <section id="founder" className="py-14 md:py-20 bg-[#FDF8F0]">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-14">
+        <div className="text-center mb-10">
           <span className="section-tag">Meet the Founder</span>
           <h2 className="section-heading mt-4">
             Visionary Leadership
@@ -21,11 +21,11 @@ export default function FounderSection() {
           <div className="gold-divider mx-auto mt-4" />
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-14 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 items-center">
           {/* LEFT: PROFILE */}
           <div className="flex flex-col items-center lg:items-start">
             {/* Founder Photo — next/image for automatic WebP + correct sizing */}
-            <div className="relative mb-8 group">
+            <div className="relative mb-6 group">
               {/* Decorative background blur */}
               <div className="absolute -inset-2 bg-gradient-to-tr from-[#800000]/20 to-[#C9A84C]/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               

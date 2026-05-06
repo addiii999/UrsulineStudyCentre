@@ -40,7 +40,7 @@ export default function HeroSection() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#C9A84C]/30 to-transparent" />
       </div>
 
-      <div className="relative z-10 w-full max-w-4xl mx-auto px-6 py-20 text-center flex flex-col items-center">
+      <div className="relative z-10 w-full max-w-4xl mx-auto px-6 py-14 text-center flex flex-col items-center">
         
         {/* ADMISSIONS BADGE */}
         {admissionsOpen && (
@@ -50,7 +50,7 @@ export default function HeroSection() {
           </div>
         )}
 
-        <div className="space-y-5 mb-10 mt-4">
+        <div className="space-y-4 mb-7 mt-2">
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-bold text-white tracking-tight leading-[1.05]">
             Ursuline{" "}
             <span className="text-[#C9A84C]">Study Centre</span>
@@ -60,7 +60,7 @@ export default function HeroSection() {
           </p>
         </div>
 
-        <div className="space-y-6 max-w-2xl mx-auto mb-12">
+        <div className="space-y-4 max-w-2xl mx-auto mb-8">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-white/95 tracking-wide">
             Empowering Girls. Building Futures.
           </h2>

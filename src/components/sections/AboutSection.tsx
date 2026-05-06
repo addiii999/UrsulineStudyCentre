@@ -11,9 +11,9 @@ const INFO_CHIPS = [
 
 export default function AboutSection() {
   return (
-    <section id="about" className="py-20 md:py-28 bg-white">
+    <section id="about" className="py-14 md:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-14 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 items-center">
           {/* LEFT: TEXT */}
           <div className="space-y-6">
             <div>

@@ -20,16 +20,16 @@ export default function CoursesSection() {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <section id="courses" className="py-20 md:py-28 bg-white">
+    <section id="courses" className="py-14 md:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         {/* HEADER */}
         <div className="text-center mb-12">
           <span className="section-tag">Programs Offered</span>
-          <h2 className="section-heading mt-4">
+          <h2 className="section-heading mt-3">
             Our <span className="text-[#800000]">Courses</span>
           </h2>
-          <div className="gold-divider mx-auto mt-4" />
-          <p className="section-subheading mx-auto mt-4">
+          <div className="gold-divider mx-auto mt-3" />
+          <p className="section-subheading mx-auto mt-3">
             Comprehensive learning programs designed specifically for girls, focusing on
             academic excellence and holistic development.
           </p>

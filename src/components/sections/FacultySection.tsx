@@ -17,10 +17,10 @@ export default async function FacultySection() {
   if (faculty.length === 0) return null;
 
   return (
-    <section id="faculty" className="py-20 md:py-28 bg-white">
+    <section id="faculty" className="py-14 md:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         {/* HEADER */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <span className="section-tag">Our Faculty</span>
           <h2 className="section-heading mt-4">
             Expert <span className="text-[#800000]">Educators</span>
@@ -109,7 +109,7 @@ export default async function FacultySection() {
           })}
         </div>
 
-        <div className="text-center mt-10 space-y-1">
+        <div className="text-center mt-8 space-y-1">
           <p className="text-gray-500 text-sm">
             All faculty members are subject matter experts with a passion for girls&apos; education.
           </p>

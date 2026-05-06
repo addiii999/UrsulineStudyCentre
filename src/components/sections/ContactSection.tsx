@@ -61,10 +61,10 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-20 md:py-28 pb-28 md:pb-28 bg-[#FDF8F0]">
+    <section id="contact" className="py-14 md:py-20 bg-[#FDF8F0]">
       <div className="max-w-7xl mx-auto px-6">
         {/* HEADER */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-10">
           <span className="section-tag">Contact Us</span>
           <h2 className="section-heading mt-4">
             Get in <span className="text-[#800000]">Touch</span>

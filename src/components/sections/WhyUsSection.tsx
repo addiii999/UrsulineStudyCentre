@@ -14,7 +14,7 @@ export default function WhyUsSection() {
   return (
     <section
       id="why-us"
-      className="py-20 md:py-28 bg-[#800000] relative overflow-hidden"
+      className="py-14 md:py-20 bg-[#800000] relative overflow-hidden"
     >
       {/* BACKGROUND TEXTURE */}
       <div className="absolute inset-0 pointer-events-none">
@@ -31,7 +31,7 @@ export default function WhyUsSection() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* HEADER */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-10">
           <span className="inline-flex items-center gap-2 bg-white/10 border border-[#C9A84C]/40 text-[#C9A84C] text-xs font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider">
             Why Choose Us
           </span>
