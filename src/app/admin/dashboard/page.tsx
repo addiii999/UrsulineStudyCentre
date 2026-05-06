@@ -110,7 +110,12 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/login", { method: "DELETE" });
+    } catch {
+      // ignore network errors — redirect anyway
+    }
     router.push("/login");
   };
 

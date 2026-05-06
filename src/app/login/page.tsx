@@ -40,15 +40,24 @@ export default function LoginPage() {
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    if (adminForm.username === "admin" && adminForm.password === "usc@admin2026") {
-      document.cookie = "admin_session=true; path=/; max-age=86400; SameSite=Lax";
-      toast.success("Welcome, Admin!");
-      router.push("/admin/dashboard");
-    } else {
-      toast.error("Invalid credentials");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: adminForm.username, password: adminForm.password }),
+      });
+      if (res.ok) {
+        toast.success("Welcome, Admin!");
+        router.push("/admin/dashboard");
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Invalid credentials");
+      }
+    } catch {
+      toast.error("Connection error. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
@@ -241,9 +250,7 @@ export default function LoginPage() {
                 <button type="submit" disabled={loading} className="btn-primary w-full justify-center mt-1">
                   {loading ? "Authenticating..." : <>Access Admin Panel <ArrowRight size={15} /></>}
                 </button>
-                <p className="text-center text-[10px] text-gray-400 mt-2">
-                  Default: admin / usc@admin2026
-                </p>
+
               </form>
             )}
           </div>
