@@ -6,6 +6,7 @@ import FounderSection from "@/components/sections/FounderSection";
 import CoursesSection from "@/components/sections/CoursesSection";
 import FacultySection from "@/components/sections/FacultySection";
 import WhyUsSection from "@/components/sections/WhyUsSection";
+import GallerySection from "@/components/sections/GallerySection";
 import ResultsSection from "@/components/sections/ResultsSection";
 import YoutubeSection from "@/components/sections/YoutubeSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
@@ -31,6 +32,7 @@ export default function HomePage() {
         <CoursesSection />
         <FacultySection />
         <WhyUsSection />
+        <GallerySection />
         <ResultsSection />
         <TrustBanner />
         <YoutubeSection />

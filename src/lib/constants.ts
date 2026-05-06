@@ -174,6 +174,7 @@ export const NAV_LINKS = [
 
 export const MORE_LINKS = [
   { label: "Founder", href: "/#founder" },
+  { label: "Gallery", href: "/#gallery" },
   { label: "Results", href: "/#results" },
   { label: "Testimonials", href: "/#testimonials" },
   { label: "YouTube", href: "/#youtube" },

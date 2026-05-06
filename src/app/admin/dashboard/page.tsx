@@ -5,7 +5,7 @@ import {
   LayoutDashboard, BookOpen, Users, Play, ClipboardList,
   CreditCard, MessageSquare, LogOut, GraduationCap, Menu,
   ChevronLeft, Bell, HelpCircle, Star, Megaphone, Trophy,
-  Settings, ExternalLink,
+  Settings, ExternalLink, Images,
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -22,10 +22,11 @@ import AdminTestimonials from "@/components/admin/AdminTestimonials";
 import AdminAnnouncements from "@/components/admin/AdminAnnouncements";
 import AdminResults from "@/components/admin/AdminResults";
 import AdminSettings from "@/components/admin/AdminSettings";
+import AdminGallery from "@/components/admin/AdminGallery";
 
 type AdminSection =
   | "dashboard"
-  | "courses" | "faculty" | "videos" | "testimonials" | "results" | "faq"
+  | "courses" | "faculty" | "videos" | "gallery" | "testimonials" | "results" | "faq"
   | "admissions" | "fees" | "enquiries"
   | "announcements"
   | "settings";
@@ -43,6 +44,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: "courses",      label: "Courses",       icon: <BookOpen size={16} /> },
       { id: "faculty",      label: "Faculty",        icon: <Users size={16} /> },
       { id: "videos",       label: "Videos",         icon: <Play size={16} /> },
+      { id: "gallery",      label: "Gallery",        icon: <Images size={16} /> },
       { id: "testimonials", label: "Testimonials",   icon: <Star size={16} /> },
       { id: "results",      label: "Results",        icon: <Trophy size={16} /> },
       { id: "faq",          label: "FAQ",            icon: <HelpCircle size={16} /> },
@@ -84,6 +86,7 @@ export default function AdminDashboardPage() {
       case "courses":      return <AdminCourses />;
       case "faculty":      return <AdminFaculty />;
       case "videos":       return <AdminVideos />;
+      case "gallery":      return <AdminGallery />;
       case "admissions":   return <AdminAdmissions />;
       case "fees":         return <AdminFees />;
       case "enquiries":    return <AdminEnquiries />;
