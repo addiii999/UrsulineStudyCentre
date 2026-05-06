@@ -79,7 +79,7 @@ export default function AdminDashboardPage() {
 
   const renderContent = () => {
     switch (activeSection) {
-      case "dashboard":    return <AdminDashboardHome />;
+      case "dashboard":    return <AdminDashboardHome onNavigate={setActiveSection} />;
       case "courses":      return <AdminCourses />;
       case "faculty":      return <AdminFaculty />;
       case "videos":       return <AdminVideos />;
@@ -91,7 +91,7 @@ export default function AdminDashboardPage() {
       case "announcements":return <AdminAnnouncements />;
       case "results":      return <AdminResults />;
       case "settings":     return <AdminSettings />;
-      default:             return <AdminDashboardHome />;
+      default:             return <AdminDashboardHome onNavigate={setActiveSection} />;
     }
   };
 

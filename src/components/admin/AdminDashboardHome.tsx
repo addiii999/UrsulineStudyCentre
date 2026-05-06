@@ -5,6 +5,14 @@ import {
   Play, Loader2, TrendingUp, ArrowUpRight,
 } from "lucide-react";
 
+type AdminSection = "dashboard" | "courses" | "faculty" | "videos" | "testimonials"
+  | "results" | "faq" | "admissions" | "fees" | "enquiries" | "announcements" | "settings";
+
+interface Props {
+  onNavigate: (section: AdminSection) => void;
+}
+
+
 const STATUS_CONFIG: Record<string, { bg: string; text: string; dot: string }> = {
   new:       { bg: "bg-sky-50",    text: "text-sky-700",    dot: "bg-sky-400" },
   contacted: { bg: "bg-amber-50",  text: "text-amber-700",  dot: "bg-amber-400" },
@@ -12,7 +20,7 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; dot: string }> =
   rejected:  { bg: "bg-rose-50",   text: "text-rose-600",   dot: "bg-rose-400" },
 };
 
-export default function AdminDashboardHome() {
+export default function AdminDashboardHome({ onNavigate }: Props) {
   const [stats, setStats] = useState({
     enquiries: 0,
     courses: 0,
@@ -241,7 +249,10 @@ export default function AdminDashboardHome() {
 
         {/* Footer */}
         <div className="px-6 py-3.5 border-t border-gray-50 bg-gray-50/40">
-          <button className="flex items-center gap-1.5 text-[#800000] text-[12px] font-semibold hover:gap-2.5 transition-all duration-150 group">
+          <button
+            onClick={() => onNavigate("enquiries")}
+            className="flex items-center gap-1.5 text-[#800000] text-[12px] font-semibold hover:gap-2.5 transition-all duration-150 group"
+          >
             <TrendingUp size={13} />
             View all enquiries
             <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -257,23 +268,27 @@ export default function AdminDashboardHome() {
             sub: "Publish to website",
             icon: <BookOpen size={18} />,
             from: "#800000", to: "#5c0000",
+            section: "courses" as AdminSection,
           },
           {
             label: "Add Faculty Member",
             sub: "Upload photo & profile",
             icon: <Users size={18} />,
             from: "#92720A", to: "#C9A84C",
+            section: "faculty" as AdminSection,
           },
           {
             label: "Add YouTube Video",
             sub: "Feature on homepage",
             icon: <Play size={18} />,
             from: "#1d4ed8", to: "#2563eb",
+            section: "videos" as AdminSection,
           },
         ].map((action) => (
           <button
             key={action.label}
-            className="group flex items-center gap-4 rounded-2xl px-5 py-4 text-left hover:opacity-95 hover:-translate-y-0.5 transition-all duration-200 shadow-sm"
+            onClick={() => onNavigate(action.section)}
+            className="group flex items-center gap-4 rounded-2xl px-5 py-4 text-left hover:opacity-95 hover:-translate-y-0.5 active:scale-95 transition-all duration-200 shadow-sm cursor-pointer"
             style={{ background: `linear-gradient(135deg, ${action.from} 0%, ${action.to} 100%)` }}
           >
             <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white flex-shrink-0 group-hover:bg-white/20 transition-colors">
