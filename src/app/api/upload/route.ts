@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { NextResponse, NextRequest } from "next/server";
+import { createAdminClient } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     // 1. Verify Admin Authentication
-    const isAdmin = await checkAdminAuth();
+    const isAdmin = await checkAdminAuth(req);
     if (!isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -36,7 +36,8 @@ export async function POST(req: Request) {
     const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExtension}`;
 
     // Upload using Supabase Admin Client (Service Role Key)
-    const { data, error } = await supabaseAdmin.storage
+    const adminClient = createAdminClient();
+    const { data, error } = await adminClient.storage
       .from("faculty_photos")
       .upload(fileName, buffer, {
         contentType: file.type,
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
     }
 
     // 5. Get Public URL
-    const { data: { publicUrl } } = supabaseAdmin.storage
+    const { data: { publicUrl } } = adminClient.storage
       .from("faculty_photos")
       .getPublicUrl(fileName);
 
