@@ -1,9 +1,55 @@
 "use client";
-import { ADMISSION_STEPS, FEE_TABLE } from "@/lib/constants";
+import { ADMISSION_STEPS } from "@/lib/constants";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+
+interface FeeRow {
+  stream: string;
+  annual: string;
+  includes: string;
+}
+
+interface FeesData {
+  session: string;
+  admissionsOpen: boolean;
+  fees: FeeRow[];
+}
+
+const DEFAULT_FEES: FeesData = {
+  session: "2026-27",
+  admissionsOpen: true,
+  fees: [
+    { stream: "Science (PCM)", annual: "15000", includes: "JEE Prep Included" },
+    { stream: "Science (PCB)", annual: "15000", includes: "NEET Prep Included" },
+    { stream: "Commerce", annual: "15000", includes: "Tally Basics Included" },
+    { stream: "Humanities", annual: "15000", includes: "CLAT Basics Included" },
+  ],
+};
 
 export default function AdmissionSection() {
+  const [feesData, setFeesData] = useState<FeesData>(DEFAULT_FEES);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((json) => {
+        const raw = json.settings?.fees_data;
+        if (raw) {
+          const parsed: FeesData = typeof raw === "string" ? JSON.parse(raw) : raw;
+          setFeesData(parsed);
+        }
+      })
+      .catch(() => {/* use defaults silently */});
+  }, []);
+
+  // Format fee for display: "15000" → "₹15,000"
+  const formatFee = (amount: string) => {
+    const num = parseInt(amount, 10);
+    if (isNaN(num)) return amount;
+    return `₹${num.toLocaleString("en-IN")}`;
+  };
+
   return (
     <section id="admission" className="py-14 md:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -22,11 +68,7 @@ export default function AdmissionSection() {
         <div className="grid lg:grid-cols-2 gap-10">
           {/* LEFT: STEPS */}
           <div>
-            <h3
-              className="text-xl font-bold text-gray-900 mb-6"
-            >
-              Admission Process
-            </h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Admission Process</h3>
             <div className="space-y-4">
               {ADMISSION_STEPS.map((step, i) => (
                 <div key={step.step} className="flex items-start gap-4 group">
@@ -53,33 +95,39 @@ export default function AdmissionSection() {
               ))}
             </div>
 
-            <Link
-              href="/apply"
-              className="btn-primary mt-8 inline-flex"
-            >
+            <Link href="/apply" className="btn-primary mt-8 inline-flex">
               Begin Admission
               <ArrowRight size={16} />
             </Link>
           </div>
 
-          {/* RIGHT: FEE CARDS (mobile-first) */}
+          {/* RIGHT: FEE STRUCTURE — dynamic from admin */}
           <div>
             <h3 className="text-xl font-bold text-gray-900 mb-6">Fee Structure</h3>
 
-            {/* FEATURED FEE */}
+            {/* FEATURED FEE — shows first fee amount as the "standard" rate */}
             <div className="bg-[#800000] rounded-2xl p-6 mb-5 text-white text-center relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10"
-                style={{ backgroundImage: "radial-gradient(circle, #C9A84C 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+              <div
+                className="absolute inset-0 opacity-10"
+                style={{
+                  backgroundImage: "radial-gradient(circle, #C9A84C 1px, transparent 1px)",
+                  backgroundSize: "20px 20px",
+                }}
+              />
               <div className="relative z-10">
-                <p className="text-[#C9A84C] text-sm font-semibold uppercase tracking-wider mb-1">Annual Fee (All Streams)</p>
-                <p className="text-5xl font-bold">₹15,000</p>
+                <p className="text-[#C9A84C] text-sm font-semibold uppercase tracking-wider mb-1">
+                  Annual Fee (All Streams) · Session {feesData.session}
+                </p>
+                <p className="text-5xl font-bold">
+                  {feesData.fees[0] ? formatFee(feesData.fees[0].annual) : "₹15,000"}
+                </p>
                 <p className="text-white/60 text-sm mt-1">Per Academic Year</p>
               </div>
             </div>
 
-            {/* FEE CARDS — no horizontal scroll */}
+            {/* FEE ROWS — pulled live from admin */}
             <div className="space-y-3">
-              {FEE_TABLE.map((row) => (
+              {feesData.fees.map((row) => (
                 <div
                   key={row.stream}
                   className="flex items-center justify-between bg-[#FDF8F0] border border-[#e8d9b8] rounded-xl px-5 py-4 gap-3"
@@ -92,7 +140,7 @@ export default function AdmissionSection() {
                     </span>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="text-lg font-bold text-[#800000]">{row.annual}</p>
+                    <p className="text-lg font-bold text-[#800000]">{formatFee(row.annual)}</p>
                     <p className="text-xs text-gray-400">per year</p>
                   </div>
                 </div>
