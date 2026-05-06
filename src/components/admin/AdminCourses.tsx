@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, ToggleLeft, ToggleRight, X, Loader2 } from "lucide-react";
+import {
+  Plus, Pencil, Trash2, Check, X,
+  BookOpen, Loader2, Eye, EyeOff, Save,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Course {
@@ -9,18 +12,29 @@ interface Course {
   category: string;
   description: string;
   is_active: boolean;
+  sort_order?: number;
 }
 
-const CATEGORIES = ["Academic", "Competitive", "Vocational"];
+const CATEGORIES = ["Academic Streams", "Competitive Exams", "Vocational Skills"];
 
 export default function AdminCourses() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", category: "Academic", description: "" });
 
+  // Edit state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editCategory, setEditCategory] = useState("Academic Streams");
+  const [editDesc, setEditDesc] = useState("");
+
+  // Add state
+  const [adding, setAdding] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newCategory, setNewCategory] = useState("Academic Streams");
+  const [newDesc, setNewDesc] = useState("");
+
+  /* ── DATA ─────────────────────────────────────────────── */
   const fetchCourses = async () => {
     setLoading(true);
     try {
@@ -36,178 +50,312 @@ export default function AdminCourses() {
 
   useEffect(() => { fetchCourses(); }, []);
 
-  const handleSubmit = async () => {
-    if (!form.name) return;
+  /* ── EDIT ─────────────────────────────────────────────── */
+  const startEdit = (course: Course) => {
+    setEditingId(course.id);
+    setEditName(course.name);
+    setEditCategory(course.category);
+    setEditDesc(course.description || "");
+    setAdding(false);
+  };
+
+  const cancelEdit = () => { setEditingId(null); setEditName(""); setEditDesc(""); };
+
+  const saveEdit = async () => {
+    if (!editName.trim()) {
+      toast.error("Course name cannot be empty");
+      return;
+    }
     setSaving(true);
     try {
-      if (editId) {
-        const res = await fetch("/api/courses", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: editId, ...form }),
-        });
-        if (!res.ok) throw new Error();
-        toast.success("Course updated");
-      } else {
-        const res = await fetch("/api/courses", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...form, is_active: true }),
-        });
-        if (!res.ok) throw new Error();
-        toast.success("Course added");
-      }
-      fetchCourses();
-      setForm({ name: "", category: "Academic", description: "" });
-      setShowForm(false);
+      const res = await fetch("/api/courses", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingId,
+          name: editName.trim(),
+          category: editCategory,
+          description: editDesc.trim(),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Course updated!");
+      await fetchCourses();
+      cancelEdit();
     } catch {
-      toast.error("Failed to save course");
+      toast.error("Failed to update");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleEdit = (c: Course) => {
-    setForm({ name: c.name, category: c.category, description: c.description || "" });
-    setEditId(c.id);
-    setShowForm(true);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this course?")) return;
+  /* ── DELETE ───────────────────────────────────────────── */
+  const deleteCourse = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this course?")) return;
     try {
       const res = await fetch(`/api/courses?id=${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
       toast.success("Course deleted");
-      setCourses(courses.filter(c => c.id !== id));
+      setCourses((prev) => prev.filter((c) => c.id !== id));
     } catch {
-      toast.error("Failed to delete course");
+      toast.error("Failed to delete");
     }
   };
 
+  /* ── TOGGLE ACTIVE ────────────────────────────────────── */
   const toggleActive = async (course: Course) => {
-    const newActiveState = !course.is_active;
-    setCourses(courses.map(c => c.id === course.id ? { ...c, is_active: newActiveState } : c));
+    const newState = !course.is_active;
+    setCourses((prev) => prev.map((c) => c.id === course.id ? { ...c, is_active: newState } : c));
     try {
       const res = await fetch("/api/courses", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: course.id, is_active: newActiveState }),
+        body: JSON.stringify({ id: course.id, is_active: newState }),
       });
       if (!res.ok) throw new Error();
+      toast.success(newState ? "Course visible on website" : "Course hidden");
     } catch {
-      toast.error("Failed to update status");
-      setCourses(courses.map(c => c.id === course.id ? { ...c, is_active: !newActiveState } : c));
+      setCourses((prev) => prev.map((c) => c.id === course.id ? { ...c, is_active: !newState } : c));
+      toast.error("Update failed");
     }
   };
 
+  /* ── ADD ──────────────────────────────────────────────── */
+  const startAdding = () => { setAdding(true); setEditingId(null); };
+  const cancelAdd = () => { setAdding(false); setNewName(""); setNewDesc(""); setNewCategory("Academic Streams"); };
+
+  const addCourse = async () => {
+    if (!newName.trim()) {
+      toast.error("Course name cannot be empty");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/courses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newName.trim(),
+          category: newCategory,
+          description: newDesc.trim(),
+          is_active: true,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("New Course added!");
+      await fetchCourses();
+      cancelAdd();
+    } catch {
+      toast.error("Failed to add course");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /* ── RENDER ───────────────────────────────────────────── */
+  const activeCourseCount = courses.filter((c) => c.is_active).length;
+
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="space-y-5 max-w-4xl">
+
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="font-bold text-gray-900 text-lg" style={{ fontFamily: "var(--font-serif)" }}>
-            Courses
+            Courses Management
           </h2>
-          <p className="text-gray-400 text-xs">Manage all course offerings</p>
+          <p className="text-gray-400 text-xs mt-0.5">
+            {activeCourseCount} of {courses.length} courses shown publicly on website
+          </p>
         </div>
         <button
-          onClick={() => { setShowForm(true); setEditId(null); setForm({ name: "", category: "Academic", description: "" }); }}
-          className="btn-primary text-sm py-2"
+          onClick={startAdding}
+          disabled={adding}
+          className="flex items-center gap-2 bg-[#800000] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#6a0000] transition-colors shadow-sm flex-shrink-0"
         >
           <Plus size={15} /> Add Course
         </button>
       </div>
 
-      {/* FORM */}
-      {showForm && (
-        <div className="bg-white rounded-xl border border-[#C9A84C]/30 p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-sm text-gray-900">{editId ? "Edit Course" : "Add New Course"}</h3>
-            <button onClick={() => setShowForm(false)}><X size={16} className="text-gray-400" /></button>
+      {/* ADD FORM */}
+      {adding && (
+        <div className="bg-white rounded-2xl border-2 border-[#800000]/25 shadow-sm overflow-hidden mb-6">
+          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-gray-50 bg-[#800000]/3">
+            <BookOpen size={15} className="text-[#800000]" />
+            <p className="font-semibold text-[#800000] text-sm">New Course</p>
           </div>
-          <div className="grid sm:grid-cols-3 gap-3">
-            <div>
-              <label className="label">Course Name</label>
-              <input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className="input-field" placeholder="e.g., Science PCM" />
-            </div>
-            <div>
-              <label className="label">Category</label>
-              <select value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} className="input-field">
-                {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-              </select>
+          <div className="p-5 space-y-4">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="label">Course Name *</label>
+                <input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="input-field"
+                  placeholder="e.g. Science (PCM)"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="label">Category *</label>
+                <select
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  className="input-field"
+                >
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div>
               <label className="label">Description</label>
-              <input value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} className="input-field" placeholder="Brief description" />
+              <input
+                value={newDesc}
+                onChange={(e) => setNewDesc(e.target.value)}
+                className="input-field"
+                placeholder="Brief description (e.g. Physics, Chemistry, Maths for JEE)"
+              />
             </div>
-          </div>
-          <div className="flex gap-2 mt-4">
-            <button onClick={handleSubmit} disabled={saving} className="btn-primary text-sm py-1.5 flex items-center gap-2">
-              {saving ? <Loader2 size={14} className="animate-spin" /> : null}
-              {editId ? "Update" : "Add Course"}
-            </button>
-            <button onClick={() => setShowForm(false)} disabled={saving} className="btn-secondary text-sm py-1.5">Cancel</button>
+            <div className="flex gap-2.5 pt-1">
+              <button
+                onClick={addCourse}
+                disabled={saving || !newName.trim()}
+                className="flex items-center gap-2 bg-[#800000] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#6a0000] disabled:opacity-50 transition-colors"
+              >
+                {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                Save Course
+              </button>
+              <button
+                onClick={cancelAdd}
+                disabled={saving}
+                className="flex items-center gap-2 border border-gray-200 text-gray-500 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
+                <X size={14} /> Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* TABLE */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-gray-50/80 border-b border-gray-100">
             <tr>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Course</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Category</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Description</th>
-              <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-              <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+              <th className="px-5 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Course Name</th>
+              <th className="px-5 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Category</th>
+              <th className="px-5 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider hidden md:table-cell">Description</th>
+              <th className="px-5 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50/80">
             {loading ? (
               <tr>
-                <td colSpan={5} className="px-5 py-10 text-center text-gray-400">
-                  <Loader2 size={24} className="animate-spin mx-auto mb-2" />
-                  Loading courses...
+                <td colSpan={4} className="px-5 py-12 text-center">
+                  <Loader2 size={24} className="animate-spin text-gray-300 mx-auto mb-2" />
+                  <p className="text-gray-400 text-sm">Loading courses...</p>
                 </td>
               </tr>
             ) : courses.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-5 py-10 text-center text-gray-400">
-                  No courses found. Add a course to get started.
+                <td colSpan={4} className="px-5 py-12 text-center">
+                  <BookOpen size={32} className="text-gray-200 mx-auto mb-3" />
+                  <p className="text-gray-400 text-sm font-medium">No courses found</p>
+                  <p className="text-gray-300 text-xs mt-1">Click "Add Course" to get started</p>
                 </td>
               </tr>
             ) : (
-              courses.map((course) => (
-                <tr key={course.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-5 py-3 font-semibold text-gray-900">{course.name}</td>
-                  <td className="px-4 py-3">
-                    <span className="maroon-chip text-[10px]">{course.category}</span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500 text-xs hidden md:table-cell">{course.description}</td>
-                  <td className="px-4 py-3 text-center">
-                    <button onClick={() => toggleActive(course)}>
-                      {course.is_active
-                        ? <ToggleRight size={22} className="text-green-500 mx-auto" />
-                        : <ToggleLeft size={22} className="text-gray-300 mx-auto" />}
-                    </button>
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <button onClick={() => handleEdit(course)} className="p-1.5 rounded-lg text-gray-400 hover:text-[#800000] hover:bg-gray-100 transition-colors">
-                        <Edit2 size={14} />
-                      </button>
-                      <button onClick={() => handleDelete(course.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+              courses.map((course, idx) => (
+                editingId === course.id ? (
+                  /* ─ EDIT ROW ─ */
+                  <tr key={course.id} className="bg-[#800000]/[0.02]">
+                    <td colSpan={4} className="p-5 border-l-[3px] border-[#800000]">
+                      <div className="space-y-4 max-w-2xl">
+                        <p className="text-xs font-semibold text-[#800000] flex items-center gap-1.5">
+                          <Pencil size={11} /> Editing Course
+                        </p>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="label">Course Name</label>
+                            <input value={editName} onChange={(e) => setEditName(e.target.value)} className="input-field bg-white" autoFocus />
+                          </div>
+                          <div>
+                            <label className="label">Category</label>
+                            <select value={editCategory} onChange={(e) => setEditCategory(e.target.value)} className="input-field bg-white">
+                              {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="label">Description</label>
+                          <input value={editDesc} onChange={(e) => setEditDesc(e.target.value)} className="input-field bg-white" />
+                        </div>
+                        <div className="flex gap-2 pt-2">
+                          <button onClick={saveEdit} disabled={saving} className="flex items-center gap-2 bg-[#800000] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#6a0000] disabled:opacity-50 transition-colors">
+                            {saving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Save Changes
+                          </button>
+                          <button onClick={cancelEdit} disabled={saving} className="flex items-center gap-2 border border-gray-200 text-gray-500 px-4 py-2 rounded-xl text-xs font-medium hover:bg-white">
+                            <X size={12} /> Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  /* ─ VIEW ROW ─ */
+                  <tr key={course.id} className={`hover:bg-gray-50/40 transition-colors ${!course.is_active ? "opacity-60" : ""}`}>
+                    <td className="px-5 py-4">
+                      <p className={`font-semibold text-[13px] ${course.is_active ? "text-gray-900" : "text-gray-500"}`}>{course.name}</p>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="inline-flex px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 border border-gray-200 text-[10.5px] font-semibold whitespace-nowrap">
+                        {course.category}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 hidden md:table-cell">
+                      <p className="text-gray-500 text-[12px] truncate max-w-xs">{course.description || "—"}</p>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-1.5 justify-end">
+                        <button
+                          onClick={() => toggleActive(course)}
+                          title={course.is_active ? "Hide from website" : "Show on website"}
+                          className={`flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded-md border transition-colors ${
+                            course.is_active
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                              : "bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100"
+                          }`}
+                        >
+                          {course.is_active ? <Eye size={11} /> : <EyeOff size={11} />}
+                        </button>
+
+                        <button
+                          onClick={() => startEdit(course)}
+                          title="Edit"
+                          className="p-1.5 rounded-md text-gray-400 hover:text-[#800000] hover:bg-[#800000]/5 transition-colors"
+                        >
+                          <Pencil size={13} />
+                        </button>
+
+                        <button
+                          onClick={() => deleteCourse(course.id)}
+                          title="Delete"
+                          className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
               ))
             )}
           </tbody>
         </table>
       </div>
+
     </div>
   );
 }
