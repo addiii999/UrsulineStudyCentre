@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
+import { createNotification } from "@/lib/notify";
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function extractVideoId(input: string): string | null {
@@ -108,6 +109,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    createNotification({
+      title:   "YouTube Video Added",
+      message: `Video "${(title ?? "").trim() || video_id}" was added to the website.`,
+      type:    "video",
+    }).catch(() => {});
     return NextResponse.json({ video: data }, { status: 201 });
   } catch (err) {
     console.error("[Videos POST] Unexpected:", err);

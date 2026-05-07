@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 import { sendAdminNotification } from "@/lib/sendEmail";
+import { createNotification } from "@/lib/notify";
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,12 +48,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── Send Email Notification (non-blocking — never fails the request) ──────
+    // ── Non-blocking: fire notification + email ──────────────────────────────
     const submittedAt = new Date().toLocaleString("en-IN", {
       timeZone: "Asia/Kolkata",
       dateStyle: "full",
       timeStyle: "short",
     });
+
+    createNotification({
+      title:   "New Admission Enquiry",
+      message: `${name.trim()} (${cls.trim()}${stream ? " – " + stream : ""}) submitted an enquiry.`,
+      type:    "enquiry",
+    }).catch(() => {});
 
     sendAdminNotification({
       name: name.trim(),

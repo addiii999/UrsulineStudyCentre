@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { createNotification } from "@/lib/notify";
 
 export async function GET() {
   try {
@@ -32,6 +33,11 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) throw error;
+    createNotification({
+      title:   "New Course Added",
+      message: `Course "${body.name || "Untitled"}" (${body.category || ""}) was published.`,
+      type:    "course",
+    }).catch(() => {});
     return NextResponse.json(data, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

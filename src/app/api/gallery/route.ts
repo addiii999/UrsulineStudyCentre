@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createAdminClient, supabase } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
+import { createNotification } from "@/lib/notify";
 
 // ─── GET: Public gallery fetch ────────────────────────────────
 export async function GET() {
@@ -70,6 +71,12 @@ export async function POST(req: NextRequest) {
       console.error("DB insert error:", dbErr);
       return NextResponse.json({ error: "DB insert failed" }, { status: 500 });
     }
+
+    createNotification({
+      title:   "Gallery Image Uploaded",
+      message: `New photo "${title || "Untitled"}" was added to the campus gallery.`,
+      type:    "gallery",
+    }).catch(() => {});
 
     return NextResponse.json({ item: data }, { status: 201 });
   } catch (err) {
