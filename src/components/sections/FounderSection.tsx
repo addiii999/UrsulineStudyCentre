@@ -12,8 +12,7 @@ const ACHIEVEMENTS = [
 export default function FounderSection() {
   return (
     <section id="founder" className="py-20 md:py-28 bg-[#FDF8F0] relative overflow-hidden">
-      {/* Subtle Background Pattern */}
-      <div className="absolute inset-0 bg-[url('/pattern.png')] opacity-[0.02] mix-blend-multiply pointer-events-none" />
+
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         
