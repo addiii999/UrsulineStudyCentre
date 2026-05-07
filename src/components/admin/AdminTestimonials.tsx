@@ -152,13 +152,14 @@ export default function AdminTestimonials() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newItem),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to add testimonial");
       toast.success("Added successfully");
       setNewItem({ rating: 5, is_visible: true });
       setAdding(false);
       fetchTestimonials();
-    } catch {
-      toast.error("Failed to add");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to add");
     } finally {
       setSaving(false);
     }
