@@ -8,6 +8,7 @@ export default async function FacultySection() {
   const { data: facultyData } = await supabase
     .from("faculty")
     .select("*")
+    .eq("is_deleted", false)
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });

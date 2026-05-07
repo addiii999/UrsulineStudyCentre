@@ -1,3 +1,4 @@
+import { logAudit } from "@/lib/audit";
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
     const supabase = createAdminClient();
     let query = supabase
       .from("videos")
-      .select("*")
+      .select("*").eq("is_deleted", false)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -169,13 +170,14 @@ export async function DELETE(req: NextRequest) {
     }
 
     const supabase = createAdminClient();
-    const { error } = await supabase.from("videos").delete().eq("id", id);
+    const { error } = await supabase.from("videos").update({ is_deleted: true, deleted_at: new Date().toISOString() }).eq("id", id);
 
     if (error) {
       console.error("[Videos DELETE]", error.message);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    logAudit({ action: "soft_delete", table_name: "videos", item_id: id }).catch(() => {});
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[Videos DELETE] Unexpected:", err);

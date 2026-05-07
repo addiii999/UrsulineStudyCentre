@@ -6,6 +6,7 @@ export default async function ResultsSection() {
   const { data: statsData } = await supabase
     .from("results")
     .select("*")
+    .eq("is_deleted", false)
     .eq("is_visible", true)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });

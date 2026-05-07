@@ -22,6 +22,7 @@ export default async function YoutubeSection() {
   const { data: videosData } = await supabase
     .from("videos")
     .select("*")
+    .eq("is_deleted", false)
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false })

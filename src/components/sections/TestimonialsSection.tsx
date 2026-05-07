@@ -7,6 +7,7 @@ export default async function TestimonialsSection() {
   const { data: testimonialsData } = await supabase
     .from("testimonials")
     .select("*")
+    .eq("is_deleted", false)
     .eq("is_visible", true)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });

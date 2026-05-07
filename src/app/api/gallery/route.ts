@@ -1,3 +1,4 @@
+import { logAudit } from "@/lib/audit";
 import { NextResponse, NextRequest } from "next/server";
 import { createAdminClient, supabase } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
@@ -8,7 +9,7 @@ export async function GET() {
   try {
     const { data, error } = await supabase
       .from("gallery")
-      .select("*")
+      .select("*").eq("is_deleted", false)
       .eq("is_active", true)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
@@ -130,9 +131,10 @@ export async function DELETE(req: NextRequest) {
       await adminClient.storage.from("faculty_photos").remove([storage_path]);
     }
 
-    const { error } = await adminClient.from("gallery").delete().eq("id", id);
+    const { error } = await adminClient.from("gallery").update({ is_deleted: true, deleted_at: new Date().toISOString() }).eq("id", id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+    logAudit({ action: "soft_delete", table_name: "gallery", item_id: id }).catch(() => {});
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Gallery DELETE error:", err);
