@@ -5,7 +5,7 @@ import {
   LayoutDashboard, BookOpen, Users, Play, ClipboardList,
   CreditCard, MessageSquare, LogOut, GraduationCap, Menu,
   ChevronLeft, HelpCircle, Star, Megaphone, Trophy,
-  Settings, ExternalLink, Images,
+  Settings, ExternalLink, Images, HardDrive,
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -24,12 +24,14 @@ import AdminResults from "@/components/admin/AdminResults";
 import AdminSettings from "@/components/admin/AdminSettings";
 import AdminGallery from "@/components/admin/AdminGallery";
 import NotificationBell from "@/components/admin/NotificationBell";
+import AdminStorageManager from "@/components/admin/AdminStorageManager";
 
 type AdminSection =
   | "dashboard"
   | "courses" | "faculty" | "videos" | "gallery" | "testimonials" | "results" | "faq"
   | "admissions" | "fees" | "enquiries"
   | "announcements"
+  | "storage"
   | "settings";
 
 type NavGroup = { label: string; items: { id: AdminSection; label: string; icon: React.ReactNode }[] };
@@ -68,7 +70,8 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "System",
     items: [
-      { id: "settings", label: "Settings", icon: <Settings size={16} /> },
+      { id: "storage",  label: "Storage & Backup", icon: <HardDrive size={16} /> },
+      { id: "settings", label: "Settings",         icon: <Settings size={16} /> },
     ],
   },
 ];
@@ -94,6 +97,7 @@ export default function AdminDashboardPage() {
       case "testimonials": return <AdminTestimonials />;
       case "announcements":return <AdminAnnouncements />;
       case "results":      return <AdminResults />;
+      case "storage":      return <AdminStorageManager />;
       case "settings":     return <AdminSettings />;
       default:             return <AdminDashboardHome onNavigate={setActiveSection} />;
     }
