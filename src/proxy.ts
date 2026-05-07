@@ -6,7 +6,7 @@ const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const MAX_REQUESTS_PER_WINDOW = 100; // 100 requests per minute
 const ADMIN_MAX_REQUESTS = 20; // Stricter for admin logins
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // 1. Auth Protection (from proxy.ts)
@@ -28,7 +28,7 @@ export function middleware(req: NextRequest) {
 
   // 2. API Rate Limiting & Security Headers
   if (pathname.startsWith("/api/")) {
-    const ip = req.headers.get("x-forwarded-for") || req.ip || "unknown-ip";
+    const ip = req.headers.get("x-forwarded-for") || "unknown-ip";
     const now = Date.now();
     
     let userRate = rateLimitMap.get(ip);
