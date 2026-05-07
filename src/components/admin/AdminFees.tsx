@@ -41,8 +41,8 @@ export default function AdminFees() {
         if (feesData) {
           setData(typeof feesData === "string" ? JSON.parse(feesData) : feesData);
         }
-      } catch {
-        toast.error("Failed to load fee data");
+      } catch (err: any) {
+        toast.error(err?.message || "Failed to load fee data");
       } finally {
         setLoading(false);
       }
@@ -67,12 +67,13 @@ export default function AdminFees() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fees_data: JSON.stringify(data) }),
       });
-      if (!res.ok) throw new Error();
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || "Request failed");
       setSaved(true);
       toast.success("Fee structure updated! Public website will update instantly.");
       setTimeout(() => setSaved(false), 3000);
-    } catch {
-      toast.error("Failed to save. Please try again.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save. Please try again.");
     } finally {
       setSaving(false);
     }

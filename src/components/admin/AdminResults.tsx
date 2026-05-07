@@ -25,8 +25,8 @@ export default function AdminResults() {
       const res = await fetch("/api/results");
       const data = await res.json();
       setStats(data.results ?? []);
-    } catch {
-      toast.error("Failed to load results");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to load results");
     } finally {
       setLoading(false);
     }
@@ -44,12 +44,13 @@ export default function AdminResults() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingId, ...draft }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("Updated successfully");
       fetchResults();
       setEditingId(null);
-    } catch {
-      toast.error("Failed to update");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update");
     } finally {
       setSaving(false);
     }
@@ -64,13 +65,14 @@ export default function AdminResults() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...draft, is_visible: true }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("Added successfully");
       fetchResults();
       setAdding(false);
       setDraft({});
-    } catch {
-      toast.error("Failed to add");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to add");
     } finally {
       setSaving(false);
     }
@@ -80,11 +82,12 @@ export default function AdminResults() {
     if (!confirm("Delete this result?")) return;
     try {
       const res = await fetch(`/api/results?id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("Deleted");
       setStats(stats.filter(s => s.id !== id));
-    } catch {
-      toast.error("Failed to delete");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete");
     }
   };
 
@@ -97,9 +100,10 @@ export default function AdminResults() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: item.id, is_visible: newState }),
       });
-      if (!res.ok) throw new Error();
-    } catch {
-      toast.error("Update failed");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
+    } catch (err: any) {
+      toast.error(err?.message || "Update failed");
       setStats(stats.map(s => s.id === item.id ? { ...s, is_visible: !newState } : s));
     }
   };

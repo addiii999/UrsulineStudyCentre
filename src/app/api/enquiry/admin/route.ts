@@ -17,7 +17,7 @@ export async function PATCH(req: NextRequest) {
       .eq("id", id);
 
     if (error) throw error;
-    logAudit({ action: "soft_delete", table_name: "enquiries", item_id: id }).catch(() => {});
+    logAudit({ action: "restore", table_name: "enquiries", item_id: id }).catch(() => {});
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

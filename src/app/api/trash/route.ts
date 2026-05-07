@@ -32,7 +32,7 @@ const TABLE_LABELS: Record<SoftDeleteTable, { singular: string; labelField: stri
 // ─── GET: All soft-deleted items across all tables ──────────
 export async function GET(req: NextRequest) {
   const isAdmin = await checkAdminAuth(req);
-  if (!isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!isAdmin) return NextResponse.json({ error: "Session expired. Please log in to the admin panel again." }, { status: 401 });
 
   try {
     const adminClient = createAdminClient();
@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
 // ─── PATCH: Restore a soft-deleted item ─────────────────────
 export async function PATCH(req: NextRequest) {
   const isAdmin = await checkAdminAuth(req);
-  if (!isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!isAdmin) return NextResponse.json({ error: "Session expired. Please log in to the admin panel again." }, { status: 401 });
 
   try {
     const { id, table, label } = await req.json();
@@ -107,7 +107,7 @@ export async function PATCH(req: NextRequest) {
 // ─── DELETE: Permanently delete one item (DB + Storage) ─────
 export async function DELETE(req: NextRequest) {
   const isAdmin = await checkAdminAuth(req);
-  if (!isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!isAdmin) return NextResponse.json({ error: "Session expired. Please log in to the admin panel again." }, { status: 401 });
 
   try {
     const { id, table, storage_path, label } = await req.json();

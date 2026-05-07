@@ -28,8 +28,8 @@ export default function AdminAnnouncements() {
       const res = await fetch("/api/announcements");
       const data = await res.json();
       setItems(data.announcements ?? []);
-    } catch {
-      toast.error("Failed to load announcements");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to load announcements");
     } finally {
       setLoading(false);
     }
@@ -41,11 +41,12 @@ export default function AdminAnnouncements() {
     if (!confirm("Delete this announcement?")) return;
     try {
       const res = await fetch(`/api/announcements?id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("Deleted");
       setItems(items.filter((a) => a.id !== id));
-    } catch {
-      toast.error("Failed to delete");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete");
     }
   };
 
@@ -58,9 +59,10 @@ export default function AdminAnnouncements() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: ann.id, is_active: newState }),
       });
-      if (!res.ok) throw new Error();
-    } catch {
-      toast.error("Failed to update status");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update status");
       setItems(items.map((a) => a.id === ann.id ? { ...a, is_active: !newState } : a));
     }
   };
@@ -74,13 +76,14 @@ export default function AdminAnnouncements() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newItem),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("Added successfully");
       fetchAnnouncements();
       setNewItem({ type: "info", is_active: true });
       setAdding(false);
-    } catch {
-      toast.error("Failed to add announcement");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to add announcement");
     } finally {
       setSaving(false);
     }

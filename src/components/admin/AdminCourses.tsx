@@ -41,8 +41,8 @@ export default function AdminCourses() {
       const res = await fetch("/api/courses");
       const data = await res.json();
       setCourses(data.courses ?? []);
-    } catch {
-      toast.error("Failed to load courses");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to load courses");
     } finally {
       setLoading(false);
     }
@@ -78,12 +78,13 @@ export default function AdminCourses() {
           description: editDesc.trim(),
         }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("Course updated!");
       await fetchCourses();
       cancelEdit();
-    } catch {
-      toast.error("Failed to update");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update");
     } finally {
       setSaving(false);
     }
@@ -94,11 +95,12 @@ export default function AdminCourses() {
     if (!confirm("Are you sure you want to delete this course?")) return;
     try {
       const res = await fetch(`/api/courses?id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("Course deleted");
       setCourses((prev) => prev.filter((c) => c.id !== id));
-    } catch {
-      toast.error("Failed to delete");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete");
     }
   };
 
@@ -112,7 +114,8 @@ export default function AdminCourses() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: course.id, is_active: newState }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success(newState ? "Course visible on website" : "Course hidden");
     } catch {
       setCourses((prev) => prev.map((c) => c.id === course.id ? { ...c, is_active: !newState } : c));
@@ -141,12 +144,13 @@ export default function AdminCourses() {
           is_active: true,
         }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("New Course added!");
       await fetchCourses();
       cancelAdd();
-    } catch {
-      toast.error("Failed to add course");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to add course");
     } finally {
       setSaving(false);
     }

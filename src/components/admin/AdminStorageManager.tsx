@@ -119,7 +119,8 @@ export default function AdminStorageManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: item.id, table: item.table, label: item.label }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       setTrash(prev => prev.filter(i => i.id !== item.id));
       showToast(`"${item.label}" restored successfully!`);
     } catch { showToast("Restore failed", "err"); }
@@ -136,7 +137,8 @@ export default function AdminStorageManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: item.id, table: item.table, storage_path: item.storage_path, label: item.label }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       setTrash(prev => prev.filter(i => i.id !== item.id));
       showToast(`"${item.label}" permanently deleted.`, "warn");
     } catch { showToast("Delete failed", "err"); }

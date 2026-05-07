@@ -39,8 +39,8 @@ export default function AdminFAQ() {
       const res = await fetch("/api/faqs");
       const data = await res.json();
       setFaqs(data.faqs ?? []);
-    } catch {
-      toast.error("Failed to load FAQs");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to load FAQs");
     } finally {
       setLoading(false);
     }
@@ -71,12 +71,13 @@ export default function AdminFAQ() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingId, question: editQ.trim(), answer: editA.trim() }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("FAQ updated!");
       await fetchFaqs();
       cancelEdit();
-    } catch {
-      toast.error("Failed to update");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update");
     } finally {
       setSaving(false);
     }
@@ -87,12 +88,13 @@ export default function AdminFAQ() {
     if (!confirm("Are you sure you want to delete this FAQ?")) return;
     try {
       const res = await fetch(`/api/faqs?id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("FAQ deleted");
       setFaqs((prev) => prev.filter((f) => f.id !== id));
       if (expandedId === id) setExpandedId(null);
-    } catch {
-      toast.error("Failed to delete");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete");
     }
   };
 
@@ -107,7 +109,8 @@ export default function AdminFAQ() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: faq.id, is_active: newState }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success(newState ? "FAQ shown on website" : "FAQ hidden from website");
     } catch {
       // Revert on failure
@@ -132,12 +135,13 @@ export default function AdminFAQ() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: newQ.trim(), answer: newA.trim(), is_active: true }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("New FAQ added!");
       await fetchFaqs();
       cancelAdd();
-    } catch {
-      toast.error("Failed to add FAQ");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to add FAQ");
     } finally {
       setSaving(false);
     }

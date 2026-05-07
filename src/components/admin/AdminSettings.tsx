@@ -36,8 +36,8 @@ export default function AdminSettings() {
       if (data.settings && Object.keys(data.settings).length > 0) {
         setSettings({ ...INIT, ...data.settings, admissionsOpen: data.settings.admissionsOpen === "true" });
       }
-    } catch {
-      toast.error("Failed to load settings");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to load settings");
     } finally {
       setLoading(false);
     }
@@ -61,12 +61,13 @@ export default function AdminSettings() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       setSettings((p) => ({ ...p, ...updates }));
       toast.success("Updated");
       setEditingField(null);
-    } catch {
-      toast.error("Failed to update");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update");
     } finally {
       setSaving(false);
     }
@@ -81,10 +82,11 @@ export default function AdminSettings() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ admissionsOpen: String(newState) }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success(newState ? "Admissions Opened" : "Admissions Closed");
-    } catch {
-      toast.error("Failed to update");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update");
       setSettings((p) => ({ ...p, admissionsOpen: !newState }));
     }
   };

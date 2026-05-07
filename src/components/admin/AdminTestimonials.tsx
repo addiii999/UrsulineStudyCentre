@@ -85,8 +85,8 @@ export default function AdminTestimonials() {
       const res = await fetch("/api/testimonials");
       const data = await res.json();
       setItems(data.testimonials ?? []);
-    } catch {
-      toast.error("Failed to load testimonials");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to load testimonials");
     } finally {
       setLoading(false);
     }
@@ -104,12 +104,13 @@ export default function AdminTestimonials() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingId, ...draft }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("Testimonial updated");
       fetchTestimonials();
       setEditingId(null);
-    } catch {
-      toast.error("Failed to update");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update");
     } finally {
       setSaving(false);
     }
@@ -119,11 +120,12 @@ export default function AdminTestimonials() {
     if (!confirm("Delete this testimonial?")) return;
     try {
       const res = await fetch(`/api/testimonials?id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("Deleted");
       setItems(items.filter((t) => t.id !== id));
-    } catch {
-      toast.error("Failed to delete");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete");
     }
   };
 
@@ -136,9 +138,10 @@ export default function AdminTestimonials() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: item.id, is_visible: newState }),
       });
-      if (!res.ok) throw new Error();
-    } catch {
-      toast.error("Update failed");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
+    } catch (err: any) {
+      toast.error(err?.message || "Update failed");
       setItems(items.map((t) => (t.id === item.id ? { ...t, is_visible: !newState } : t)));
     }
   };

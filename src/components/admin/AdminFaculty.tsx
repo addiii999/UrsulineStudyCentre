@@ -31,8 +31,8 @@ export default function AdminFaculty() {
       const res = await fetch("/api/faculty");
       const data = await res.json();
       setFaculty(data.faculty ?? []);
-    } catch {
-      toast.error("Failed to load faculty");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to load faculty");
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,8 @@ export default function AdminFaculty() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: editId, ...form }),
         });
-        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || "Request failed");
         toast.success("Faculty updated");
       } else {
         const res = await fetch("/api/faculty", {
@@ -94,14 +95,15 @@ export default function AdminFaculty() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...form, is_active: true }),
         });
-        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || "Request failed");
         toast.success("Faculty added");
       }
       fetchFaculty();
       setForm({ name: "", subject: "", qualification: "", experience: "", role: "", image_url: "" });
       setShowForm(false);
-    } catch {
-      toast.error("Failed to save faculty");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save faculty");
     } finally {
       setSaving(false);
     }
@@ -124,11 +126,12 @@ export default function AdminFaculty() {
     if (!confirm("Remove this faculty member?")) return;
     try {
       const res = await fetch(`/api/faculty?id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("Faculty removed");
       setFaculty(faculty.filter(f => f.id !== id));
-    } catch {
-      toast.error("Failed to delete faculty");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to delete faculty");
     }
   };
 
@@ -141,9 +144,10 @@ export default function AdminFaculty() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: member.id, is_active: newActiveState }),
       });
-      if (!res.ok) throw new Error();
-    } catch {
-      toast.error("Failed to update status");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update status");
       setFaculty(faculty.map(f => f.id === member.id ? { ...f, is_active: !newActiveState } : f));
     }
   };
