@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Check, X, Star, Quote, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
-interface Testimonial { id: string; name: string; student_class: string; quote: string; rating: number; is_visible: boolean; }
+interface Testimonial { id: string; name: string; role: string; quote: string; rating: number; is_visible: boolean; }
 
 // ─── Lifted OUT of the main component — never remounts ────────
 function StarRating({ value, onChange }: { value: number; onChange?: (v: number) => void }) {
@@ -44,8 +44,8 @@ function FormFields({
         <div>
           <label className="block text-xs font-semibold text-gray-600 mb-1">Class / Stream</label>
           <input
-            value={data.student_class || ""}
-            onChange={(e) => setData({ ...data, student_class: e.target.value })}
+            value={data.role || ""}
+            onChange={(e) => setData({ ...data, role: e.target.value })}
             className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-[#800000] focus:outline-none"
             placeholder="e.g. Class 12 (PCM)"
           />
@@ -272,7 +272,7 @@ export default function AdminTestimonials() {
                   <p className="text-gray-600 text-sm italic mt-2 leading-relaxed">&quot;{t.quote}&quot;</p>
                   <div className="mt-3 pt-3 border-t border-gray-50">
                     <p className="font-bold text-gray-900 text-sm">{t.name}</p>
-                    <p className="text-gray-400 text-xs">{t.student_class}</p>
+                    <p className="text-gray-400 text-xs">{t.role}</p>
                   </div>
                 </div>
               )}

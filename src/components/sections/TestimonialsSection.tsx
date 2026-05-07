@@ -68,7 +68,7 @@ export default async function TestimonialsSection() {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
-                    <p className="text-gray-400 text-xs">{t.student_class}</p>
+                    <p className="text-gray-400 text-xs">{t.role}</p>
                   </div>
                 </div>
               </div>
