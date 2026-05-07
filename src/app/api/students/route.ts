@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
 // GET — Admin: fetch all students
 export async function GET(req: NextRequest) {
-  if (!checkAdminAuth(req)) {
+  if (!(await checkAdminAuth(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
 
 // PATCH — Admin: update student status or notes
 export async function PATCH(req: NextRequest) {
-  if (!checkAdminAuth(req)) {
+  if (!(await checkAdminAuth(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {

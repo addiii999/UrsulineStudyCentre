@@ -4,9 +4,14 @@ import { NextRequest } from "next/server";
  * Server-side: Checks if the incoming request has a valid admin session cookie.
  * Used in all protected API routes (PATCH, POST, DELETE).
  */
-export function checkAdminAuth(req: NextRequest): boolean {
+export async function checkAdminAuth(req: NextRequest): Promise<boolean> {
   const cookie = req.cookies.get("admin_session");
-  return cookie?.value === "true";
+  const isValid = cookie?.value === "true";
+  if (!isValid) {
+    const { logAudit } = await import("./audit");
+    await logAudit({ action: "unauthorized_request", table_name: "auth", item_label: req.nextUrl.pathname });
+  }
+  return isValid;
 }
 
 /**

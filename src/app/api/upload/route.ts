@@ -32,8 +32,13 @@ export async function POST(req: NextRequest) {
 
     // 4. Upload to Supabase Storage
     const buffer = Buffer.from(await file.arrayBuffer());
-    const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExtension}`;
+    const mimeToExt: Record<string, string> = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+    };
+    const secureExtension = mimeToExt[file.type] || "jpg";
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${secureExtension}`;
 
     // Upload using Supabase Admin Client (Service Role Key)
     const adminClient = createAdminClient();
@@ -46,6 +51,8 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error("Storage upload error:", error);
+      const { logAudit } = await import("@/lib/audit");
+      await logAudit({ action: "upload_failure", table_name: "storage", item_label: error.message });
       return NextResponse.json({ error: "Failed to upload image to storage" }, { status: 500 });
     }
 

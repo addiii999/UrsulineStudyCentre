@@ -99,7 +99,9 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ enquiries: data ?? [] });
+    return NextResponse.json({ enquiries: data ?? [] }, {
+      headers: { "Cache-Control": "no-store, max-age=0" }
+    });
   } catch (err) {
     console.error("[API] GET error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

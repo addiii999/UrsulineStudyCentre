@@ -15,7 +15,9 @@ export async function GET() {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    return NextResponse.json({ items: data ?? [] });
+    return NextResponse.json({ items: data ?? [] }, {
+      headers: { "Cache-Control": "no-store, max-age=0" }
+    });
   } catch (err) {
     console.error("Gallery GET error:", err);
     return NextResponse.json({ items: [] }, { status: 500 });
@@ -44,8 +46,14 @@ export async function POST(req: NextRequest) {
 
     // Upload to Supabase Storage ─────────────────────────────
     const adminClient = createAdminClient();
-    const ext      = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const fileName = `gallery/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`;
+    const mimeToExt: Record<string, string> = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+      "image/gif": "gif"
+    };
+    const secureExt = mimeToExt[file.type] || "jpg";
+    const fileName = `gallery/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${secureExt}`;
     const buffer   = Buffer.from(await file.arrayBuffer());
 
     const { error: storageErr } = await adminClient.storage
@@ -54,6 +62,7 @@ export async function POST(req: NextRequest) {
 
     if (storageErr) {
       console.error("Storage error:", storageErr);
+      await logAudit({ action: "upload_failure", table_name: "storage", item_label: storageErr.message });
       return NextResponse.json({ error: "Storage upload failed" }, { status: 500 });
     }
 

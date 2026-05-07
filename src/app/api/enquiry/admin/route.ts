@@ -5,7 +5,7 @@ import { checkAdminAuth } from "@/lib/auth";
 
 // PATCH — Update enquiry status or notes
 export async function PATCH(req: NextRequest) {
-  if (!checkAdminAuth(req)) {
+  if (!(await checkAdminAuth(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
@@ -26,7 +26,7 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE — Remove enquiry
 export async function DELETE(req: NextRequest) {
-  if (!checkAdminAuth(req)) {
+  if (!(await checkAdminAuth(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {

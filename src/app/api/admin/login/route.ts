@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { logAudit } from "@/lib/audit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,12 +23,14 @@ export async function POST(req: NextRequest) {
     if (username.trim().toLowerCase() !== storedUsername.toLowerCase()) {
       // Simulate timing delay to prevent user enumeration attacks
       await bcrypt.compare("dummy", "$2b$12$dummyhashfortimingnormalisation");
+      logAudit({ action: "failed_login", table_name: "admin", item_label: "Invalid Username" });
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
     // 3. Compare password securely using bcrypt
     const passwordMatch = await bcrypt.compare(password, storedHash);
     if (!passwordMatch) {
+      logAudit({ action: "failed_login", table_name: "admin", item_label: "Invalid Password" });
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 

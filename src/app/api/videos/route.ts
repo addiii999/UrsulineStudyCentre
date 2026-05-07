@@ -49,7 +49,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ videos: data ?? [] });
+    return NextResponse.json({ videos: data ?? [] }, {
+      headers: { "Cache-Control": "no-store, max-age=0" }
+    });
   } catch (err) {
     console.error("[Videos GET] Unexpected:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -58,7 +60,7 @@ export async function GET(req: NextRequest) {
 
 // ── POST — add a new video ─────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  if (!checkAdminAuth(req)) return NextResponse.json({ error: "Session expired. Please log in to the admin panel again." }, { status: 401 });
+  if (!(await checkAdminAuth(req))) return NextResponse.json({ error: "Session expired. Please log in to the admin panel again." }, { status: 401 });
   try {
     const body = await req.json();
     const { url, title } = body;
@@ -124,7 +126,7 @@ export async function POST(req: NextRequest) {
 
 // ── PATCH — toggle active or update title/sort_order ──────────────────────────
 export async function PATCH(req: NextRequest) {
-  if (!checkAdminAuth(req)) return NextResponse.json({ error: "Session expired. Please log in to the admin panel again." }, { status: 401 });
+  if (!(await checkAdminAuth(req))) return NextResponse.json({ error: "Session expired. Please log in to the admin panel again." }, { status: 401 });
   try {
     const body = await req.json();
     const { id, is_active, title, sort_order } = body;
@@ -160,7 +162,7 @@ export async function PATCH(req: NextRequest) {
 
 // ── DELETE — remove a video permanently ───────────────────────────────────────
 export async function DELETE(req: NextRequest) {
-  if (!checkAdminAuth(req)) return NextResponse.json({ error: "Session expired. Please log in to the admin panel again." }, { status: 401 });
+  if (!(await checkAdminAuth(req))) return NextResponse.json({ error: "Session expired. Please log in to the admin panel again." }, { status: 401 });
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");

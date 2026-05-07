@@ -10,7 +10,12 @@ export type AuditAction =
   | "restore"
   | "permanent_delete"
   | "export"
-  | "cleanup";
+  | "cleanup"
+  | "failed_login"
+  | "unauthorized_request"
+  | "upload_failure"
+  | "suspicious_activity"
+  | "db_error";
 
 interface AuditPayload {
   action:      AuditAction;
