@@ -25,6 +25,7 @@ import AdminSettings from "@/components/admin/AdminSettings";
 import AdminGallery from "@/components/admin/AdminGallery";
 import NotificationBell from "@/components/admin/NotificationBell";
 import AdminStorageManager from "@/components/admin/AdminStorageManager";
+import WeeklyBackupReminder from "@/components/admin/WeeklyBackupReminder";
 
 type AdminSection =
   | "dashboard"
@@ -112,6 +113,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "#F4F6F9", fontFamily: "'Inter', 'Manrope', system-ui, sans-serif" }}>
+      <WeeklyBackupReminder />
 
       {/* ─── SIDEBAR ─────────────────────────────────────────── */}
       <aside
