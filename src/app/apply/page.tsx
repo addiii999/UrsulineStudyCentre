@@ -177,12 +177,21 @@ export default function ApplyPage() {
       };
       const resolvedClass = lvl === "class11" ? "Class XI" : lvl === "class12" ? "Class XII" :
         lvl === "class9" ? "Class IX" : lvl === "class10" ? "Class X" : levelLabel[lvl] || "";
-      const resolvedCourse = form.stream ||
-        (lvl === "vocational" ? "Vocational" : "") ||
-        (lvl === "competitive" ? `Competitive: ${form.competitiveInterest.join(", ")}` : "") ||
-        form.course || "";
-      const competitiveNote = form.competitiveInterest.length > 0
-        ? ` | Competitive: ${form.competitiveInterest.join(", ")}` : "";
+      const resolvedCourse =
+        form.stream ||
+        (lvl === "vocational" ? (form.vocational || "Vocational") : "") ||
+        (lvl === "competitive" && form.competitiveInterest.length > 0
+          ? `Competitive: ${form.competitiveInterest.join(", ")}`
+          : "") ||
+        form.course ||
+        levelLabel[lvl] ||   // always-present fallback e.g. "Class IX"
+        lvl;
+      const competitiveNote =
+        !form.stream && form.competitiveInterest.length > 0
+          ? ""   // already included in resolvedCourse above
+          : form.competitiveInterest.length > 0
+            ? ` | Competitive: ${form.competitiveInterest.join(", ")}`
+            : "";
 
       const dbPayload = {
         full_name: form.fullName.trim(),

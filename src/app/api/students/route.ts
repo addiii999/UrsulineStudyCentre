@@ -9,9 +9,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     // Basic required field check
-    if (!body.full_name || !body.present_phone || !body.course) {
+    if (!body.full_name || !body.present_phone) {
       return NextResponse.json(
-        { error: "Missing required fields: full_name, present_phone, course" },
+        { error: "Missing required fields: full_name, present_phone" },
         { status: 400 }
       );
     }
