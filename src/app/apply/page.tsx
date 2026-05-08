@@ -5,13 +5,28 @@ import Link from "next/link";
 import { SITE_CONFIG } from "@/lib/constants";
 
 const BOARDS = ["JAC", "CBSE", "ICSE", "Other"];
-const PRESENT_CLASSES = ["Class XI", "Class XII"];
-const MAIN_COURSES = ["Science (PCM)", "Science (PCB)", "Commerce", "Arts / Humanities"];
+const ACADEMIC_LEVELS = [
+  { value: "class9",      label: "Class 9" },
+  { value: "class10",     label: "Class 10" },
+  { value: "class11",     label: "Class 11" },
+  { value: "class12",     label: "Class 12" },
+  { value: "passed10",    label: "Passed Class 10" },
+  { value: "passed12",    label: "Passed Class 12" },
+  { value: "competitive", label: "Competitive Exam Prep (JEE / NEET / CLAT)" },
+  { value: "vocational",  label: "Vocational Course Only" },
+];
+const STREAMS = ["Science (PCM)", "Science (PCB)", "Commerce", "Arts / Humanities"];
+const COMPETITIVE = ["JEE", "NEET", "CLAT"];
+const MEDIUMS = ["Hindi", "English"];
 const VOCATIONAL = ["AI & Machine Learning", "Programming", "Social Media Marketing", "Spoken English", "DCA (Diploma in Computer Applications)", "Tally"];
 
 interface FormData {
   fullName: string; dob: string; aadhaar: string;
   motherName: string; fatherName: string;
+  academicLevel: string;
+  stream: string; medium: string;
+  competitiveInterest: string[];
+  schoolName: string; board: string; currentClass: string;
   prevBoard: string; prevSchool: string; prevYear: string; prevMarks: string;
   presentClass: string; presentBoard: string; presentSchool: string; presentYear: string;
   course: string; vocational: string;
@@ -23,6 +38,10 @@ interface FormData {
 const INIT: FormData = {
   fullName: "", dob: "", aadhaar: "",
   motherName: "", fatherName: "",
+  academicLevel: "",
+  stream: "", medium: "",
+  competitiveInterest: [],
+  schoolName: "", board: "", currentClass: "",
   prevBoard: "", prevSchool: "", prevYear: "", prevMarks: "",
   presentClass: "", presentBoard: "", presentSchool: "", presentYear: "",
   course: "", vocational: "",
@@ -114,12 +133,18 @@ export default function ApplyPage() {
     const e: Partial<Record<keyof FormData, string>> = {};
     if (!form.fullName.trim()) e.fullName = "Required";
     if (!form.dob) e.dob = "Required";
-    if (!/^\d{12}$/.test(form.aadhaar)) e.aadhaar = "Must be 12 digits";
+    if (form.aadhaar && !/^\d{12}$/.test(form.aadhaar)) e.aadhaar = "Must be 12 digits";
     if (!form.motherName.trim()) e.motherName = "Required";
     if (!form.fatherName.trim()) e.fatherName = "Required";
-    if (!form.prevBoard) e.prevBoard = "Required";
-    if (!form.prevSchool.trim()) e.prevSchool = "Required";
-    if (!form.course) e.course = "Required";
+    if (!form.academicLevel) e.academicLevel = "Please select your academic level";
+    const isVocOnly = form.academicLevel === "vocational";
+    const isCompetitive = form.academicLevel === "competitive";
+    const needsSchool = ["class9","class10","class11","class12"].includes(form.academicLevel);
+    if (!isVocOnly && !isCompetitive && !form.schoolName.trim()) e.schoolName = "Required";
+    if (!isVocOnly && !form.board) e.board = "Required";
+    if (["class11","class12","passed10","passed12","competitive"].includes(form.academicLevel) && !form.stream) e.stream = "Required";
+    if (isVocOnly && !form.vocational) e.vocational = "Please select a vocational course";
+    if (!isVocOnly && !form.vocational && !form.stream && !isCompetitive) e.course = "Select a stream or vocational course";
     if (!/^\d{10}$/.test(form.presentPhone)) e.presentPhone = "Must be 10 digits";
     if (!form.confirmed) e.confirmed = "Please confirm";
     setErrors(e);
@@ -131,23 +156,38 @@ export default function ApplyPage() {
     if (!validate()) return;
     setLoading(true);
     try {
-      // 1. Save to Supabase Database
+      // 1. Build DB payload from smart education fields
+      const lvl = form.academicLevel;
+      const levelLabel: Record<string,string> = {
+        class9:"Class IX", class10:"Class X", class11:"Class XI", class12:"Class XII",
+        passed10:"Passed Class X", passed12:"Passed Class XII",
+        competitive:"Competitive Exam", vocational:"Vocational",
+      };
+      const resolvedClass = lvl === "class11" ? "Class XI" : lvl === "class12" ? "Class XII" :
+        lvl === "class9" ? "Class IX" : lvl === "class10" ? "Class X" : levelLabel[lvl] || "";
+      const resolvedCourse = form.stream ||
+        (lvl === "vocational" ? "Vocational" : "") ||
+        (lvl === "competitive" ? `Competitive: ${form.competitiveInterest.join(", ")}` : "") ||
+        form.course || "";
+      const competitiveNote = form.competitiveInterest.length > 0
+        ? ` | Competitive: ${form.competitiveInterest.join(", ")}` : "";
+
       const dbPayload = {
         full_name: form.fullName.trim(),
-        dob: form.dob,
-        aadhaar_last4: form.aadhaar.slice(-4),
+        dob: form.dob || null,
+        aadhaar_last4: form.aadhaar ? form.aadhaar.slice(-4) : null,
         mother_name: form.motherName.trim(),
         father_name: form.fatherName.trim(),
-        prev_board: form.prevBoard,
-        prev_school: form.prevSchool.trim(),
-        prev_year: form.prevYear,
-        prev_marks: form.prevMarks,
-        present_class: form.presentClass,
-        present_board: form.presentBoard,
-        present_school: form.presentSchool.trim(),
-        present_year: form.presentYear,
-        course: form.course,
-        vocational: form.vocational,
+        prev_board: form.prevBoard || form.board || "",
+        prev_school: form.prevSchool.trim() || "",
+        prev_year: form.prevYear || "",
+        prev_marks: form.prevMarks || "",
+        present_class: resolvedClass,
+        present_board: form.board || form.presentBoard || "",
+        present_school: form.schoolName.trim() || form.presentSchool.trim() || "",
+        present_year: form.presentYear || "",
+        course: resolvedCourse + competitiveNote,
+        vocational: form.vocational || "",
         present_village: form.presentVillage.trim(),
         present_district: form.presentDistrict.trim(),
         present_ps: form.presentPS.trim(),
@@ -155,7 +195,7 @@ export default function ApplyPage() {
         permanent_village: form.permanentVillage.trim(),
         permanent_district: form.permanentDistrict.trim(),
         permanent_ps: form.permanentPS.trim(),
-        permanent_phone: form.permanentPhone,
+        permanent_phone: form.permanentPhone || "",
       };
 
       const res = await fetch("/api/students", {
@@ -286,103 +326,215 @@ export default function ApplyPage() {
             </div>
           </div>
 
-          {/* SECTION 3 */}
+          {/* SECTION 3 — SMART EDUCATION */}
           <div className="bg-white rounded-2xl border border-[#f0ebe0] shadow-sm p-6 md:p-8">
             <SectionHeader num={3} title="Education Details" />
 
-            <p className="text-xs font-bold text-[#800000] uppercase tracking-widest mb-4">Previous Qualification (Class X)</p>
-            <div className="space-y-5 mb-8">
-              <Field label="Board" required>
-                <div className="flex flex-wrap gap-3">
-                  {BOARDS.map((b) => (
-                    <button type="button" key={b} onClick={() => set("prevBoard", b)}
-                      className={`px-5 py-2.5 rounded-xl text-sm font-semibold border-2 transition-all ${form.prevBoard === b ? "bg-[#800000] text-white border-[#800000]" : "bg-white text-gray-700 border-gray-200 hover:border-[#800000]"}`}>
-                      {b}
-                    </button>
-                  ))}
-                </div>
-                {errors.prevBoard && <p className="text-red-500 text-xs mt-1">{errors.prevBoard}</p>}
-              </Field>
-              <Field label="School Name" required>
-                <input value={form.prevSchool} onChange={(e) => set("prevSchool", e.target.value)}
-                  className={inp + (errors.prevSchool ? " border-red-400" : "")} placeholder="Name of school" />
-                {errors.prevSchool && <p className="text-red-500 text-xs mt-1">{errors.prevSchool}</p>}
-              </Field>
-              <div className="grid sm:grid-cols-2 gap-5">
-                <Field label="Year of Passing">
-                  <input value={form.prevYear} onChange={(e) => set("prevYear", e.target.value.replace(/\D/g, "").slice(0, 4))}
-                    className={inp} placeholder="e.g. 2024" inputMode="numeric" />
-                </Field>
-                <Field label="Percentage / Marks Obtained">
-                  <input value={form.prevMarks} onChange={(e) => set("prevMarks", e.target.value)}
-                    className={inp} placeholder="e.g. 78% or 390/500" />
-                </Field>
+            {/* Step 1 — Academic Level */}
+            <Field label="Current Academic Level" required>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {ACADEMIC_LEVELS.map((lvl) => (
+                  <button type="button" key={lvl.value}
+                    onClick={() => { set("academicLevel", lvl.value); setForm(p => ({...p, stream:"", board:"", schoolName:"", competitiveInterest:[], vocational:"", course:""})); }}
+                    className={`flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all ${
+                      form.academicLevel === lvl.value ? "bg-[#800000]/5 border-[#800000]" : "border-gray-200 hover:border-[#800000]/40"
+                    }`}>
+                    <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                      form.academicLevel === lvl.value ? "border-[#800000]" : "border-gray-300"
+                    }`}>
+                      {form.academicLevel === lvl.value && <div className="w-2 h-2 rounded-full bg-[#800000]" />}
+                    </div>
+                    <span className={`text-sm font-semibold ${form.academicLevel === lvl.value ? "text-[#800000]" : "text-gray-700"}`}>{lvl.label}</span>
+                  </button>
+                ))}
               </div>
-            </div>
+              {errors.academicLevel && <p className="text-red-500 text-xs mt-2">{errors.academicLevel}</p>}
+            </Field>
 
-            <p className="text-xs font-bold text-[#800000] uppercase tracking-widest mb-4">Present Qualification</p>
-            <div className="space-y-5">
-              <div className="grid sm:grid-cols-2 gap-5">
-                <Field label="Class">
-                  <select value={form.presentClass} onChange={(e) => set("presentClass", e.target.value)} className={sel}>
-                    <option value="">Select Class</option>
-                    {PRESENT_CLASSES.map((c) => <option key={c}>{c}</option>)}
-                  </select>
+            {/* Class 9 / 10 fields */}
+            {(form.academicLevel === "class9" || form.academicLevel === "class10") && (
+              <div className="mt-6 space-y-5 pt-5 border-t border-[#f0ebe0]">
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <Field label="School Name" required>
+                    <input value={form.schoolName} onChange={e => set("schoolName", e.target.value)}
+                      className={inp + (errors.schoolName ? " border-red-400" : "")} placeholder="Current school name" />
+                    {errors.schoolName && <p className="text-red-500 text-xs mt-1">{errors.schoolName}</p>}
+                  </Field>
+                  <Field label="Board" required>
+                    <div className="flex flex-wrap gap-2">
+                      {BOARDS.map(b => (
+                        <button type="button" key={b} onClick={() => set("board", b)}
+                          className={`px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all ${
+                            form.board === b ? "bg-[#800000] text-white border-[#800000]" : "bg-white text-gray-700 border-gray-200 hover:border-[#800000]"
+                          }`}>{b}</button>
+                      ))}
+                    </div>
+                    {errors.board && <p className="text-red-500 text-xs mt-1">{errors.board}</p>}
+                  </Field>
+                </div>
+                <Field label="Medium">
+                  <div className="flex gap-3">
+                    {MEDIUMS.map(m => (
+                      <button type="button" key={m} onClick={() => set("medium", m)}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-semibold border-2 transition-all ${
+                          form.medium === m ? "bg-[#800000] text-white border-[#800000]" : "bg-white text-gray-700 border-gray-200 hover:border-[#800000]"
+                        }`}>{m}</button>
+                    ))}
+                  </div>
                 </Field>
-                <Field label="Board">
-                  <select value={form.presentBoard} onChange={(e) => set("presentBoard", e.target.value)} className={sel}>
-                    <option value="">Select Board</option>
-                    {BOARDS.map((b) => <option key={b}>{b}</option>)}
-                  </select>
+                <Field label="Vocational / Add-on Course Interest">
+                  <div className="grid sm:grid-cols-2 gap-2">
+                    {VOCATIONAL.map(v => (
+                      <button type="button" key={v} onClick={() => set("vocational", form.vocational === v ? "" : v)}
+                        className={`flex items-center gap-2 p-3 rounded-lg border-2 text-left text-sm transition-all ${
+                          form.vocational === v ? "bg-[#C9A84C]/10 border-[#C9A84C]" : "border-gray-200 hover:border-[#C9A84C]/50"
+                        }`}>
+                        <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
+                          form.vocational === v ? "border-[#C9A84C] bg-[#C9A84C]" : "border-gray-300"
+                        }`} />
+                        <span className={form.vocational === v ? "text-[#8a6b20] font-semibold" : "text-gray-700"}>{v}</span>
+                      </button>
+                    ))}
+                  </div>
                 </Field>
               </div>
-              <Field label="School / College Name">
-                <input value={form.presentSchool} onChange={(e) => set("presentSchool", e.target.value)}
-                  className={inp} placeholder="Current school or college" />
-              </Field>
-              <Field label="Year">
-                <input value={form.presentYear} onChange={(e) => set("presentYear", e.target.value.replace(/\D/g, "").slice(0, 4))}
-                  className={inp + " max-w-[180px]"} placeholder="e.g. 2025" inputMode="numeric" />
-              </Field>
-            </div>
+            )}
+
+            {/* Class 11 / 12 / Passed fields */}
+            {(["class11","class12","passed10","passed12"].includes(form.academicLevel)) && (
+              <div className="mt-6 space-y-5 pt-5 border-t border-[#f0ebe0]">
+                <Field label="Stream" required>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {STREAMS.map(s => (
+                      <button type="button" key={s} onClick={() => set("stream", s)}
+                        className={`flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all ${
+                          form.stream === s ? "bg-[#800000]/5 border-[#800000]" : "border-gray-200 hover:border-[#800000]/40"
+                        }`}>
+                        <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
+                          form.stream === s ? "border-[#800000] bg-[#800000]" : "border-gray-300"
+                        }`} />
+                        <span className={`text-sm font-semibold ${form.stream === s ? "text-[#800000]" : "text-gray-700"}`}>{s}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {errors.stream && <p className="text-red-500 text-xs mt-1">{errors.stream}</p>}
+                </Field>
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <Field label="School / College Name" required>
+                    <input value={form.schoolName} onChange={e => set("schoolName", e.target.value)}
+                      className={inp + (errors.schoolName ? " border-red-400" : "")} placeholder="School or college name" />
+                    {errors.schoolName && <p className="text-red-500 text-xs mt-1">{errors.schoolName}</p>}
+                  </Field>
+                  <Field label="Board" required>
+                    <div className="flex flex-wrap gap-2">
+                      {BOARDS.map(b => (
+                        <button type="button" key={b} onClick={() => set("board", b)}
+                          className={`px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all ${
+                            form.board === b ? "bg-[#800000] text-white border-[#800000]" : "bg-white text-gray-700 border-gray-200 hover:border-[#800000]"
+                          }`}>{b}</button>
+                      ))}
+                    </div>
+                    {errors.board && <p className="text-red-500 text-xs mt-1">{errors.board}</p>}
+                  </Field>
+                </div>
+                <Field label="Also preparing for competitive exam?">
+                  <div className="flex gap-3">
+                    {COMPETITIVE.map(c => {
+                      const sel2 = form.competitiveInterest.includes(c);
+                      return (
+                        <button type="button" key={c}
+                          onClick={() => setForm(p => ({...p, competitiveInterest: sel2 ? p.competitiveInterest.filter(x=>x!==c) : [...p.competitiveInterest, c]}))}
+                          className={`px-5 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
+                            sel2 ? "bg-[#800000] text-white border-[#800000]" : "bg-white text-gray-700 border-gray-200 hover:border-[#800000]"
+                          }`}>{c}</button>
+                      );
+                    })}
+                  </div>
+                </Field>
+                <Field label="Add-on Vocational Course">
+                  <div className="grid sm:grid-cols-2 gap-2">
+                    {VOCATIONAL.map(v => (
+                      <button type="button" key={v} onClick={() => set("vocational", form.vocational === v ? "" : v)}
+                        className={`flex items-center gap-2 p-3 rounded-lg border-2 text-left text-sm transition-all ${
+                          form.vocational === v ? "bg-[#C9A84C]/10 border-[#C9A84C]" : "border-gray-200 hover:border-[#C9A84C]/50"
+                        }`}>
+                        <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
+                          form.vocational === v ? "border-[#C9A84C] bg-[#C9A84C]" : "border-gray-300"
+                        }`} />
+                        <span className={form.vocational === v ? "text-[#8a6b20] font-semibold" : "text-gray-700"}>{v}</span>
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+              </div>
+            )}
+
+            {/* Competitive Exam Only fields */}
+            {form.academicLevel === "competitive" && (
+              <div className="mt-6 space-y-5 pt-5 border-t border-[#f0ebe0]">
+                <Field label="Exam(s) Preparing For" required>
+                  <div className="flex gap-3">
+                    {COMPETITIVE.map(c => {
+                      const sel2 = form.competitiveInterest.includes(c);
+                      return (
+                        <button type="button" key={c}
+                          onClick={() => setForm(p => ({...p, stream: "", competitiveInterest: sel2 ? p.competitiveInterest.filter(x=>x!==c) : [...p.competitiveInterest, c]}))}
+                          className={`px-6 py-3 rounded-xl text-sm font-bold border-2 transition-all ${
+                            sel2 ? "bg-[#800000] text-white border-[#800000]" : "bg-white text-gray-700 border-gray-200 hover:border-[#800000]"
+                          }`}>{c}</button>
+                      );
+                    })}
+                  </div>
+                  {errors.stream && <p className="text-red-500 text-xs mt-1">{errors.stream}</p>}
+                </Field>
+                <Field label="Stream">
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {STREAMS.map(s => (
+                      <button type="button" key={s} onClick={() => set("stream", form.stream === s ? "" : s)}
+                        className={`flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all ${
+                          form.stream === s ? "bg-[#800000]/5 border-[#800000]" : "border-gray-200 hover:border-[#800000]/40"
+                        }`}>
+                        <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
+                          form.stream === s ? "border-[#800000] bg-[#800000]" : "border-gray-300"
+                        }`} />
+                        <span className={`text-sm font-semibold ${form.stream === s ? "text-[#800000]" : "text-gray-700"}`}>{s}</span>
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+              </div>
+            )}
+
+            {/* Vocational Only */}
+            {form.academicLevel === "vocational" && (
+              <div className="mt-6 pt-5 border-t border-[#f0ebe0]">
+                <Field label="Select Vocational Course" required>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {VOCATIONAL.map(v => (
+                      <button type="button" key={v} onClick={() => set("vocational", v)}
+                        className={`flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${
+                          form.vocational === v ? "bg-[#C9A84C]/10 border-[#C9A84C]" : "border-gray-200 hover:border-[#C9A84C]/50"
+                        }`}>
+                        <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                          form.vocational === v ? "border-[#C9A84C]" : "border-gray-300"
+                        }`}>
+                          {form.vocational === v && <div className="w-2.5 h-2.5 rounded-full bg-[#C9A84C]" />}
+                        </div>
+                        <span className={`text-sm font-semibold ${form.vocational === v ? "text-[#8a6b20]" : "text-gray-700"}`}>{v}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {errors.vocational && <p className="text-red-500 text-xs mt-2">{errors.vocational}</p>}
+                </Field>
+              </div>
+            )}
           </div>
+
+
 
           {/* SECTION 4 */}
           <div className="bg-white rounded-2xl border border-[#f0ebe0] shadow-sm p-6 md:p-8">
-            <SectionHeader num={4} title="Course Applied For" />
-            <div className="grid sm:grid-cols-2 gap-4">
-              {MAIN_COURSES.map((c) => (
-                <button type="button" key={c} onClick={() => set("course", c)}
-                  className={`flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${form.course === c ? "bg-[#800000]/5 border-[#800000]" : "border-gray-200 hover:border-[#800000]/40"}`}>
-                  <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${form.course === c ? "border-[#800000]" : "border-gray-300"}`}>
-                    {form.course === c && <div className="w-2.5 h-2.5 rounded-full bg-[#800000]" />}
-                  </div>
-                  <span className={`text-sm font-semibold ${form.course === c ? "text-[#800000]" : "text-gray-700"}`}>{c}</span>
-                </button>
-              ))}
-            </div>
-            {errors.course && <p className="text-red-500 text-xs mt-3">{errors.course}</p>}
-          </div>
-
-          {/* SECTION 5 */}
-          <div className="bg-white rounded-2xl border border-[#f0ebe0] shadow-sm p-6 md:p-8">
-            <SectionHeader num={5} title="Vocational Course (Select One)" />
-            <div className="grid sm:grid-cols-2 gap-3">
-              {VOCATIONAL.map((v) => (
-                <button type="button" key={v} onClick={() => set("vocational", form.vocational === v ? "" : v)}
-                  className={`flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${form.vocational === v ? "bg-[#C9A84C]/10 border-[#C9A84C]" : "border-gray-200 hover:border-[#C9A84C]/50"}`}>
-                  <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${form.vocational === v ? "border-[#C9A84C]" : "border-gray-300"}`}>
-                    {form.vocational === v && <div className="w-2.5 h-2.5 rounded-full bg-[#C9A84C]" />}
-                  </div>
-                  <span className={`text-sm font-semibold ${form.vocational === v ? "text-[#8a6b20]" : "text-gray-700"}`}>{v}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* SECTION 6 */}
-          <div className="bg-white rounded-2xl border border-[#f0ebe0] shadow-sm p-6 md:p-8">
-            <SectionHeader num={6} title="Address Details" />
+            <SectionHeader num={4} title="Address Details" />
 
             <p className="text-xs font-bold text-[#800000] uppercase tracking-widest mb-4">Present Address</p>
             <div className="space-y-4 mb-8">
@@ -443,9 +595,9 @@ export default function ApplyPage() {
             </div>
           </div>
 
-          {/* SECTION 7 - SUBMIT */}
+          {/* SECTION 5 - SUBMIT */}
           <div className="bg-white rounded-2xl border border-[#f0ebe0] shadow-sm p-6 md:p-8">
-            <SectionHeader num={7} title="Declaration & Submit" />
+            <SectionHeader num={5} title="Declaration & Submit" />
             <label className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all mb-6 ${form.confirmed ? "border-[#800000] bg-[#800000]/5" : "border-gray-200"} ${errors.confirmed ? "border-red-400" : ""}`}>
               <input type="checkbox" checked={form.confirmed} onChange={(e) => set("confirmed", e.target.checked)} className="mt-0.5 w-5 h-5 accent-[#800000] flex-shrink-0" />
               <span className="text-sm text-gray-700 leading-relaxed">
