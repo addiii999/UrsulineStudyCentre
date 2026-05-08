@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [loginForm, setLoginForm] = useState({ phone: "" });
+  const [loginForm, setLoginForm] = useState({ phone: "", password: "" });
   const [signupForm, setSignupForm] = useState({ name: "", phone: "", email: "", password: "" });
   const [adminForm, setAdminForm] = useState({ username: "", password: "" });
 
@@ -26,7 +26,7 @@ export default function LoginPage() {
       const res = await fetch("/api/student/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: loginForm.phone }),
+        body: JSON.stringify({ phone: loginForm.phone, password: loginForm.password }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -138,12 +138,33 @@ export default function LoginPage() {
                       type="tel"
                       inputMode="numeric"
                       value={loginForm.phone}
-                      onChange={(e) => setLoginForm({ phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                      onChange={(e) => setLoginForm({ ...loginForm, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
                       placeholder="10-digit mobile number"
                       className="input-field pl-9"
                       maxLength={10}
                       required
                     />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="label">Password (DOB for first login: YYYY-MM-DD)</label>
+                  <div className="relative">
+                    <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type={showPass ? "text" : "password"}
+                      value={loginForm.password}
+                      onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                      placeholder="e.g. 2005-08-15"
+                      className="input-field pl-9 pr-10"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass((p) => !p)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    >
+                      {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
                   </div>
                 </div>
                 <button type="submit" disabled={loading} className="btn-primary w-full justify-center mt-1">

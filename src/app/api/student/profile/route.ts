@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase, createAdminClient } from "@/lib/supabase";
+import { verifyStudentAuth } from "@/lib/studentAuth";
 
-// Helper: get the student's phone stored in cookie session
-function getStudentPhone(req: NextRequest): string | null {
-  const cookie = req.cookies.get("student_phone")?.value;
-  return cookie ?? null;
-}
-
-// GET — Fetch student profile (identified by session cookie)
+// GET — Fetch student profile (identified by secure session JWT)
 export async function GET(req: NextRequest) {
-  // For demo purposes, also allow ?phone= param as fallback
-  const phone = getStudentPhone(req) ?? req.nextUrl.searchParams.get("phone");
-  if (!phone) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const session = await verifyStudentAuth(req);
+  
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated. Please log in again." }, { status: 401 });
   }
+
+  const phone = session.phone;
 
   try {
     const { data, error } = await supabase
@@ -34,10 +31,13 @@ export async function GET(req: NextRequest) {
 
 // PATCH — Student updates only their safe editable fields
 export async function PATCH(req: NextRequest) {
-  const phone = getStudentPhone(req) ?? req.nextUrl.searchParams.get("phone");
-  if (!phone) {
+  const session = await verifyStudentAuth(req);
+  
+  if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+  
+  const phone = session.phone;
 
   try {
     const body = await req.json();

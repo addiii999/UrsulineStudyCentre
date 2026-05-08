@@ -43,7 +43,7 @@ export default function StudentDashboardPage() {
         ?.split("=")[1];
 
       if (phone) {
-        const stuRes = await fetch(`/api/student/profile?phone=${encodeURIComponent(phone)}`);
+        const stuRes = await fetch(`/api/student/profile`);
         const stuData = await stuRes.json();
         if (stuData.student) {
           setStudent(stuData.student);
