@@ -3,29 +3,51 @@ import { createAdminClient } from "@/lib/supabase";
 import { sendAdminNotification } from "@/lib/sendEmail";
 import { createNotification } from "@/lib/notify";
 import { checkAdminAuth } from "@/lib/auth";
+import { enquirySchema, sanitizeText } from "@/lib/validation";
+import { checkRateLimit, RATE_LIMITS, getClientIdentifier } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
+  const clientId = getClientIdentifier(req);
+  
+  // Rate limiting: 3 enquiries per hour per IP
+  const rateLimit = checkRateLimit(`enquiry:${clientId}`, RATE_LIMITS.enquiry);
+  
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "Too many enquiries submitted. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await req.json();
-    const { name, phone, class: cls, stream, message } = body;
-
-    if (!name?.trim() || !phone?.trim() || !cls?.trim()) {
-      return NextResponse.json({ error: "Name, phone, and class are required." }, { status: 400 });
+    
+    // Validate and sanitize input
+    const validation = enquirySchema.safeParse(body);
+    
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.errors[0].message },
+        { status: 400 }
+      );
     }
 
-    if (!/^\d{10}$/.test(phone.trim())) {
-      return NextResponse.json({ error: "Please enter a valid 10-digit phone number." }, { status: 400 });
-    }
+    const { name, phone, class: cls, stream, message } = validation.data;
+
+    // Additional sanitization
+    const sanitizedData = {
+      name: sanitizeText(name, 100),
+      phone: phone.trim(),
+      class: sanitizeText(cls, 50),
+      stream: stream ? sanitizeText(stream, 100) : "",
+      message: message ? sanitizeText(message, 1000) : "",
+    };
 
     const adminClient = createAdminClient();
     const { data, error } = await adminClient
       .from("enquiries")
       .insert([{
-        name: name.trim(),
-        phone: phone.trim(),
-        class: cls.trim(),
-        stream: (stream || "").trim(),
-        message: (message || "").trim(),
+        ...sanitizedData,
         status: "new",
         is_deleted: false,
       }])
@@ -43,13 +65,17 @@ export async function POST(req: NextRequest) {
 
     createNotification({
       title: "New Admission Enquiry",
-      message: `${name.trim()} (${cls.trim()}${stream ? " – " + stream : ""}) submitted an enquiry.`,
+      message: `${sanitizedData.name} (${sanitizedData.class}${sanitizedData.stream ? " – " + sanitizedData.stream : ""}) submitted an enquiry.`,
       type: "enquiry",
     }).catch(() => {});
 
     sendAdminNotification({
-      name: name.trim(), phone: phone.trim(), studentClass: cls.trim(),
-      stream: (stream || "").trim(), message: (message || "").trim(), submittedAt,
+      name: sanitizedData.name,
+      phone: sanitizedData.phone,
+      studentClass: sanitizedData.class,
+      stream: sanitizedData.stream,
+      message: sanitizedData.message,
+      submittedAt,
     }).catch((emailErr) => {
       console.error("[Email] Failed to send notification:", emailErr.message);
     });

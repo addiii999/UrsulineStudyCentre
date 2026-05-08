@@ -6,7 +6,15 @@ import { logAudit } from "@/lib/audit";
 export async function GET(req: NextRequest) {
   // 1. Verify cron secret to ensure it's triggered by Vercel securely
   const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const cronSecret = process.env.CRON_SECRET;
+  
+  if (!cronSecret) {
+    console.error("[Cron] CRON_SECRET not configured in environment variables");
+    return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+  }
+  
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    console.warn("[Cron] Unauthorized cron attempt from:", req.headers.get("x-forwarded-for"));
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

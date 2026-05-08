@@ -1,6 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
+import { checkRateLimit, RATE_LIMITS, getClientIdentifier } from "@/lib/rateLimit";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +11,17 @@ export async function POST(req: NextRequest) {
     const isAdmin = await checkAdminAuth(req);
     if (!isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // 2. Rate limiting
+    const clientId = getClientIdentifier(req);
+    const rateLimit = checkRateLimit(`upload:${clientId}`, RATE_LIMITS.upload);
+    
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: "Too many uploads. Please try again later." },
+        { status: 429 }
+      );
     }
 
     const formData = await req.formData();
@@ -18,22 +32,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // 2. Validate File Type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-    if (!validTypes.includes(file.type)) {
-      return NextResponse.json({ error: "Invalid file format. Only JPG, PNG, and WEBP are allowed." }, { status: 400 });
+    // 3. Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB` },
+        { status: 400 }
+      );
     }
 
-    // 3. Process with Sharp
+    // 4. Get file buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+
+    // 5. Verify file type using magic numbers (not just MIME type)
+    const fileType = await import("file-type");
+    const detectedType = await fileType.fileTypeFromBuffer(buffer);
     
-    // Import sharp dynamically
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!detectedType || !validTypes.includes(detectedType.mime)) {
+      return NextResponse.json(
+        { error: "Invalid file type. Only JPEG, PNG, and WebP images are allowed." },
+        { status: 400 }
+      );
+    }
+
+    // 6. Process with Sharp
     const sharp = (await import("sharp")).default;
     
     let sharpInstance = sharp(buffer);
     
-    // Auto-rotate based on EXIF, strip metadata (Sharp strips by default)
+    // Auto-rotate based on EXIF, strip metadata
     sharpInstance = sharpInstance.rotate();
     
     // Apply optimizations based on category
@@ -51,13 +79,15 @@ export async function POST(req: NextRequest) {
 
     const optimizedBuffer = await sharpInstance.toBuffer();
     
-    // Generate secure filename
-    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.webp`;
+    // 7. Generate secure filename with hash
+    const crypto = await import("crypto");
+    const hash = crypto.createHash("sha256").update(optimizedBuffer).digest("hex").substring(0, 16);
+    const fileName = `${folder}/${Date.now()}-${hash}.webp`;
 
-    // Upload using Supabase Admin Client
+    // 8. Upload using Supabase Admin Client
     const adminClient = createAdminClient();
     const { data, error } = await adminClient.storage
-      .from("faculty_photos") // Using general bucket name or change as needed
+      .from("faculty_photos")
       .upload(fileName, optimizedBuffer, {
         contentType: "image/webp",
         upsert: false
@@ -70,7 +100,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to upload image to storage" }, { status: 500 });
     }
 
-    // 5. Get Public URL
+    // 9. Get Public URL
     const { data: { publicUrl } } = adminClient.storage
       .from("faculty_photos")
       .getPublicUrl(fileName);
