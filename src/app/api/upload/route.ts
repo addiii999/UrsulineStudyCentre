@@ -19,33 +19,47 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Validate File Type
-    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!validTypes.includes(file.type)) {
       return NextResponse.json({ error: "Invalid file format. Only JPG, PNG, and WEBP are allowed." }, { status: 400 });
     }
 
-    // 3. Validate File Size (Max 5MB)
-    const MAX_SIZE = 5 * 1024 * 1024;
-    if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: "File size exceeds 5MB limit." }, { status: 400 });
+    // 3. Process with Sharp
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
+    // Import sharp dynamically
+    const sharp = (await import("sharp")).default;
+    
+    let sharpInstance = sharp(buffer);
+    
+    // Auto-rotate based on EXIF, strip metadata (Sharp strips by default)
+    sharpInstance = sharpInstance.rotate();
+    
+    // Apply optimizations based on category
+    if (folder === "faculty") {
+      sharpInstance = sharpInstance.resize(600, 600, { fit: "cover", withoutEnlargement: true }).webp({ quality: 65, effort: 6 });
+    } else if (folder === "gallery") {
+      sharpInstance = sharpInstance.resize(1600, 1600, { fit: "inside", withoutEnlargement: true }).webp({ quality: 70, effort: 6 });
+    } else if (folder === "logos") {
+      sharpInstance = sharpInstance.resize(300, 300, { fit: "inside", withoutEnlargement: true }).webp({ quality: 80, effort: 6 });
+    } else if (folder === "thumbnails") {
+      sharpInstance = sharpInstance.resize(800, 450, { fit: "cover", withoutEnlargement: true }).webp({ quality: 65, effort: 6 });
+    } else {
+      sharpInstance = sharpInstance.resize(1200, 1200, { fit: "inside", withoutEnlargement: true }).webp({ quality: 70, effort: 6 });
     }
 
-    // 4. Upload to Supabase Storage
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const mimeToExt: Record<string, string> = {
-      "image/jpeg": "jpg",
-      "image/png": "png",
-      "image/webp": "webp",
-    };
-    const secureExtension = mimeToExt[file.type] || "jpg";
-    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${secureExtension}`;
+    const optimizedBuffer = await sharpInstance.toBuffer();
+    
+    // Generate secure filename
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.webp`;
 
-    // Upload using Supabase Admin Client (Service Role Key)
+    // Upload using Supabase Admin Client
     const adminClient = createAdminClient();
     const { data, error } = await adminClient.storage
-      .from("faculty_photos")
-      .upload(fileName, buffer, {
-        contentType: file.type,
+      .from("faculty_photos") // Using general bucket name or change as needed
+      .upload(fileName, optimizedBuffer, {
+        contentType: "image/webp",
         upsert: false
       });
 
