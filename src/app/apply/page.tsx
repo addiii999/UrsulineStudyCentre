@@ -137,16 +137,28 @@ export default function ApplyPage() {
     if (!form.motherName.trim()) e.motherName = "Required";
     if (!form.fatherName.trim()) e.fatherName = "Required";
     if (!form.academicLevel) e.academicLevel = "Please select your academic level";
+    
     const isVocOnly = form.academicLevel === "vocational";
     const isCompetitive = form.academicLevel === "competitive";
-    const needsSchool = ["class9","class10","class11","class12"].includes(form.academicLevel);
+    
     if (!isVocOnly && !isCompetitive && !form.schoolName.trim()) e.schoolName = "Required";
-    if (!isVocOnly && !form.board) e.board = "Required";
-    if (["class11","class12","passed10","passed12","competitive"].includes(form.academicLevel) && !form.stream) e.stream = "Required";
-    if (isVocOnly && !form.vocational) e.vocational = "Please select a vocational course";
-    if (!isVocOnly && !form.vocational && !form.stream && !isCompetitive) e.course = "Select a stream or vocational course";
+    if (!isVocOnly && !isCompetitive && !form.board) e.board = "Required";
+    
+    if (["class11", "class12", "passed10", "passed12"].includes(form.academicLevel) && !form.stream) {
+      e.stream = "Required";
+    }
+    
+    if (isVocOnly && !form.vocational) {
+      e.vocational = "Please select a vocational course";
+    }
+    
+    if (isCompetitive && form.competitiveInterest.length === 0) {
+      e.stream = "Please select at least one exam";
+    }
+    
     if (!/^\d{10}$/.test(form.presentPhone)) e.presentPhone = "Must be 10 digits";
     if (!form.confirmed) e.confirmed = "Please confirm";
+    
     setErrors(e);
     return Object.keys(e).length === 0;
   };
