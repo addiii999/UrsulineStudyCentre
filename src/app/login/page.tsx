@@ -14,18 +14,32 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [loginForm, setLoginForm] = useState({ phone: "" });
   const [signupForm, setSignupForm] = useState({ name: "", phone: "", email: "", password: "" });
   const [adminForm, setAdminForm] = useState({ username: "", password: "" });
 
   const handleStudentLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loginForm.phone.length !== 10) { toast.error("Enter a valid 10-digit phone number"); return; }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    document.cookie = "student_session=true; path=/; max-age=86400; SameSite=Lax";
-    toast.success("Logged in successfully!");
-    router.push("/student/dashboard");
-    setLoading(false);
+    try {
+      const res = await fetch("/api/student/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: loginForm.phone }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Login failed");
+        return;
+      }
+      toast.success(`Welcome back, ${data.student?.name?.split(" ")[0] ?? "Student"}!`);
+      router.push("/student/dashboard");
+    } catch {
+      toast.error("Connection error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleStudentSignup = async (e: React.FormEvent) => {
@@ -113,48 +127,32 @@ export default function LoginPage() {
             {/* STUDENT LOGIN */}
             {tab === "student-login" && (
               <form onSubmit={handleStudentLogin} className="space-y-4">
-                <div>
-                  <label className="label">Email Address</label>
-                  <div className="relative">
-                    <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="email"
-                      value={loginForm.email}
-                      onChange={(e) => setLoginForm((p) => ({ ...p, email: e.target.value }))}
-                      placeholder="you@example.com"
-                      className="input-field pl-9"
-                      required
-                    />
-                  </div>
+                <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700">
+                  Login using the phone number you registered during admission.
                 </div>
                 <div>
-                  <label className="label">Password</label>
+                  <label className="label">Registered Phone Number</label>
                   <div className="relative">
-                    <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Phone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
-                      type={showPass ? "text" : "password"}
-                      value={loginForm.password}
-                      onChange={(e) => setLoginForm((p) => ({ ...p, password: e.target.value }))}
-                      placeholder="••••••••"
-                      className="input-field pl-9 pr-10"
+                      type="tel"
+                      inputMode="numeric"
+                      value={loginForm.phone}
+                      onChange={(e) => setLoginForm({ phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                      placeholder="10-digit mobile number"
+                      className="input-field pl-9"
+                      maxLength={10}
                       required
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPass((p) => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
-                    </button>
                   </div>
                 </div>
                 <button type="submit" disabled={loading} className="btn-primary w-full justify-center mt-1">
-                  {loading ? "Logging in..." : <>Login <ArrowRight size={15} /></>}
+                  {loading ? "Verifying..." : <>Access Portal <ArrowRight size={15} /></>}
                 </button>
                 <p className="text-center text-xs text-gray-500">
-                  No account?{" "}
+                  New student?{" "}
                   <button type="button" onClick={() => setTab("student-signup")} className="text-[#800000] font-semibold hover:underline">
-                    Sign up here
+                    Apply for admission
                   </button>
                 </p>
               </form>

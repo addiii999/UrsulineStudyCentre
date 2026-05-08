@@ -36,11 +36,14 @@ export default function StudentDashboardPage() {
       if (annData.announcements) setNotices(annData.announcements);
       if (settingsData.settings) setSettings(settingsData.settings);
 
-      // Fetch student profile — phone is taken from query param as session fallback
-      const params = new URLSearchParams(window.location.search);
-      const phone = params.get("phone") ?? "";
+      // Read phone from cookie set by /api/student/login server response
+      const phone = document.cookie
+        .split("; ")
+        .find((c) => c.startsWith("student_phone="))
+        ?.split("=")[1];
+
       if (phone) {
-        const stuRes = await fetch(`/api/student/profile?phone=${phone}`);
+        const stuRes = await fetch(`/api/student/profile?phone=${encodeURIComponent(phone)}`);
         const stuData = await stuRes.json();
         if (stuData.student) {
           setStudent(stuData.student);
