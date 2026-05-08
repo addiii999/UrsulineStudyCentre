@@ -27,6 +27,9 @@ export default function AdminDashboardHome({ onNavigate }: Props) {
     faculty: 0,
     students: 0,
     recentEnquiries: [] as any[],
+    recentAdmissions: [] as any[],
+    classBreakdown: {} as Record<string, number>,
+    streamBreakdown: {} as Record<string, number>,
   });
   const [loading, setLoading] = useState(true);
 
@@ -45,13 +48,26 @@ export default function AdminDashboardHome({ onNavigate }: Props) {
           crsRes.json().catch(() => ({})),
           facRes.json().catch(() => ({})),
         ]);
-        setStats({
-          enquiries: enq.enquiries?.length || 0,
-          students: stu.students?.filter((s: any) => s.admission_status === "enrolled").length || 0,
-          courses: crs.courses?.length || 0,
-          faculty: fac.faculty?.length || 0,
-          recentEnquiries: (enq.enquiries || []).slice(0, 6),
-        });
+          const enrolledStudents = stu.students?.filter((s: any) => s.admission_status === "enrolled" || s.admission_status === "approved") || [];
+          
+          const classCounts: Record<string, number> = {};
+          const streamCounts: Record<string, number> = {};
+          
+          enrolledStudents.forEach((s: any) => {
+            if (s.present_class) classCounts[s.present_class] = (classCounts[s.present_class] || 0) + 1;
+            if (s.course) streamCounts[s.course] = (streamCounts[s.course] || 0) + 1;
+          });
+
+          setStats({
+            enquiries: enq.enquiries?.length || 0,
+            students: enrolledStudents.length,
+            courses: crs.courses?.length || 0,
+            faculty: fac.faculty?.length || 0,
+            recentEnquiries: (enq.enquiries || []).slice(0, 6),
+            recentAdmissions: enrolledStudents.slice(0, 5),
+            classBreakdown: classCounts,
+            streamBreakdown: streamCounts,
+          });
       } catch (e) {
         console.error(e);
       } finally {
@@ -170,93 +186,95 @@ export default function AdminDashboardHome({ onNavigate }: Props) {
         ))}
       </div>
 
-      {/* ── RECENT ENQUIRIES ───────────────────────────────── */}
-      <div
-        className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
-        style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50">
-          <div className="flex items-center gap-2.5">
-            <div className="w-1 h-4 rounded-full bg-[#C9A84C]" />
-            <h3 className="font-semibold text-gray-800 text-[13.5px]">Recent Enquiries</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* ── RECENT ENQUIRIES ───────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm flex flex-col">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50">
+            <div className="flex items-center gap-2.5">
+              <div className="w-1 h-4 rounded-full bg-[#C9A84C]" />
+              <h3 className="font-semibold text-gray-800 text-[13.5px]">Recent Enquiries</h3>
+            </div>
           </div>
-          <span className="text-[11px] text-gray-400 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-full">
-            Latest 6
-          </span>
+          <div className="flex-1 overflow-y-auto min-h-[300px]">
+            {loading ? (
+              <div className="flex justify-center items-center h-full text-gray-300"><Loader2 className="animate-spin" /></div>
+            ) : stats.recentEnquiries.length > 0 ? (
+              <div className="divide-y divide-gray-50/80">
+                {stats.recentEnquiries.slice(0,5).map((e, idx) => {
+                  const sc = STATUS_CONFIG[e.status] ?? { bg: "bg-gray-50", text: "text-gray-600", dot: "bg-gray-400" };
+                  const initials = (e.name || "?").slice(0, 2).toUpperCase();
+                  const colors = ["#7c3aed", "#2563eb", "#059669", "#d97706", "#dc2626", "#0891b2"];
+                  const avatarColor = colors[idx % colors.length];
+                  return (
+                    <div key={e.id} className="flex items-center gap-4 px-6 py-3.5 hover:bg-gray-50/60 transition-colors group">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold" style={{ background: avatarColor }}>{initials}</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-800 text-[13px] truncate">{e.name}</p>
+                        <p className="text-gray-400 text-[11px] truncate">{e.class} · {e.stream}</p>
+                      </div>
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${sc.bg} ${sc.text} capitalize`}>{e.status}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-gray-300"><MessageSquare size={24} className="mb-2"/>No enquiries yet</div>
+            )}
+          </div>
+          <div className="px-6 py-3 border-t border-gray-50 bg-gray-50/40">
+            <button onClick={() => onNavigate("enquiries")} className="text-[#800000] text-[12px] font-semibold flex items-center gap-1 hover:gap-2 transition-all">View all <ArrowUpRight size={12} /></button>
+          </div>
         </div>
 
-        {/* Rows */}
-        <div>
-          {loading ? (
-            <div className="flex flex-col gap-0 divide-y divide-gray-50">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="flex items-center gap-4 px-6 py-3.5">
-                  <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse flex-shrink-0" />
-                  <div className="flex-1 space-y-1.5">
-                    <div className="w-32 h-3 bg-gray-100 rounded animate-pulse" />
-                    <div className="w-48 h-2.5 bg-gray-50 rounded animate-pulse" />
+        {/* ── STUDENT ANALYTICS & BREAKDOWNS ──────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm flex flex-col">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50">
+            <div className="flex items-center gap-2.5">
+              <div className="w-1 h-4 rounded-full bg-[#800000]" />
+              <h3 className="font-semibold text-gray-800 text-[13.5px]">Enrolled Students Breakdown</h3>
+            </div>
+          </div>
+          <div className="flex-1 p-6 flex flex-col gap-5 overflow-y-auto min-h-[300px]">
+            {loading ? (
+              <div className="flex justify-center items-center h-full text-gray-300"><Loader2 className="animate-spin" /></div>
+            ) : (
+              <>
+                <div>
+                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">By Class</h4>
+                  <div className="space-y-2">
+                    {Object.entries(stats.classBreakdown).map(([cls, count]) => (
+                      <div key={cls} className="flex items-center justify-between">
+                        <span className="text-[13px] font-medium text-gray-700">{cls}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-32 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#800000]" style={{ width: `${(count/stats.students)*100}%` }} /></div>
+                          <span className="text-[12px] font-bold text-gray-900 w-6 text-right">{count}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {Object.keys(stats.classBreakdown).length === 0 && <span className="text-xs text-gray-400">No data</span>}
                   </div>
-                  <div className="w-16 h-5 bg-gray-100 rounded-full animate-pulse" />
                 </div>
-              ))}
-            </div>
-          ) : stats.recentEnquiries.length > 0 ? (
-            <div className="divide-y divide-gray-50/80">
-              {stats.recentEnquiries.map((e, idx) => {
-                const sc = STATUS_CONFIG[e.status] ?? { bg: "bg-gray-50", text: "text-gray-600", dot: "bg-gray-400" };
-                const initials = (e.name || "?").slice(0, 2).toUpperCase();
-                const colors = ["#7c3aed", "#2563eb", "#059669", "#d97706", "#dc2626", "#0891b2"];
-                const avatarColor = colors[idx % colors.length];
-                return (
-                  <div
-                    key={e.id || e.name}
-                    className="flex items-center gap-4 px-6 py-3.5 hover:bg-gray-50/60 transition-colors duration-100 group"
-                  >
-                    {/* Avatar */}
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0"
-                      style={{ background: avatarColor }}
-                    >
-                      {initials}
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-800 text-[13px] leading-tight">{e.name}</p>
-                      <p className="text-gray-400 text-[11px] mt-0.5 truncate">
-                        {e.class} · {e.stream} · {new Date(e.created_at).toLocaleDateString("en-IN")}
-                      </p>
-                    </div>
-
-                    {/* Status badge */}
-                    <span className={`inline-flex items-center gap-1.5 text-[10.5px] font-semibold px-2.5 py-1 rounded-full ${sc.bg} ${sc.text} capitalize`}>
-                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${sc.dot}`} />
-                      {e.status || "new"}
-                    </span>
+                <div>
+                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">By Stream</h4>
+                  <div className="space-y-2">
+                    {Object.entries(stats.streamBreakdown).map(([stream, count]) => (
+                      <div key={stream} className="flex items-center justify-between">
+                        <span className="text-[13px] font-medium text-gray-700 truncate max-w-[120px]">{stream}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-32 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#C9A84C]" style={{ width: `${(count/stats.students)*100}%` }} /></div>
+                          <span className="text-[12px] font-bold text-gray-900 w-6 text-right">{count}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {Object.keys(stats.streamBreakdown).length === 0 && <span className="text-xs text-gray-400">No data</span>}
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
-              <MessageSquare size={28} className="text-gray-200" />
-              <p className="text-gray-400 text-sm">No enquiries yet</p>
-              <p className="text-gray-300 text-xs">They will appear here once students submit the form</p>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-gray-50 bg-gray-50/40">
-          <button
-            onClick={() => onNavigate("enquiries")}
-            className="flex items-center gap-1.5 text-[#800000] text-[12px] font-semibold hover:gap-2.5 transition-all duration-150 group"
-          >
-            <TrendingUp size={13} />
-            View all enquiries
-            <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
+                </div>
+              </>
+            )}
+          </div>
+          <div className="px-6 py-3 border-t border-gray-50 bg-gray-50/40">
+            <button onClick={() => onNavigate("students")} className="text-[#800000] text-[12px] font-semibold flex items-center gap-1 hover:gap-2 transition-all">Manage Student Records <ArrowUpRight size={12} /></button>
+          </div>
         </div>
       </div>
 

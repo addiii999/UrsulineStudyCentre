@@ -11,13 +11,45 @@ export async function PATCH(req: NextRequest) {
   try {
     const { id, ...updates } = await req.json();
     const adminClient = createAdminClient();
+    
+    // Auto-create student record if marked as admitted
+    if (updates.status === "admitted") {
+      const { data: enquiry } = await adminClient.from("enquiries").select("*").eq("id", id).single();
+      if (enquiry) {
+        // Check if student already exists to prevent duplicate (by phone and name)
+        const { data: existing } = await adminClient.from("students")
+          .select("id")
+          .eq("present_phone", enquiry.phone)
+          .eq("full_name", enquiry.name)
+          .single();
+
+        if (!existing) {
+          await adminClient.from("students").insert([{
+            full_name: enquiry.name,
+            present_phone: enquiry.phone,
+            present_class: enquiry.class || "",
+            course: enquiry.stream || "",
+            admission_status: "enrolled",
+            admin_notes: `Auto-generated from enquiry ${id}`,
+          }]);
+        } else {
+          // Update existing student record to enrolled
+          await adminClient.from("students").update({
+            admission_status: "enrolled",
+            admin_notes: `Synced from enquiry ${id}`,
+            updated_at: new Date().toISOString()
+          }).eq("id", existing.id);
+        }
+      }
+    }
+
     const { error } = await adminClient
       .from("enquiries")
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq("id", id);
 
     if (error) throw error;
-    logAudit({ action: "restore", table_name: "enquiries", item_id: id }).catch(() => {});
+    logAudit({ action: "update", table_name: "enquiries", item_id: id }).catch(() => {});
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
 
     // 2. Count live items per table
     const tables = [
+      { key: "students",     label: "Students",     emoji: "🎓" },
       { key: "gallery",      label: "Gallery",      emoji: "🖼️" },
       { key: "faculty",      label: "Faculty",      emoji: "👩‍🏫" },
       { key: "courses",      label: "Courses",      emoji: "📚" },
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
 
       // Deleted count (only for tables that have is_deleted)
       let deleted = 0;
-      if (["gallery", "faculty", "courses", "videos", "testimonials", "enquiries", "faqs"].includes(t.key)) {
+      if (["students", "gallery", "faculty", "courses", "videos", "testimonials", "enquiries", "faqs"].includes(t.key)) {
         const { count } = await adminClient
           .from(t.key)
           .select("*", { count: "exact", head: true })
@@ -105,7 +106,7 @@ export async function GET(req: NextRequest) {
 
     // 5. Items approaching auto-purge (deleted 25+ days ago)
     const twentyFiveDaysAgo = new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString();
-    const softDeleteTables = ["gallery", "faculty", "courses", "videos", "testimonials", "enquiries", "faqs"];
+    const softDeleteTables = ["students", "gallery", "faculty", "courses", "videos", "testimonials", "enquiries", "faqs"];
     let expiringCount = 0;
 
     for (const table of softDeleteTables) {
