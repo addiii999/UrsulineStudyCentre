@@ -59,6 +59,25 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error;
 
+    // ── Auto-create Enquiry so Admin sees this registration in the pipeline ──
+    // Use upsert on phone to avoid duplicates if enquiry already exists
+    const enquiryPayload: any = {
+      name: sanitizedBody.full_name,
+      phone: sanitizedBody.present_phone,
+      class: sanitizedBody.present_class || "",
+      stream: sanitizedBody.course || "",
+      message: `Admission form submitted. Course: ${sanitizedBody.course || "-"}, Board: ${sanitizedBody.present_board || "-"}.`,
+      source: "admission_form",
+      status: "new",
+    };
+
+    // Only set is_deleted if migration has been run
+    const enquiryInsert = await adminClient.from("enquiries").insert([{ ...enquiryPayload, is_deleted: false }]);
+    if (enquiryInsert.error && enquiryInsert.error.code === "42703") {
+      // Fallback without is_deleted column
+      try { await adminClient.from("enquiries").insert([enquiryPayload]); } catch (e) { /* ignore */ }
+    }
+
     // Fire notification to admin dashboard
     const { createNotification } = await import("@/lib/notify");
     await createNotification({

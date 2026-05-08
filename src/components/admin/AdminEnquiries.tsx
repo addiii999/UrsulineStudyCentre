@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Search, MessageSquare, CheckCircle, PhoneCall, XCircle, Loader2, Trash2, RotateCcw, Archive, AlertTriangle } from "lucide-react";
+import { Search, MessageSquare, CheckCircle, PhoneCall, XCircle, Loader2, Trash2, RotateCcw, Archive, AlertTriangle, UserCheck } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Enquiry {
@@ -81,6 +81,26 @@ export default function AdminEnquiries() {
       setActionId(null);
     }
   };
+
+  const approveAdmission = async (id: string, name: string) => {
+    setActionId(id);
+    try {
+      const res = await fetch("/api/enquiry/admin", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action: "approve" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Approval failed");
+      setActiveEnquiries((prev) => prev.map((e) => (e.id === id ? { ...e, status: "enrolled" } : e)));
+      toast.success(`${name} approved and added to Student Records!`);
+    } catch (err: any) {
+      toast.error(err.message || "Approval failed");
+    } finally {
+      setActionId(null);
+    }
+  };
+
 
   const moveToTrash = async (id: string) => {
     setActionId(id);
@@ -250,25 +270,39 @@ export default function AdminEnquiries() {
                       </div>
 
                       {/* QUICK ACTIONS & STATUS DROPDOWN */}
-                      <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-gray-100">
-                        <select
-                          disabled={actionId === e.id}
-                          value={e.status}
-                          onChange={(ev) => updateStatus(e.id, ev.target.value)}
-                          className="bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-700 rounded-lg px-2.5 py-1.5 outline-none focus:border-[#800000] disabled:opacity-50"
-                        >
-                          {FILTERS.filter(f => f !== "all").map(f => (
-                            <option key={f} value={f}>{STATUS_CONFIG[f]?.label}</option>
-                          ))}
-                        </select>
-                        <button
-                          onClick={() => moveToTrash(e.id)}
-                          disabled={actionId === e.id}
-                          className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors ml-auto md:ml-0"
-                          title="Move to Trash"
-                        >
-                          {actionId === e.id ? <Loader2 size={16} className="animate-spin text-rose-600" /> : <Trash2 size={16} />}
-                        </button>
+                      <div className="flex flex-col gap-2 w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-0 border-gray-100">
+                        {/* APPROVE ADMISSION BUTTON */}
+                        {e.status !== "enrolled" && e.status !== "rejected" && (
+                          <button
+                            onClick={() => approveAdmission(e.id, e.name)}
+                            disabled={actionId === e.id}
+                            className="flex items-center justify-center gap-1.5 text-[11px] font-bold px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors w-full"
+                            title="Approve & Enroll Student"
+                          >
+                            {actionId === e.id ? <Loader2 size={12} className="animate-spin" /> : <UserCheck size={12} />}
+                            Approve Admission
+                          </button>
+                        )}
+                        <div className="flex items-center gap-2">
+                          <select
+                            disabled={actionId === e.id}
+                            value={e.status}
+                            onChange={(ev) => updateStatus(e.id, ev.target.value)}
+                            className="bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-700 rounded-lg px-2.5 py-1.5 outline-none focus:border-[#800000] disabled:opacity-50 flex-1"
+                          >
+                            {FILTERS.filter(f => f !== "all").map(f => (
+                              <option key={f} value={f}>{STATUS_CONFIG[f]?.label}</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => moveToTrash(e.id)}
+                            disabled={actionId === e.id}
+                            className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                            title="Move to Trash"
+                          >
+                            {actionId === e.id ? <Loader2 size={16} className="animate-spin text-rose-600" /> : <Trash2 size={16} />}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

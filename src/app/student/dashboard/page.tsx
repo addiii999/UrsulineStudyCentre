@@ -25,38 +25,37 @@ export default function StudentDashboardPage() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [annRes, settingsRes] = await Promise.all([
+      const [annRes, settingsRes, stuRes] = await Promise.all([
         fetch("/api/announcements"),
         fetch("/api/settings"),
+        fetch("/api/student/profile"), // JWT cookie authenticates this
       ]);
-      const [annData, settingsData] = await Promise.all([
+      const [annData, settingsData, stuData] = await Promise.all([
         annRes.json(),
         settingsRes.json(),
+        stuRes.json(),
       ]);
+
       if (annData.announcements) setNotices(annData.announcements);
       if (settingsData.settings) setSettings(settingsData.settings);
 
-      // Read phone from cookie set by /api/student/login server response
-      const phone = document.cookie
-        .split("; ")
-        .find((c) => c.startsWith("student_phone="))
-        ?.split("=")[1];
+      if (stuRes.status === 401 || stuRes.status === 403) {
+        // Session invalid or expired — redirect to login
+        router.push("/login");
+        return;
+      }
 
-      if (phone) {
-        const stuRes = await fetch(`/api/student/profile`);
-        const stuData = await stuRes.json();
-        if (stuData.student) {
-          setStudent(stuData.student);
-          setEditPhone(stuData.student.present_phone ?? "");
-          setEditEmergency(stuData.student.emergency_contact ?? "");
-        }
+      if (stuData.student) {
+        setStudent(stuData.student);
+        setEditPhone(stuData.student.present_phone ?? "");
+        setEditEmergency(stuData.student.emergency_contact ?? "");
       }
     } catch (e) {
       console.error("Dashboard fetch error:", e);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
@@ -71,7 +70,7 @@ export default function StudentDashboardPage() {
     if (editPhone.length !== 10) { toast.error("Phone must be 10 digits"); return; }
     setSaving(true);
     try {
-      const res = await fetch(`/api/student/profile?phone=${student.present_phone}`, {
+      const res = await fetch(`/api/student/profile`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ present_phone: editPhone, emergency_contact: editEmergency }),
