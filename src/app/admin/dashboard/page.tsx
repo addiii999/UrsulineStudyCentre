@@ -14,7 +14,7 @@ import AdminDashboardHome from "@/components/admin/AdminDashboardHome";
 import AdminCourses from "@/components/admin/AdminCourses";
 import AdminFaculty from "@/components/admin/AdminFaculty";
 import AdminVideos from "@/components/admin/AdminVideos";
-import AdminAdmissions from "@/components/admin/AdminAdmissions";
+import AdminStudents from "@/components/admin/AdminStudents";
 import AdminFees from "@/components/admin/AdminFees";
 import AdminEnquiries from "@/components/admin/AdminEnquiries";
 import AdminFAQ from "@/components/admin/AdminFAQ";
@@ -30,7 +30,7 @@ import WeeklyBackupReminder from "@/components/admin/WeeklyBackupReminder";
 type AdminSection =
   | "dashboard"
   | "courses" | "faculty" | "videos" | "gallery" | "testimonials" | "results" | "faq"
-  | "admissions" | "fees" | "enquiries"
+  | "students" | "fees" | "enquiries"
   | "announcements"
   | "storage"
   | "settings";
@@ -58,7 +58,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Students & Leads",
     items: [
       { id: "enquiries",  label: "Enquiries",   icon: <MessageSquare size={16} /> },
-      { id: "admissions", label: "Admissions",  icon: <ClipboardList size={16} /> },
+      { id: "students",   label: "Student Records",  icon: <ClipboardList size={16} /> },
       { id: "fees",       label: "Fees",        icon: <CreditCard size={16} /> },
     ],
   },
@@ -91,7 +91,7 @@ export default function AdminDashboardPage() {
       case "faculty":      return <AdminFaculty />;
       case "videos":       return <AdminVideos />;
       case "gallery":      return <AdminGallery />;
-      case "admissions":   return <AdminAdmissions />;
+      case "students":     return <AdminStudents />;
       case "fees":         return <AdminFees />;
       case "enquiries":    return <AdminEnquiries />;
       case "faq":          return <AdminFAQ />;

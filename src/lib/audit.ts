@@ -15,6 +15,7 @@ export type AuditAction =
   | "unauthorized_request"
   | "upload_failure"
   | "suspicious_activity"
+  | "update"
   | "db_error";
 
 interface AuditPayload {

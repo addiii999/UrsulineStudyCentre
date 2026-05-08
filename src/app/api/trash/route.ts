@@ -13,6 +13,7 @@ const SOFT_DELETE_TABLES = [
   "enquiries",
   "faqs",
   "results",
+  "students",
 ] as const;
 
 type SoftDeleteTable = (typeof SOFT_DELETE_TABLES)[number];
@@ -27,6 +28,7 @@ const TABLE_LABELS: Record<SoftDeleteTable, { singular: string; labelField: stri
   enquiries:    { singular: "Enquiry",         labelField: "name"    },
   faqs:         { singular: "FAQ",             labelField: "q"       },
   results:      { singular: "Result",          labelField: "student_name" },
+  students:     { singular: "Student Record",  labelField: "full_name" },
 };
 
 // ─── GET: All soft-deleted items across all tables ──────────

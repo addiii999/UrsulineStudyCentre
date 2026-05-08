@@ -329,19 +329,62 @@ export default function AdminStorageManager() {
 
       {/* ── BACKUP & EXPORT TAB ─────────────────────────────────── */}
       {tab === "backup" && (
-        <div className="space-y-4">
+        <div className="space-y-5">
+          <div className="bg-[#800000] border border-[#5C0000] rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-5">
+              <div>
+                <h3 className="text-lg font-bold flex items-center gap-2"><Shield size={18} className="text-[#C9A84C]" /> Complete Database Backup</h3>
+                <p className="text-white/70 text-sm mt-1 mb-4 max-w-md">Instantly download a complete, highly-compressed ZIP snapshot of your entire database including all operational data.</p>
+                <div className="flex flex-wrap gap-4 text-xs font-semibold text-white/60">
+                  <p>Weekly Backup: <span className="text-white">{typeof window !== 'undefined' ? localStorage.getItem("lastBackupWeek") || "None" : "None"}</span></p>
+                  <p>Last Manual: <span className="text-white">{typeof window !== 'undefined' ? localStorage.getItem("lastManualBackup") || "Never" : "Never"}</span></p>
+                </div>
+              </div>
+              <button 
+                onClick={async () => {
+                  setBusy("full_backup");
+                  try {
+                    const res = await fetch("/api/backup/full");
+                    if (!res.ok) throw new Error();
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `USC_Manual_Backup_${new Date().toISOString().slice(0,10)}.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    localStorage.setItem("lastManualBackup", new Date().toLocaleDateString());
+                    showToast("Full backup downloaded successfully!", "ok");
+                  } catch(e) {
+                    showToast("Backup failed. Please try again.", "err");
+                  } finally {
+                    setBusy(null);
+                  }
+                }}
+                disabled={busy === "full_backup"}
+                className="w-full md:w-auto flex items-center justify-center gap-2 bg-white text-[#800000] px-6 py-3.5 rounded-xl font-bold hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-70"
+              >
+                {busy === "full_backup" ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                {busy === "full_backup" ? "Generating ZIP..." : "Download Full Backup Now"}
+              </button>
+            </div>
+          </div>
+
           <div className="bg-sky-50 border border-sky-100 rounded-2xl px-5 py-4 text-[12px] text-sky-700">
-            <p className="font-bold mb-1">📦 How Backup Works</p>
-            <p>Download a full snapshot of any table as <strong>JSON</strong> (full fidelity, re-importable) or <strong>CSV</strong> (Excel-compatible). Save regularly to your computer or cloud drive.</p>
+            <p className="font-bold mb-1">📦 Individual Table Exports</p>
+            <p>Download a snapshot of any specific table as <strong>JSON</strong> (full fidelity) or <strong>CSV</strong> (Excel-compatible). Avoids downloading entire database.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {EXPORT_TABLES.map(t => (
-              <div key={t.key} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center justify-between gap-3">
+              <div key={t.key} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center justify-between gap-3 hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{t.emoji}</span>
                   <div>
                     <p className="text-[13px] font-bold text-gray-800">{t.label}</p>
-                    <p className="text-[10px] text-gray-400">Full table export</p>
+                    <p className="text-[10px] text-gray-400">Single table data</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
