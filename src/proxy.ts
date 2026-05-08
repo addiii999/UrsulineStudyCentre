@@ -26,9 +26,35 @@ export function proxy(req: NextRequest) {
     }
   }
 
-  // 2. API Rate Limiting & Security Headers
+  // 2. API Rate Limiting, CSRF, & Security Headers
   if (pathname.startsWith("/api/")) {
     const ip = req.headers.get("x-forwarded-for") || "unknown-ip";
+    
+    // --- CSRF PROTECTION ---
+    const method = req.method;
+    const mutationMethods = ["POST", "PATCH", "DELETE", "PUT"];
+    
+    if (mutationMethods.includes(method) && process.env.NODE_ENV === "production" && !pathname.includes("/api/cron")) {
+      const origin = req.headers.get("origin");
+      const referer = req.headers.get("referer");
+      const host = req.headers.get("host");
+      
+      const allowedOrigins = [
+        `https://${host}`,
+        "https://ursulinestudycentre.com",
+        "https://www.ursulinestudycentre.com",
+      ];
+
+      if (origin && !allowedOrigins.some(ao => origin.startsWith(ao))) {
+        return new NextResponse(JSON.stringify({ error: "Security violation: Cross-site request blocked." }), { status: 403, headers: { "Content-Type": "application/json" } });
+      }
+
+      if (!origin && referer && !allowedOrigins.some(ao => referer.startsWith(ao))) {
+        return new NextResponse(JSON.stringify({ error: "Security violation: Unauthorized referer." }), { status: 403, headers: { "Content-Type": "application/json" } });
+      }
+    }
+    // --- END CSRF PROTECTION ---
+
     const now = Date.now();
     
     let userRate = rateLimitMap.get(ip);
