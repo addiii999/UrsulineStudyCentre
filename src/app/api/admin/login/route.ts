@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { SignJWT } from "jose";
 import { logAudit } from "@/lib/audit";
 
 export async function POST(req: NextRequest) {
@@ -34,9 +35,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // 4. Set secure HttpOnly session cookie (not accessible from JS)
+    // 4. Generate JWT
+    const secretStr = process.env.JWT_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY; // Fallback to supabase secret if JWT secret missing
+    if (!secretStr) {
+      console.error("JWT_SECRET is missing.");
+      return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+    }
+
+    const secret = new TextEncoder().encode(secretStr);
+    const token = await new SignJWT({ role: "admin", username: storedUsername })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("8h")
+      .sign(secret);
+
+    // 5. Set secure HttpOnly session cookie
     const response = NextResponse.json({ success: true });
-    response.cookies.set("admin_session", "true", {
+    response.cookies.set("admin_session", token, {
       httpOnly: true,       // JS cannot read this
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",   // CSRF protection
