@@ -42,12 +42,18 @@ export async function GET(req: NextRequest) {
     const { data, error } = await query;
     // Suppress missing column error temporarily if user hasn't ran the migration yet
     if (error && error.code === '42703') {
-       // Fallback for schema mismatch: just fetch without is_deleted
-       let fallbackQuery = adminClient.from("students").select("*").order("created_at", { ascending: false });
-       if (status) fallbackQuery = fallbackQuery.eq("admission_status", status);
-       if (session) fallbackQuery = fallbackQuery.eq("session", session);
-       const { data: fbData } = await fallbackQuery;
-       return NextResponse.json({ students: fbData ?? [] });
+        // Fallback for schema mismatch: fetch without is_deleted, but filter out 'rejected' by default
+        let fallbackQuery = adminClient.from("students")
+          .select("*")
+          .neq("admission_status", "rejected")
+          .order("created_at", { ascending: false });
+
+        if (status) fallbackQuery = adminClient.from("students").select("*").eq("admission_status", status).order("created_at", { ascending: false });
+        if (session) fallbackQuery = fallbackQuery.eq("session", session);
+
+        const { data: fbData, error: fbError } = await fallbackQuery;
+        if (fbError) throw fbError;
+        return NextResponse.json({ students: fbData ?? [] });
     }
     if (error) throw error;
 
@@ -100,9 +106,14 @@ export async function DELETE(req: NextRequest) {
       .eq("id", id);
 
     if (error) {
-       // If column missing, just change status
+       // If column missing (42703), fallback to changing status to "rejected"
        if (error.code === '42703') {
-         await adminClient.from("students").update({ admission_status: "rejected" }).eq("id", id);
+         const { error: fallbackError } = await adminClient
+           .from("students")
+           .update({ admission_status: "rejected", updated_at: new Date().toISOString() })
+           .eq("id", id);
+         
+         if (fallbackError) throw new Error("Failed to archive: " + fallbackError.message);
        } else {
          throw error;
        }
@@ -113,6 +124,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
+    console.error("Student DELETE error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
