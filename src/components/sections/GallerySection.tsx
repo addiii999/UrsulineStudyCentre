@@ -133,7 +133,7 @@ export default function GallerySection() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (!loading && items.length === 0) return null; // hide section if no photos
+  // Empty state is handled inside the render now
 
   return (
     <section id="gallery" className="py-20 md:py-28 bg-white">

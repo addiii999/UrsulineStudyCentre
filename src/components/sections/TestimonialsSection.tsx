@@ -15,7 +15,22 @@ export default async function TestimonialsSection() {
   const testimonials = testimonialsData ?? [];
 
   if (testimonials.length === 0) {
-    return null;
+    return (
+      <section id="testimonials" className="py-14 md:py-20 bg-[#FDF8F0]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <span className="section-tag">Testimonials</span>
+            <h2 className="section-heading mt-4">
+              What <span className="text-[#800000]">Parents & Students</span> Say
+            </h2>
+            <div className="gold-divider mx-auto mt-4" />
+          </div>
+          <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
+            <p className="text-gray-500 font-medium">No testimonials available yet.</p>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (

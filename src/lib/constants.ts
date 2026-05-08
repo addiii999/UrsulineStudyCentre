@@ -28,55 +28,8 @@ export const SITE_CONFIG = {
 
 export const STATS: { value: string; label: string; }[] = [];
 
-export const COURSES = [
-  {
-    category: "Academic Streams",
-    icon: "stream",
-    courses: [
-      { name: "Science (PCM)", desc: "Physics, Chemistry, Mathematics for JEE aspirants" },
-      { name: "Science (PCB)", desc: "Physics, Chemistry, Biology for NEET aspirants" },
-      { name: "Commerce", desc: "Accountancy, Business Studies, Economics" },
-      { name: "Humanities", desc: "History, Geography, Political Science, Sociology" },
-    ],
-  },
-  {
-    category: "Competitive Exams",
-    icon: "exam",
-    courses: [
-      { name: "JEE Main & Advanced", desc: "Structured preparation for IIT & NIT entrance" },
-      { name: "NEET UG", desc: "Medical entrance with expert biology faculty" },
-      { name: "CLAT", desc: "Law entrance preparation with legal reasoning" },
-    ],
-  },
-  {
-    category: "Vocational Skills",
-    icon: "skill",
-    courses: [
-      { name: "AI & Machine Learning", desc: "Basics to advanced AI concepts" },
-      { name: "Programming", desc: "Python, web development fundamentals" },
-      { name: "DCA", desc: "Diploma in Computer Applications" },
-      { name: "Tally & Accounts", desc: "Professional accounting software" },
-      { name: "Social Media Marketing", desc: "Digital marketing & content creation" },
-    ],
-  },
-];
-
-export const FACULTY = [
-  {
-    name: "Abhishek Pathak",
-    subject: "Mathematics & JEE",
-    qualification: "M.Sc Mathematics",
-    experience: "10+ Years",
-    role: "Founder & Director",
-  },
-  {
-    name: "Sr. Dr. Mary Grace",
-    subject: "Academic Guidance",
-    qualification: "PhD, Education",
-    experience: "20+ Years",
-    role: "Visionary Principal",
-  },
-];
+export const COURSES: any[] = [];
+export const FACULTY: any[] = [];
 
 export const WHY_CHOOSE_US = [
   {
@@ -112,43 +65,8 @@ export const WHY_CHOOSE_US = [
 ];
 
 export const TESTIMONIALS: { name: string; role: string; review: string; rating: number }[] = [];
-
 export const YOUTUBE_VIDEOS: { id: string; title: string; thumbnail: string; }[] = [];
-
-export const FAQS = [
-  {
-    q: "Is Ursuline Study Centre exclusively for girls?",
-    a: "Yes, Ursuline Study Centre is a 100% girls-only premium educational institution. This ensures a safe, focused, and empowering academic environment for all our students.",
-  },
-  {
-    q: "Which boards do you cover?",
-    a: "We cover both JAC (Jharkhand Academic Council) and CBSE (Central Board of Secondary Education), providing complete curriculum support for Classes 9 to 12.",
-  },
-  {
-    q: "Which competitive exams do you prepare for?",
-    a: "We offer dedicated preparation for JEE Main & Advanced, NEET UG, and CLAT alongside regular board studies.",
-  },
-  {
-    q: "What is the batch size?",
-    a: "We maintain small, focused batches of 20–25 students to ensure personalized attention and effective learning for every student.",
-  },
-  {
-    q: "Do you offer vocational courses alongside academics?",
-    a: "Yes! We offer a unique combination of academic excellence with vocational skills including AI, Programming, DCA, Tally, and Social Media Marketing.",
-  },
-  {
-    q: "What is the medium of instruction?",
-    a: "We teach in both English and Hindi (bilingual) to ensure every student grasps concepts thoroughly, regardless of their primary language.",
-  },
-  {
-    q: "How do I take admission?",
-    a: "Simply fill the enquiry form, attend a free counselling session, submit your documents, and complete the fee payment. We guide you through every step.",
-  },
-  {
-    q: "What is the fee structure?",
-    a: "Our annual fee is ₹15,000 for all academic streams (PCM, PCB, Commerce, Humanities). Vocational courses have separate pricing. Please contact us for detailed fee breakdowns.",
-  },
-];
+export const FAQS: { q: string; a: string; }[] = [];
 
 export const ADMISSION_STEPS = [
   { step: "01", title: "Enquiry", desc: "Fill the online form or call us", icon: "form" },

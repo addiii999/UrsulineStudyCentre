@@ -14,7 +14,27 @@ export default async function ResultsSection() {
   const stats = statsData ?? [];
 
   if (stats.length === 0) {
-    return null;
+    return (
+      <section id="results" className="py-14 md:py-20 bg-[#800000] relative overflow-hidden">
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
+          <div className="text-center mb-8">
+            <span className="inline-flex items-center gap-2 bg-white/10 border border-[#C9A84C]/40 text-[#C9A84C] text-xs font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider">
+              Our Results
+            </span>
+            <h2
+              className="text-3xl md:text-4xl font-bold text-white mt-4"
+              style={{ fontFamily: "var(--font-serif)" }}
+            >
+              Numbers That Speak for{" "}
+              <span className="text-[#C9A84C]">Themselves</span>
+            </h2>
+          </div>
+          <div className="text-center py-16 bg-white/5 border border-white/10 rounded-2xl">
+            <p className="text-white/70 font-medium">No results available yet.</p>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (

@@ -61,7 +61,24 @@ export default function CoursesSection() {
     );
   }
 
-  if (groupedCourses.length === 0) return null;
+  if (groupedCourses.length === 0) {
+    return (
+      <section id="courses" className="py-14 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <span className="section-tag">Programs Offered</span>
+            <h2 className="section-heading mt-3">
+              Our <span className="text-[#800000]">Courses</span>
+            </h2>
+            <div className="gold-divider mx-auto mt-3" />
+          </div>
+          <div className="text-center py-16 bg-[#FDF8F0] rounded-xl border border-[#e8d9b8]">
+            <p className="text-gray-500 font-medium">No courses available yet.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   // Make sure activeTab is within bounds
   const currentTabIdx = activeTab < groupedCourses.length ? activeTab : 0;

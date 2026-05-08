@@ -42,7 +42,24 @@ export default function FaqSection() {
     );
   }
 
-  if (faqs.length === 0) return null;
+  if (faqs.length === 0) {
+    return (
+      <section id="faq" className="py-14 md:py-20 bg-[#FDF8F0]">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <span className="section-tag">FAQ</span>
+            <h2 className="section-heading mt-4">
+              Frequently Asked <span className="text-[#800000]">Questions</span>
+            </h2>
+            <div className="gold-divider mx-auto mt-4" />
+          </div>
+          <div className="text-center py-10 bg-white rounded-xl border border-[#f0ebe0]">
+            <p className="text-gray-500 font-medium">No FAQs available yet.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="faq" className="py-14 md:py-20 bg-[#FDF8F0]">

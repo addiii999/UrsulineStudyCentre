@@ -15,7 +15,24 @@ export default async function FacultySection() {
 
   const faculty = facultyData ?? [];
 
-  if (faculty.length === 0) return null;
+  if (faculty.length === 0) {
+    return (
+      <section id="faculty" className="py-14 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-8">
+            <span className="section-tag">Our Faculty</span>
+            <h2 className="section-heading mt-4">
+              Expert <span className="text-[#800000]">Educators</span>
+            </h2>
+            <div className="gold-divider mx-auto mt-4" />
+          </div>
+          <div className="text-center py-16 bg-gray-50 rounded-xl border border-gray-100">
+            <p className="text-gray-500 font-medium">No faculty members available yet.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="faculty" className="py-14 md:py-20 bg-white">
