@@ -264,18 +264,54 @@ export default function ContactSection() {
               </a>
             </div>
 
-            {/* MAP */}
-            <div className="rounded-2xl overflow-hidden border border-[#f0ebe0] shadow-sm h-56">
-              <iframe
-                src={settings.mapEmbed}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Ursuline Study Centre Location"
-              />
+            {/* MAP SECTION */}
+            <div className="space-y-3">
+              <div className="relative rounded-2xl overflow-hidden border border-[#f0ebe0] shadow-sm h-64 bg-gray-50 flex items-center justify-center">
+                {/* FALLBACK UI (Behind iframe) */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-[#FDF8F0]/50">
+                  <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-3">
+                    <MapPin size={20} className="text-[#800000]" />
+                  </div>
+                  <h4 className="font-bold text-gray-900 text-sm">Ursuline Study Centre</h4>
+                  <p className="text-xs text-gray-500 mt-1 max-w-[200px] leading-relaxed">
+                    Ursuline Convent Campus, Dr. Camil Bulcke Path, Ranchi, Jharkhand, India
+                  </p>
+                </div>
+
+                {/* IFRAME */}
+                <iframe
+                  src={settings.mapEmbed}
+                  className="absolute inset-0 w-full h-full border-0 z-10"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Ursuline Study Centre Location"
+                />
+              </div>
+
+              {/* MAP ACTIONS */}
+              <div className="grid grid-cols-2 gap-3">
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=Ursuline+Convent+Campus,+Dr.+Camil+Bulcke+Path,+Ranchi,+Jharkhand,+India"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-2 bg-white border border-[#e8d9b8] text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 hover:text-[#800000] hover:border-[#C9A84C] transition-all"
+                >
+                  <MapPin size={16} className="text-[#C9A84C]" />
+                  Open in Maps
+                </a>
+                <a
+                  href="https://www.google.com/maps/dir/?api=1&destination=Ursuline+Convent+Campus,+Dr.+Camil+Bulcke+Path,+Ranchi,+Jharkhand,+India"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-2 bg-[#800000] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#5C0000] shadow-sm hover:shadow transition-all"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                  </svg>
+                  Get Directions
+                </a>
+              </div>
             </div>
           </div>
         </div>
