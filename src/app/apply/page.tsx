@@ -158,11 +158,16 @@ export default function ApplyPage() {
         permanent_phone: form.permanentPhone,
       };
 
-      await fetch("/api/students", {
+      const res = await fetch("/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dbPayload),
-      }).catch(err => console.error("DB Save Error:", err));
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Failed to save application to database");
+      }
 
       // 2. Send Email via FormSubmit
       const data = new FormData();
@@ -176,8 +181,9 @@ export default function ApplyPage() {
         method: "POST", body: data, headers: { Accept: "application/json" },
       });
       setSubmitted(true);
-    } catch {
-      alert("Network error. Please try again.");
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Network error. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -6,13 +6,36 @@ import { checkAdminAuth } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { data, error } = await supabase
+    const adminClient = createAdminClient();
+
+    // Try inserting with is_deleted column first
+    let { data, error } = await adminClient
       .from("students")
       .insert([{ ...body, is_deleted: false }])
       .select()
       .single();
 
+    // Fallback if migration for is_deleted is not yet run
+    if (error && error.code === "42703") {
+      const fallbackInsert = await adminClient
+        .from("students")
+        .insert([body])
+        .select()
+        .single();
+      data = fallbackInsert.data;
+      error = fallbackInsert.error;
+    }
+
     if (error) throw error;
+
+    // Fire notification to admin dashboard
+    const { createNotification } = await import("@/lib/notify");
+    await createNotification({
+      title: "New Admission Application",
+      message: `${body.full_name} submitted an admission form.`,
+      type: "enquiry",
+    }).catch(() => {}); // non-blocking
+
     return NextResponse.json({ success: true, id: data?.id }, { status: 201 });
   } catch (err: any) {
     console.error("Student POST error:", err);
