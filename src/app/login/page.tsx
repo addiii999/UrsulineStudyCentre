@@ -239,7 +239,7 @@ export default function LoginPage() {
                     <input
                       value={adminForm.username}
                       onChange={(e) => setAdminForm((p) => ({ ...p, username: e.target.value }))}
-                      placeholder="admin"
+                      placeholder="admin@example.com"
                       className="input-field pl-9"
                       required
                     />
