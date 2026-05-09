@@ -40,6 +40,11 @@ CREATE TABLE IF NOT EXISTS public.login_attempts (
   created_at  TIMESTAMPTZ DEFAULT now()
 );
 
+-- Ensure columns exist in case the table was created previously
+ALTER TABLE public.login_attempts
+  ADD COLUMN IF NOT EXISTS email TEXT,
+  ADD COLUMN IF NOT EXISTS is_success BOOLEAN DEFAULT false;
+
 -- ─────────────────────────────────────────────────────────────────────
 -- ⚠️ PHASE 2: INDEXES AND UPDATES
 -- Using a DO block with EXECUTE prevents Postgres from trying to parse 
