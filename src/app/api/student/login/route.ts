@@ -3,124 +3,144 @@ import { createAdminClient } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
 
-// POST — Student login by phone number and password
+const MAX_ATTEMPTS = 6;
+const LOCKOUT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") || "unknown";
+  const adminClient = createAdminClient();
+
   try {
-    const { phone, password } = await req.json();
+    const { email, password } = await req.json();
 
-    if (!phone || phone.length !== 10) {
-      return NextResponse.json({ error: "Valid 10-digit phone number required" }, { status: 400 });
+    if (!email || !password) {
+      return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
     }
 
-    if (!password) {
-      return NextResponse.json({ error: "Password is required" }, { status: 400 });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
 
-    const adminClient = createAdminClient();
+    // ── Brute-force protection ──────────────────────────────
+    const { data: recentFails } = await adminClient
+      .from("login_attempts")
+      .select("id")
+      .eq("ip_address", ip)
+      .eq("email", email.toLowerCase().trim())
+      .eq("is_success", false)
+      .gt("created_at", new Date(Date.now() - LOCKOUT_WINDOW_MS).toISOString());
 
-    // Fetch student data. 
-    // We try to fetch password_hash. If migration hasn't run, it might fail.
-    // So we fetch safely by catching column errors.
-    let studentData;
-    let { data, error } = await adminClient
-      .from("students")
-      .select("id, full_name, present_phone, admission_status, dob, password_hash")
-      .eq("present_phone", phone)
-      .eq("is_deleted", false)
-      .maybeSingle();
-
-    if (error && error.code === "42703") {
-      // password_hash column doesn't exist yet, fallback fetch
-      const fallback = await adminClient
-        .from("students")
-        .select("id, full_name, present_phone, admission_status, dob")
-        .eq("present_phone", phone)
-        .eq("is_deleted", false)
-        .maybeSingle();
-      data = fallback.data as any;
-      error = fallback.error;
-    }
-
-    if (error) throw error;
-
-    if (!data) {
+    if (recentFails && recentFails.length >= MAX_ATTEMPTS) {
       return NextResponse.json(
-        { error: "No student record found with this phone number." },
-        { status: 404 }
+        { error: "Too many failed attempts. Please try again in 15 minutes." },
+        { status: 429 }
       );
     }
 
-    if (data.admission_status === "rejected") {
+    // ── Fetch student record ────────────────────────────────
+    const { data: student, error: fetchErr } = await adminClient
+      .from("students")
+      .select("id, full_name, email, present_phone, password_hash, email_verified, admission_status, approval_status, course, present_class, session")
+      .eq("email", email.toLowerCase().trim())
+      .eq("is_deleted", false)
+      .maybeSingle();
+
+    if (fetchErr) throw fetchErr;
+
+    // Simulate delay to prevent timing attacks on non-existent accounts
+    await new Promise(r => setTimeout(r, 400));
+
+    const recordAttempt = async (success: boolean) => {
+      try {
+        await adminClient.from("login_attempts").insert({
+          ip_address: ip,
+          email: email.toLowerCase().trim(),
+          is_success: success,
+        });
+      } catch { /* non-critical */ }
+    };
+
+    if (!student) {
+      await recordAttempt(false);
+      return NextResponse.json({ error: "No account found with this email address." }, { status: 404 });
+    }
+
+    // ── Email must be verified before login is allowed ──────
+    if (!student.email_verified) {
+      await recordAttempt(false);
       return NextResponse.json(
-        { error: "Your admission was not approved. Please contact the admin office." },
+        { error: "Email not verified. Please complete the OTP verification first." },
         { status: 403 }
       );
     }
 
-    // AUTHENTICATION LOGIC
-    let isAuthenticated = false;
-
-    if (data.password_hash) {
-      // Normal flow: verify bcrypt hash
-      isAuthenticated = await bcrypt.compare(password, data.password_hash);
-    } else {
-      // Migration flow: No password_hash set yet. Verify against DOB.
-      // DOB format from Supabase is usually YYYY-MM-DD
-      const dobString = data.dob ? new Date(data.dob).toISOString().split("T")[0] : null;
-      
-      if (dobString && password === dobString) {
-        isAuthenticated = true;
-        // Auto-hash and save for future logins
-        const newHash = await bcrypt.hash(password, 10);
-        try {
-          await adminClient
-            .from("students")
-            .update({ password_hash: newHash })
-            .eq("id", data.id);
-        } catch (e) {
-          // Ignore error if column doesn't exist
-        }
-      } else if (!dobString) {
-         // Student has no DOB set in db, so they can't login via this fallback. Admin intervention required.
-         return NextResponse.json({ error: "Account setup incomplete. Please contact admin." }, { status: 403 });
-      }
+    // ── Admin approval required to login ───────────────────
+    if (student.approval_status === "rejected") {
+      await recordAttempt(false);
+      return NextResponse.json(
+        { error: "Your application was not approved. Please contact the admin office." },
+        { status: 403 }
+      );
     }
 
-    if (!isAuthenticated) {
-      // Simulate delay
-      await new Promise(r => setTimeout(r, 500));
-      return NextResponse.json({ error: "Invalid phone number or password." }, { status: 401 });
+    if (student.approval_status === "pending") {
+      await recordAttempt(false);
+      return NextResponse.json(
+        { error: "Your application is pending admin approval. You will be notified once approved." },
+        { status: 403 }
+      );
     }
 
-    // Create JWT Session token
+    // ── Password verification ───────────────────────────────
+    if (!student.password_hash) {
+      await recordAttempt(false);
+      return NextResponse.json(
+        { error: "Account setup incomplete. Please contact the admin office." },
+        { status: 403 }
+      );
+    }
+
+    const passwordValid = await bcrypt.compare(password, student.password_hash);
+
+    if (!passwordValid) {
+      await recordAttempt(false);
+      return NextResponse.json({ error: "Incorrect password. Please try again." }, { status: 401 });
+    }
+
+    // ── Authentication successful ───────────────────────────
+    await recordAttempt(true);
+
     const secretStr = process.env.JWT_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!secretStr) {
       return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
     }
 
     const secret = new TextEncoder().encode(secretStr);
-    const token = await new SignJWT({ role: "student", id: data.id, phone: data.present_phone })
+    const token = await new SignJWT({
+      role: "student",
+      id: student.id,
+      email: student.email,
+      phone: student.present_phone,
+    })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("24h")
       .sign(secret);
 
-    // Create session response with secure cookies
-    const res = NextResponse.json({ success: true, student: { name: data.full_name } });
-    
-    // Set secure JWT cookie
-    res.cookies.set("student_session", token, { 
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === "production",
-      path: "/", 
-      maxAge: 86400, 
-      sameSite: "strict" 
+    const res = NextResponse.json({
+      success: true,
+      student: { name: student.full_name },
     });
-    
-    // We can keep the phone cookie for client-side convenience, but it's not used for auth anymore
-    res.cookies.set("student_phone", phone, { path: "/", maxAge: 86400, sameSite: "lax" });
+
+    res.cookies.set("student_session", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 86400,
+      sameSite: "strict",
+    });
 
     return res;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Student login error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

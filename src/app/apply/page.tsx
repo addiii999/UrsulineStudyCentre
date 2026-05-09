@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { CheckCircle2, Send, MessageCircle, ArrowLeft, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { CheckCircle2, Send, MessageCircle, ArrowLeft, Loader2, Mail, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { SITE_CONFIG } from "@/lib/constants";
 
@@ -21,6 +21,7 @@ const MEDIUMS = ["Hindi", "English"];
 const VOCATIONAL = ["AI & Machine Learning", "Programming", "Social Media Marketing", "Spoken English", "DCA (Diploma in Computer Applications)", "Tally"];
 
 interface FormData {
+  email: string; password: string; confirmPassword: string;
   fullName: string; dob: string; aadhaar: string;
   motherName: string; fatherName: string;
   academicLevel: string;
@@ -36,6 +37,7 @@ interface FormData {
 }
 
 const INIT: FormData = {
+  email: "", password: "", confirmPassword: "",
   fullName: "", dob: "", aadhaar: "",
   motherName: "", fatherName: "",
   academicLevel: "",
@@ -77,8 +79,24 @@ export default function ApplyPage() {
   const [form, setForm] = useState<FormData>(INIT);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData | "otp" | "general", string>>>({});
   const [settings, setSettings] = useState(SITE_CONFIG);
+
+  // OTP flow state
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -130,83 +148,111 @@ export default function ApplyPage() {
     setForm((p) => ({ ...p, [k]: v }));
 
   const validate = () => {
-    const e: Partial<Record<keyof FormData, string>> = {};
+    const e: Partial<Record<keyof FormData | "otp" | "general", string>> = {};
+    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Valid email required";
+    if (!form.password || form.password.length < 8) e.password = "Minimum 8 characters";
+    if (form.password !== form.confirmPassword) e.confirmPassword = "Passwords do not match";
     if (!form.fullName.trim()) e.fullName = "Required";
     if (!form.dob) e.dob = "Required";
     if (form.aadhaar && !/^\d{12}$/.test(form.aadhaar)) e.aadhaar = "Must be 12 digits";
     if (!form.motherName.trim()) e.motherName = "Required";
     if (!form.fatherName.trim()) e.fatherName = "Required";
     if (!form.academicLevel) e.academicLevel = "Please select your academic level";
-    
     const isVocOnly = form.academicLevel === "vocational";
     const isCompetitive = form.academicLevel === "competitive";
-    
     if (!isVocOnly && !isCompetitive && !form.schoolName.trim()) e.schoolName = "Required";
     if (!isVocOnly && !isCompetitive && !form.board) e.board = "Required";
-    
-    if (["class11", "class12", "passed10", "passed12"].includes(form.academicLevel) && !form.stream) {
-      e.stream = "Required";
-    }
-    
-    if (isVocOnly && !form.vocational) {
-      e.vocational = "Please select a vocational course";
-    }
-    
-    if (isCompetitive && form.competitiveInterest.length === 0) {
-      e.stream = "Please select at least one exam";
-    }
-    
+    if (["class11", "class12", "passed10", "passed12"].includes(form.academicLevel) && !form.stream) e.stream = "Required";
+    if (isVocOnly && !form.vocational) e.vocational = "Please select a vocational course";
+    if (isCompetitive && form.competitiveInterest.length === 0) e.stream = "Please select at least one exam";
     if (!/^\d{10}$/.test(form.presentPhone)) e.presentPhone = "Must be 10 digits";
     if (!form.confirmed) e.confirmed = "Please confirm";
-    
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
+  // Step 1 — validate form then send OTP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate()) { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
     setLoading(true);
     try {
-      // 1. Build DB payload from smart education fields
+      const res = await fetch("/api/student/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email.toLowerCase().trim(), name: form.fullName }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send OTP");
+      setStep("otp");
+      setResendCooldown(60);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err: any) {
+      setErrors(prev => ({ ...prev, general: err.message }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // OTP digit input handler
+  const handleOtpInput = (i: number, val: string) => {
+    const v = val.replace(/\D/g, "").slice(-1);
+    const next = [...otpDigits];
+    next[i] = v;
+    setOtpDigits(next);
+    if (v && i < 5) otpRefs.current[i + 1]?.focus();
+    if (!v && i > 0) otpRefs.current[i - 1]?.focus();
+  };
+
+  // Step 2 — verify OTP then submit full registration
+  const handleVerifyOtp = async () => {
+    const otp = otpDigits.join("");
+    if (otp.length < 6) { setErrors({ otp: "Enter all 6 digits" }); return; }
+    setOtpLoading(true);
+    setErrors({});
+    try {
+      // Verify OTP
+      const verifyRes = await fetch("/api/student/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email.toLowerCase().trim(), otp }),
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok) throw new Error(verifyData.error || "Invalid OTP");
+
+      // Build DB payload
       const lvl = form.academicLevel;
-      const levelLabel: Record<string,string> = {
-        class9:"Class IX", class10:"Class X", class11:"Class XI", class12:"Class XII",
-        passed10:"Passed Class X", passed12:"Passed Class XII",
-        competitive:"Competitive Exam", vocational:"Vocational",
+      const levelLabel: Record<string, string> = {
+        class9: "Class IX", class10: "Class X", class11: "Class XI", class12: "Class XII",
+        passed10: "Passed Class X", passed12: "Passed Class XII",
+        competitive: "Competitive Exam", vocational: "Vocational",
       };
-      const resolvedClass = lvl === "class11" ? "Class XI" : lvl === "class12" ? "Class XII" :
-        lvl === "class9" ? "Class IX" : lvl === "class10" ? "Class X" : levelLabel[lvl] || "";
+      const resolvedClass = levelLabel[lvl] || lvl;
       const resolvedCourse =
         form.stream ||
         (lvl === "vocational" ? (form.vocational || "Vocational") : "") ||
         (lvl === "competitive" && form.competitiveInterest.length > 0
-          ? `Competitive: ${form.competitiveInterest.join(", ")}`
-          : "") ||
-        form.course ||
-        levelLabel[lvl] ||   // always-present fallback e.g. "Class IX"
-        lvl;
-      const competitiveNote =
-        !form.stream && form.competitiveInterest.length > 0
-          ? ""   // already included in resolvedCourse above
-          : form.competitiveInterest.length > 0
-            ? ` | Competitive: ${form.competitiveInterest.join(", ")}`
-            : "";
+          ? `Competitive: ${form.competitiveInterest.join(", ")}` : "") ||
+        levelLabel[lvl] || lvl;
+      const competitiveNote = form.stream && form.competitiveInterest.length > 0
+        ? ` | Competitive: ${form.competitiveInterest.join(", ")}` : "";
 
-      const dbPayload = {
+      const payload = {
+        email: form.email.toLowerCase().trim(),
+        password: form.password,
         full_name: form.fullName.trim(),
         dob: form.dob || null,
         aadhaar_last4: form.aadhaar ? form.aadhaar.slice(-4) : null,
         mother_name: form.motherName.trim(),
         father_name: form.fatherName.trim(),
         prev_board: form.prevBoard || form.board || "",
-        prev_school: form.prevSchool.trim() || "",
-        prev_year: form.prevYear || "",
-        prev_marks: form.prevMarks || "",
+        prev_school: form.prevSchool.trim(),
+        prev_year: form.prevYear,
+        prev_marks: form.prevMarks,
         present_class: resolvedClass,
         present_board: form.board || form.presentBoard || "",
-        present_school: form.schoolName.trim() || form.presentSchool.trim() || "",
-        present_year: form.presentYear || "",
+        present_school: form.schoolName.trim() || form.presentSchool.trim(),
+        present_year: form.presentYear,
         course: resolvedCourse + competitiveNote,
         vocational: form.vocational || "",
         present_village: form.presentVillage.trim(),
@@ -219,36 +265,43 @@ export default function ApplyPage() {
         permanent_phone: form.permanentPhone || "",
       };
 
-      const res = await fetch("/api/students", {
+      const submitRes = await fetch("/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dbPayload),
+        body: JSON.stringify(payload),
       });
+      const submitData = await submitRes.json();
+      if (!submitRes.ok) throw new Error(submitData.error || "Registration failed");
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Failed to save application to database");
-      }
-
-      // 2. Send Email via FormSubmit
-      const data = new FormData();
-      data.append("_subject", `New Admission Application - ${form.fullName}`);
-      data.append("_captcha", "false");
-      data.append("_template", "table");
-      Object.entries(form).forEach(([k, v]) => {
-        if (k !== "confirmed") data.append(k.replace(/([A-Z])/g, " $1"), String(v));
-      });
-      await fetch("https://formsubmit.co/ursulinestudycentre@gmail.com", {
-        method: "POST", body: data, headers: { Accept: "application/json" },
-      });
       setSubmitted(true);
     } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Network error. Please try again.");
+      setErrors({ otp: err.message });
     } finally {
-      setLoading(false);
+      setOtpLoading(false);
     }
   };
+
+  // Resend OTP
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    setOtpLoading(true);
+    try {
+      const res = await fetch("/api/student/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email.toLowerCase().trim(), name: form.fullName }),
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+      setOtpDigits(["", "", "", "", "", ""]);
+      setResendCooldown(60);
+      setErrors({});
+    } catch (err: any) {
+      setErrors({ otp: err.message });
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
 
   const openWhatsApp = () => {
     const msg = encodeURIComponent(
@@ -284,6 +337,50 @@ export default function ApplyPage() {
     );
   }
 
+  // ── OTP Verification Screen ─────────────────────────────
+  if (step === "otp") {
+    return (
+      <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center p-6">
+        <div className="bg-white rounded-3xl shadow-xl border border-[#f0ebe0] p-8 max-w-sm w-full">
+          <div className="w-16 h-16 rounded-2xl bg-[#800000]/10 flex items-center justify-center mx-auto mb-5">
+            <ShieldCheck size={32} className="text-[#800000]" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 text-center mb-1">Verify Your Email</h2>
+          <p className="text-gray-500 text-sm text-center mb-6 leading-relaxed">
+            A 6-digit code was sent to <strong className="text-gray-800">{form.email}</strong>. Enter it below.
+          </p>
+          <div className="flex gap-2 justify-center mb-5">
+            {otpDigits.map((d, i) => (
+              <input key={i} ref={el => { otpRefs.current[i] = el; }}
+                value={d} maxLength={1} inputMode="numeric"
+                onChange={e => handleOtpInput(i, e.target.value)}
+                onKeyDown={e => { if (e.key === "Backspace" && !d && i > 0) otpRefs.current[i-1]?.focus(); }}
+                className={`w-11 h-13 text-center text-xl font-bold border-2 rounded-xl outline-none transition-colors ${
+                  errors.otp ? "border-red-400" : d ? "border-[#800000]" : "border-gray-200 focus:border-[#800000]"
+                }`} />
+            ))}
+          </div>
+          {errors.otp && <p className="text-red-500 text-sm text-center mb-4">{errors.otp}</p>}
+          <button onClick={handleVerifyOtp} disabled={otpLoading}
+            className="w-full flex items-center justify-center gap-2 bg-[#800000] text-white font-bold py-3.5 rounded-xl hover:bg-[#600000] transition-colors disabled:opacity-60 mb-4">
+            {otpLoading ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
+            {otpLoading ? "Verifying..." : "Verify & Submit Application"}
+          </button>
+          <div className="flex items-center justify-between text-sm">
+            <button type="button" onClick={() => { setStep("form"); setOtpDigits(["","","","","",""]); setErrors({}); }}
+              className="text-gray-500 hover:text-gray-700 font-medium">← Go Back</button>
+            <button type="button" onClick={handleResendOtp} disabled={resendCooldown > 0 || otpLoading}
+              className={`font-semibold transition-colors ${
+                resendCooldown > 0 ? "text-gray-300 cursor-not-allowed" : "text-[#800000] hover:underline"
+              }`}>
+              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend OTP"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FDF8F0]">
       {/* HEADER */}
@@ -308,8 +405,45 @@ export default function ApplyPage() {
 
           {/* SECTION 1 */}
           <div className="bg-white rounded-2xl border border-[#f0ebe0] shadow-sm p-6 md:p-8">
-            <SectionHeader num={1} title="Basic Details" />
+            <SectionHeader num={1} title="Account & Basic Details" />
             <div className="space-y-5">
+              {/* Account credentials */}
+              <div className="bg-[#800000]/5 border border-[#800000]/10 rounded-xl p-4 flex items-start gap-3">
+                <ShieldCheck size={16} className="text-[#800000] flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-[#800000] font-medium leading-relaxed">Your email and password will be used to log in to the Student Portal after approval.</p>
+              </div>
+              <Field label="Student Email Address" required>
+                <div className="relative">
+                  <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input type="email" value={form.email} onChange={e => set("email", e.target.value)}
+                    className={inp + " pl-10" + (errors.email ? " border-red-400" : "")} placeholder="student@example.com" />
+                </div>
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              </Field>
+              <div className="grid sm:grid-cols-2 gap-5">
+                <Field label="Password" required>
+                  <div className="relative">
+                    <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input type={showPass ? "text" : "password"} value={form.password} onChange={e => set("password", e.target.value)}
+                      className={inp + " pl-10 pr-10" + (errors.password ? " border-red-400" : "")} placeholder="Min. 8 characters" />
+                    <button type="button" onClick={() => setShowPass(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                </Field>
+                <Field label="Confirm Password" required>
+                  <div className="relative">
+                    <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input type={showConfirm ? "text" : "password"} value={form.confirmPassword} onChange={e => set("confirmPassword", e.target.value)}
+                      className={inp + " pl-10 pr-10" + (errors.confirmPassword ? " border-red-400" : "")} placeholder="Repeat password" />
+                    <button type="button" onClick={() => setShowConfirm(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+                </Field>
+              </div>
               <Field label="Full Name (in Block Letters)" required>
                 <input value={form.fullName} onChange={(e) => set("fullName", e.target.value.toUpperCase())}
                   className={inp + (errors.fullName ? " border-red-400" : "")} placeholder="AS WRITTEN ON CERTIFICATE" />
@@ -321,7 +455,7 @@ export default function ApplyPage() {
                     className={inp + (errors.dob ? " border-red-400" : "")} />
                   {errors.dob && <p className="text-red-500 text-xs mt-1">{errors.dob}</p>}
                 </Field>
-                <Field label="Aadhaar Number" required>
+                <Field label="Aadhaar Number">
                   <input value={form.aadhaar} onChange={(e) => set("aadhaar", e.target.value.replace(/\D/g, "").slice(0, 12))}
                     className={inp + (errors.aadhaar ? " border-red-400" : "")} placeholder="12-digit number" inputMode="numeric" />
                   {errors.aadhaar && <p className="text-red-500 text-xs mt-1">{errors.aadhaar}</p>}

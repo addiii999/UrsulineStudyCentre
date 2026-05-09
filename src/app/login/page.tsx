@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff, ShieldCheck, ClipboardList, CheckCircle } from "lucide-react";
+import { GraduationCap, Mail, Lock, User, ArrowRight, Eye, EyeOff, ShieldCheck, ClipboardList, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import clsx from "clsx";
 
@@ -14,25 +14,24 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [loginForm, setLoginForm] = useState({ phone: "", password: "" });
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [signupForm, setSignupForm] = useState({ name: "", phone: "", email: "", password: "" });
   const [adminForm, setAdminForm] = useState({ username: "", password: "" });
 
   const handleStudentLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginForm.phone.length !== 10) { toast.error("Enter a valid 10-digit phone number"); return; }
+    if (!loginForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginForm.email)) {
+      toast.error("Enter a valid email address"); return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/student/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: loginForm.phone, password: loginForm.password }),
+        body: JSON.stringify({ email: loginForm.email, password: loginForm.password }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        toast.error(data.error || "Login failed");
-        return;
-      }
+      if (!res.ok) { toast.error(data.error || "Login failed"); return; }
       toast.success(`Welcome back, ${data.student?.name?.split(" ")[0] ?? "Student"}!`);
       router.push("/student/dashboard");
     } catch {
@@ -128,20 +127,18 @@ export default function LoginPage() {
             {tab === "student-login" && (
               <form onSubmit={handleStudentLogin} className="space-y-4">
                 <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700">
-                  Login using the phone number you registered during admission.
+                  Login using the email address you used during admission registration.
                 </div>
                 <div>
-                  <label className="label">Registered Phone Number</label>
+                  <label className="label">Registered Email Address</label>
                   <div className="relative">
-                    <Phone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
-                      type="tel"
-                      inputMode="numeric"
-                      value={loginForm.phone}
-                      onChange={(e) => setLoginForm({ ...loginForm, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
-                      placeholder="10-digit mobile number"
+                      type="email"
+                      value={loginForm.email}
+                      onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                      placeholder="student@example.com"
                       className="input-field pl-9"
-                      maxLength={10}
                       required
                     />
                   </div>
