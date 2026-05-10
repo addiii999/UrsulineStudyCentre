@@ -14,10 +14,10 @@ export async function POST(req: NextRequest) {
     const normalizedEmail = email.toLowerCase().trim();
     const adminClient = createAdminClient();
 
-    // ── Look up pending registration ──────────────────────────────
+    // Look up pending registration
     const { data: pending, error: fetchErr } = await adminClient
       .from("pending_registrations")
-      .select("id, otp_code, otp_expires_at, otp_attempts")
+      .select("id, otp_code, otp_expires_at, otp_attempts, verified")
       .eq("email", normalizedEmail)
       .maybeSingle();
 
@@ -27,35 +27,36 @@ export async function POST(req: NextRequest) {
     }
 
     if (!pending) {
-      // Could be:
-      // a) User never submitted the form (direct API call)
-      // b) pending_registrations table doesn't exist yet (migration not run)
       return NextResponse.json(
         { error: "No pending registration found. Please go back and submit your form again." },
         { status: 404 }
       );
     }
 
-    // ── Check expiry FIRST ────────────────────────────────────────
+    // Already verified — let them proceed
+    if (pending.verified) {
+      return NextResponse.json({ success: true, message: "Email already verified." });
+    }
+
+    // Check expiry FIRST
     if (!pending.otp_expires_at || new Date(pending.otp_expires_at) < new Date()) {
-      // Clean up expired record
-      await adminClient.from("pending_registrations").delete().eq("email", normalizedEmail);
+      await adminClient.from("pending_registrations").delete().eq("id", pending.id);
       return NextResponse.json(
         { error: "This OTP has expired. Please go back and request a new one." },
         { status: 410 }
       );
     }
 
-    // ── Check attempt limit ───────────────────────────────────────
+    // Check attempt limit
     if ((pending.otp_attempts || 0) >= MAX_OTP_ATTEMPTS) {
-      await adminClient.from("pending_registrations").delete().eq("email", normalizedEmail);
+      await adminClient.from("pending_registrations").delete().eq("id", pending.id);
       return NextResponse.json(
         { error: "Too many incorrect attempts. Please go back and request a new OTP." },
         { status: 429 }
       );
     }
 
-    // ── Verify OTP ────────────────────────────────────────────────
+    // Compare OTP
     const submittedOtp = String(otp).trim();
     if (pending.otp_code !== submittedOtp) {
       // Increment attempt count
@@ -69,30 +70,29 @@ export async function POST(req: NextRequest) {
         {
           error: remaining > 0
             ? `Incorrect code. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining.`
-            : "Incorrect code. You have no attempts remaining. Please request a new OTP.",
+            : "Incorrect code. No attempts remaining. Please request a new OTP.",
         },
         { status: 401 }
       );
     }
 
-    // ✅ OTP correct — mark as verified in pending table
-    // We do NOT delete the record yet — it gets consumed in the final POST /api/students
-    await adminClient
+    // ✅ OTP correct — mark as verified using the boolean column
+    // This avoids any NOT NULL constraint issues on otp_code
+    const { error: updateErr } = await adminClient
       .from("pending_registrations")
       .update({
-        otp_code: null,          // clear OTP so it can't be reused
-        otp_expires_at: null,
+        verified: true,
         otp_attempts: 0,
-        // Set a special marker via a very far future expiry on form_data
-        // The record will be cleaned up by the final registration POST
         updated_at: new Date().toISOString(),
       })
       .eq("id", pending.id);
 
-    return NextResponse.json({
-      success: true,
-      message: "Email verified successfully.",
-    });
+    if (updateErr) {
+      console.error("[verify-otp] Failed to mark as verified:", updateErr);
+      return NextResponse.json({ error: "Verification failed to save. Please try again." }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, message: "Email verified successfully." });
 
   } catch (err: unknown) {
     console.error("[verify-otp] Error:", err);

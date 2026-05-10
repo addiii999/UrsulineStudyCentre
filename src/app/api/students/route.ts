@@ -30,10 +30,10 @@ export async function POST(req: NextRequest) {
     const adminClient = createAdminClient();
 
     // Verify OTP was completed via pending_registrations table.
-    // After verify-otp succeeds it sets otp_code = null (verified marker).
+    // verify-otp sets verified=true on success.
     const { data: pending, error: pendingErr } = await adminClient
       .from("pending_registrations")
-      .select("id, otp_code")
+      .select("id, verified")
       .eq("email", email)
       .maybeSingle();
 
@@ -56,8 +56,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // otp_code is null only after successful verification
-    if (pending.otp_code !== null) {
+    // Must be verified via OTP before registration can complete
+    if (!pending.verified) {
       return NextResponse.json(
         { error: "Email not yet verified. Please complete OTP verification before submitting." },
         { status: 403 }
