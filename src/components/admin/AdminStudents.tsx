@@ -29,6 +29,11 @@ export default function AdminStudents() {
   const [migrationNeeded, setMigrationNeeded] = useState(false);
   const [resetPassId, setResetPassId] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState("");
+  // Bulk select state
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkModal, setBulkModal] = useState<"restore" | "delete" | null>(null);
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const MAX_SELECT = 5;
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -88,6 +93,43 @@ export default function AdminStudents() {
       await fetchStudents();
     } catch (err: any) { alert(err.message); }
     finally { setActionId(null); }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= MAX_SELECT) {
+        alert(`You can manage up to ${MAX_SELECT} records at once for safety reasons.`);
+        return prev;
+      }
+      return [...prev, id];
+    });
+  };
+
+  const handleBulkRestore = async () => {
+    setBulkLoading(true);
+    try {
+      const res = await fetch("/api/students/bulk", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "bulk_restore", ids: selectedIds }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Restore failed");
+      setSelectedIds([]);
+      setBulkModal(null);
+      await fetchStudents();
+    } catch (err: any) { alert(err.message); }
+    finally { setBulkLoading(false); }
+  };
+
+  const handleBulkScheduleDelete = async () => {
+    setBulkLoading(true);
+    try {
+      const res = await fetch("/api/students/bulk", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "bulk_schedule_delete", ids: selectedIds }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Schedule delete failed");
+      setSelectedIds([]);
+      setBulkModal(null);
+      await fetchStudents();
+    } catch (err: any) { alert(err.message); }
+    finally { setBulkLoading(false); }
   };
 
   const handleApproval = async (id: string, action: "approve" | "reject") => {
@@ -269,47 +311,116 @@ export default function AdminStudents() {
 
       {/* TRASH VIEW */}
       {view === "trash" && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden overflow-x-auto">
-          <div className="px-5 py-3 border-b border-gray-100 bg-rose-50 flex items-center gap-2">
-            <Trash2 size={15} className="text-rose-600" />
-            <p className="text-sm font-bold text-rose-800">Trash — Recently Deleted</p>
-            <p className="text-xs text-rose-600 ml-1">Records here are hidden from all views. Restore or permanently delete.</p>
+        <div className="space-y-3">
+          {/* Bulk action bar */}
+          <div className="flex flex-wrap items-center gap-3 bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
+            <div className="flex items-center gap-2 flex-1">
+              <Trash2 size={14} className="text-rose-500" />
+              <span className="text-sm font-bold text-gray-700">Trash</span>
+              <span className="text-xs text-gray-400">({trashed.length} records)</span>
+              {selectedIds.length > 0 && (
+                <span className="ml-2 text-xs font-bold bg-[#800000] text-white px-2.5 py-0.5 rounded-full">{selectedIds.length} selected</span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {selectedIds.length > 0 && (
+                <button onClick={() => setSelectedIds([])} className="text-xs text-gray-400 hover:text-gray-600 font-medium">Clear</button>
+              )}
+              <button onClick={() => setBulkModal("restore")} disabled={selectedIds.length === 0}
+                className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                <RotateCcw size={11} /> Restore Selected
+              </button>
+              <button onClick={() => setBulkModal("delete")} disabled={selectedIds.length === 0}
+                className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg hover:bg-rose-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                <XCircle size={11} /> Delete Forever Selected
+              </button>
+            </div>
           </div>
-          <table className="w-full text-sm min-w-[800px]">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>{["Name", "Phone", "Class", "Archived On", "Archived By", "Actions"].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>)}</tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {loading ? (
-                <tr><td colSpan={6} className="py-12 text-center text-gray-400"><Loader2 size={20} className="animate-spin mx-auto mb-2" />Loading...</td></tr>
-              ) : trashed.length === 0 ? (
-                <tr><td colSpan={6} className="py-12 text-center text-gray-400">Trash is empty</td></tr>
-              ) : trashed.map(s => (
-                <tr key={s.id} className="hover:bg-gray-50/50 opacity-75">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">{(s.full_name || "?")[0]}</div>
-                      <p className="font-semibold text-gray-600">{s.full_name}</p>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">{s.present_phone}</td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">{s.present_class} — {s.course}</td>
-                  <td className="px-4 py-3 text-gray-400 text-xs">{s.deleted_at ? new Date(s.deleted_at).toLocaleString() : "—"}</td>
-                  <td className="px-4 py-3 text-gray-400 text-xs capitalize">{s.deleted_by ?? "admin"}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => handleRestore(s.id)} disabled={actionId === s.id} className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 disabled:opacity-50 transition-colors">
-                        {actionId === s.id ? <Loader2 size={12} className="animate-spin" /> : <RotateCcw size={12} />} Restore
-                      </button>
-                      <button onClick={() => handlePermanentDelete(s)} disabled={actionId === s.id} className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg hover:bg-rose-100 disabled:opacity-50 transition-colors">
-                        <XCircle size={12} /> Delete Forever
-                      </button>
-                    </div>
-                  </td>
+
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden overflow-x-auto">
+            <div className="px-5 py-2.5 border-b border-gray-100 bg-rose-50/60">
+              <p className="text-xs text-rose-600">Select up to {MAX_SELECT} records. Records can be recovered within 30 days of scheduled deletion.</p>
+            </div>
+            <table className="w-full text-sm min-w-[820px]">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-4 py-3 w-10"></th>
+                  {["Name", "Phone", "Class", "Archived On", "Archived By", "Actions"].map(h => (
+                    <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {loading ? (
+                  <tr><td colSpan={7} className="py-12 text-center text-gray-400"><Loader2 size={20} className="animate-spin mx-auto mb-2" />Loading...</td></tr>
+                ) : trashed.length === 0 ? (
+                  <tr><td colSpan={7} className="py-12 text-center text-gray-400">Trash is empty</td></tr>
+                ) : trashed.map(s => {
+                  const isSelected = selectedIds.includes(s.id);
+                  return (
+                    <tr key={s.id} className={`transition-colors ${isSelected ? "bg-blue-50/60" : "hover:bg-gray-50/50 opacity-75"}`}>
+                      <td className="px-4 py-3">
+                        <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(s.id)}
+                          className="w-4 h-4 accent-[#800000] cursor-pointer rounded" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0 ${isSelected ? "bg-[#800000]" : "bg-gray-400"}`}>{(s.full_name || "?")[0]}</div>
+                          <p className="font-semibold text-gray-600">{s.full_name}</p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">{s.present_phone}</td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">{s.present_class} — {s.course}</td>
+                      <td className="px-4 py-3 text-gray-400 text-xs">{s.deleted_at ? new Date(s.deleted_at).toLocaleString() : "—"}</td>
+                      <td className="px-4 py-3 text-gray-400 text-xs capitalize">{s.deleted_by ?? "admin"}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleRestore(s.id)} disabled={actionId === s.id} className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 disabled:opacity-50 transition-colors">
+                            {actionId === s.id ? <Loader2 size={12} className="animate-spin" /> : <RotateCcw size={12} />} Restore
+                          </button>
+                          <button onClick={() => handlePermanentDelete(s)} disabled={actionId === s.id} className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg hover:bg-rose-100 disabled:opacity-50 transition-colors">
+                            <XCircle size={12} /> Delete Forever
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* BULK ACTION CONFIRMATION MODAL */}
+      {bulkModal && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${bulkModal === "restore" ? "bg-emerald-100" : "bg-amber-100"}`}>
+                {bulkModal === "restore" ? <RotateCcw size={22} className="text-emerald-600" /> : <AlertTriangle size={22} className="text-amber-600" />}
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">{bulkModal === "restore" ? `Restore ${selectedIds.length} Record(s)?` : `Schedule ${selectedIds.length} Record(s) for Deletion?`}</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{bulkModal === "restore" ? "Records will return to Active Students" : "30-day recovery window applies"}</p>
+              </div>
+            </div>
+            {bulkModal === "delete" && (
+              <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-4">
+                <p className="text-sm text-amber-800 leading-relaxed">This will move selected records into <strong>scheduled permanent deletion</strong>. Records can still be recovered within <strong>30 days</strong> from the Storage &amp; Backup Manager.</p>
+              </div>
+            )}
+            <div className="flex gap-3 mt-4">
+              <button onClick={() => setBulkModal(null)} disabled={bulkLoading} className="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors border border-gray-200">Cancel</button>
+              <button
+                onClick={bulkModal === "restore" ? handleBulkRestore : handleBulkScheduleDelete}
+                disabled={bulkLoading}
+                className={`flex-1 px-4 py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-colors ${bulkModal === "restore" ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-amber-600 hover:bg-amber-700 text-white"} disabled:opacity-60`}>
+                {bulkLoading ? <Loader2 size={16} className="animate-spin" /> : null}
+                {bulkLoading ? "Processing..." : bulkModal === "restore" ? "Yes, Restore" : "Yes, Schedule Deletion"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

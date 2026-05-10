@@ -10,6 +10,10 @@ import {
 interface TableStat { key: string; label: string; emoji: string; total: number; active: number; deleted: number; }
 interface TrashItem  { table: string; singular: string; id: string; label: string; deleted_at: string; storage_path?: string; }
 interface AuditLog   { id: string; action: string; table_name: string; item_label?: string; created_at: string; }
+interface DeletionQueueItem {
+  id: string; student_id: string; student_name: string; student_phone?: string; student_class?: string;
+  deleted_by: string; deletion_requested_at: string; scheduled_deletion_at: string; is_purged: boolean;
+}
 interface Stats {
   tableStats:    TableStat[];
   totalDeleted:  number;
@@ -71,12 +75,13 @@ const EXPORT_TABLES = [
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────
 export default function AdminStorageManager() {
-  const [tab,      setTab]      = useState<"overview" | "trash" | "backup" | "audit">("overview");
+  const [tab,      setTab]      = useState<"overview" | "trash" | "queue" | "backup" | "audit">("overview");
   const [stats,    setStats]    = useState<Stats | null>(null);
   const [trash,    setTrash]    = useState<TrashItem[]>([]);
+  const [queue,    setQueue]    = useState<DeletionQueueItem[]>([]);
   const [loading,  setLoading]  = useState(true);
   const [toast,    setToast]    = useState<{ msg: string; type: "ok"|"err"|"warn" } | null>(null);
-  const [busy,     setBusy]     = useState<string | null>(null); // item id being processed
+  const [busy,     setBusy]     = useState<string | null>(null);
 
   const showToast = (msg: string, type: "ok"|"err"|"warn" = "ok") => {
     setToast({ msg, type });
@@ -105,10 +110,21 @@ export default function AdminStorageManager() {
     finally  { setLoading(false); }
   }, []);
 
+  const fetchQueue = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res  = await fetch("/api/students/bulk");
+      const json = await res.json();
+      setQueue(json.queue ?? []);
+    } catch { showToast("Failed to load deletion queue", "err"); }
+    finally  { setLoading(false); }
+  }, []);
+
   useEffect(() => {
     if (tab === "overview" || tab === "audit") fetchStats();
     if (tab === "trash") fetchTrash();
-  }, [tab, fetchStats, fetchTrash]);
+    if (tab === "queue") fetchQueue();
+  }, [tab, fetchStats, fetchTrash, fetchQueue]);
 
   // ─── Restore ─────────────────────────────────────────────────
   const handleRestore = async (item: TrashItem) => {
@@ -159,6 +175,35 @@ export default function AdminStorageManager() {
     finally  { setBusy(null); }
   };
 
+  const handleRestoreFromQueue = async (item: DeletionQueueItem) => {
+    if (!confirm(`Restore "${item.student_name}" before permanent deletion?`)) return;
+    setBusy(item.id);
+    try {
+      const res = await fetch("/api/students/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "restore_from_queue", ids: [item.id] }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Restore failed");
+      setQueue(prev => prev.filter(q => q.id !== item.id));
+      showToast(`"${item.student_name}" restored successfully!`);
+    } catch { showToast("Restore failed", "err"); }
+    finally  { setBusy(null); }
+  };
+
+  const handleRunPurge = async () => {
+    if (!confirm("Run auto-purge now? All records past their 30-day window will be permanently deleted.")) return;
+    setBusy("purge");
+    try {
+      const res  = await fetch("/api/students/bulk", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "execute_purge", ids: [] }) });
+      const json = await res.json();
+      showToast(`Purge complete. ${json.purged ?? 0} record(s) permanently deleted.`, "warn");
+      fetchQueue();
+    } catch { showToast("Purge failed", "err"); }
+    finally  { setBusy(null); }
+  };
+
   // ─── Export Download ──────────────────────────────────────────
   const handleExport = (table: string, format: "json" | "csv") => {
     window.open(`/api/backup?table=${table}&format=${format}`, "_blank");
@@ -185,8 +230,9 @@ export default function AdminStorageManager() {
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
         {([
-          { id: "overview", label: "Overview",  icon: <HardDrive size={13} /> },
+                { id: "overview", label: "Overview",  icon: <HardDrive size={13} /> },
           { id: "trash",    label: "Trash",     icon: <Trash2 size={13} /> },
+          { id: "queue",    label: "Deletion Queue", icon: <Clock size={13} /> },
           { id: "backup",   label: "Backup & Export", icon: <Download size={13} /> },
           { id: "audit",    label: "Audit Log", icon: <ClipboardList size={13} /> },
         ] as { id: typeof tab; label: string; icon: React.ReactNode }[]).map(t => (
@@ -324,6 +370,59 @@ export default function AdminStorageManager() {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* ── DELETION QUEUE TAB ──────────────────────────────────── */}
+      {tab === "queue" && !loading && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4">
+            <div>
+              <p className="font-bold text-amber-800 text-[13px] flex items-center gap-2"><Clock size={14} /> Scheduled Permanent Deletion</p>
+              <p className="text-[11px] text-amber-600 mt-0.5">Records will be permanently purged after 30 days. Restore to cancel.</p>
+            </div>
+            <button onClick={handleRunPurge} disabled={busy === "purge"}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 text-white text-[11px] font-bold hover:bg-rose-700 disabled:opacity-50 transition-colors">
+              {busy === "purge" ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
+              Run Auto-Purge
+            </button>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            {queue.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-gray-300 gap-3">
+                <CheckCircle2 size={36} className="opacity-40" />
+                <p className="font-semibold text-gray-400">No records in deletion queue</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {queue.map(item => {
+                  const daysLeft = Math.max(0, Math.ceil((new Date(item.scheduled_deletion_at).getTime() - Date.now()) / 86400000));
+                  const urgent = daysLeft <= 7;
+                  return (
+                    <div key={item.id} className={`flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50/80 transition-colors ${urgent ? "bg-rose-50/30" : ""}`}>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-bold text-[#800000] bg-[#800000]/10 px-2 py-0.5 rounded-full">Student</span>
+                          {urgent && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1"><Clock size={9} />Expiring soon</span>}
+                        </div>
+                        <p className="text-[13px] font-semibold text-gray-800 mt-1 truncate">{item.student_name}</p>
+                        <p className="text-[10px] text-gray-400 mt-0.5">
+                          Requested: {new Date(item.deletion_requested_at).toLocaleDateString()} &middot; Purges in: {daysLeft}d
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => handleRestoreFromQueue(item)} disabled={busy === item.id}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-[11px] font-bold hover:bg-emerald-100 disabled:opacity-50 transition-colors">
+                          {busy === item.id ? <Loader2 size={11} className="animate-spin" /> : <RotateCcw size={11} />}
+                          Restore
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
