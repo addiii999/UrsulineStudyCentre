@@ -4,62 +4,89 @@ import { checkAdminAuth } from "@/lib/auth";
 import { studentUpdateSchema, sanitizeText } from "@/lib/validation";
 import bcrypt from "bcryptjs";
 
-// ─── POST — Complete student registration after OTP verified ───────────────────
+// POST — Complete student registration after OTP verified
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    const email = (body.email || "").toLowerCase().trim();
 
-    // Required auth fields
-    if (!body.email || !body.present_phone || !body.full_name) {
+    // Input validation
+    if (!email || !body.present_phone || !body.full_name) {
       return NextResponse.json(
         { error: "Missing required fields: full_name, email, present_phone" },
         { status: 400 }
       );
     }
-
-    // Phone validation
     if (!/^\d{10}$/.test(body.present_phone)) {
-      return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
+      return NextResponse.json({ error: "Phone number must be exactly 10 digits." }, { status: 400 });
     }
-
-    // Email format validation
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
-      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
+    }
+    if (!body.password || body.password.length < 8) {
+      return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
     }
 
     const adminClient = createAdminClient();
-    const email = body.email.toLowerCase().trim();
 
-    // Find the pre-registration record (created during OTP send)
-    const { data: preReg, error: findErr } = await adminClient
-      .from("students")
-      .select("id, email_verified, approval_status")
+    // Verify OTP was completed via pending_registrations table.
+    // After verify-otp succeeds it sets otp_code = null (verified marker).
+    const { data: pending, error: pendingErr } = await adminClient
+      .from("pending_registrations")
+      .select("id, otp_code")
       .eq("email", email)
       .maybeSingle();
 
-    // Email MUST be verified before we save the full registration
-    if (!preReg || !preReg.email_verified) {
+    if (pendingErr) {
+      console.error("[students POST] pending_registrations lookup error:", pendingErr);
+      const code = (pendingErr as { code?: string }).code;
+      if (code === "42P01") {
+        return NextResponse.json(
+          { error: "Server configuration incomplete. Please run supabase_pending_registrations.sql in Supabase." },
+          { status: 500 }
+        );
+      }
+      return NextResponse.json({ error: "Verification check failed. Please try again." }, { status: 500 });
+    }
+
+    if (!pending) {
       return NextResponse.json(
-        { error: "Email not verified. Please complete OTP verification first." },
+        { error: "Your verification session was not found. Please go back and complete OTP verification again." },
         { status: 403 }
       );
     }
 
-    // Hash the password securely
-    const passwordHash = body.password_hash
-      ? body.password_hash  // admin-sent pre-hashed (unlikely)
-      : body.password
-        ? await bcrypt.hash(body.password, 12)
-        : null;
-
-    if (!passwordHash) {
-      return NextResponse.json({ error: "Password is required" }, { status: 400 });
+    // otp_code is null only after successful verification
+    if (pending.otp_code !== null) {
+      return NextResponse.json(
+        { error: "Email not yet verified. Please complete OTP verification before submitting." },
+        { status: 403 }
+      );
     }
 
-    // Sanitize all text inputs
-    const sanitizedBody: Record<string, string | boolean | null> = {
+    // Check for duplicate email
+    const { data: existingStudent } = await adminClient
+      .from("students")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (existingStudent) {
+      // Clean up stale pending record
+      await adminClient.from("pending_registrations").delete().eq("id", pending.id);
+      return NextResponse.json(
+        { error: "An account with this email already exists. Please log in." },
+        { status: 409 }
+      );
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(body.password, 12);
+
+    // Build sanitized student record
+    const record: Record<string, string | boolean | null> = {
       full_name:          sanitizeText(body.full_name || "", 100),
-      email:              email,
+      email,
       dob:                body.dob || null,
       aadhaar_last4:      body.aadhaar_last4 || null,
       mother_name:        sanitizeText(body.mother_name || "", 100),
@@ -72,7 +99,7 @@ export async function POST(req: NextRequest) {
       present_board:      sanitizeText(body.present_board || "", 50),
       present_school:     sanitizeText(body.present_school || "", 200),
       present_year:       sanitizeText(body.present_year || "", 10),
-      course:             sanitizeText(body.course || "", 200),
+      course:             sanitizeText(body.course || "General", 200),
       vocational:         sanitizeText(body.vocational || "", 200),
       present_village:    sanitizeText(body.present_village || "", 100),
       present_district:   sanitizeText(body.present_district || "", 100),
@@ -81,7 +108,7 @@ export async function POST(req: NextRequest) {
       permanent_village:  sanitizeText(body.permanent_village || "", 100),
       permanent_district: sanitizeText(body.permanent_district || "", 100),
       permanent_ps:       sanitizeText(body.permanent_ps || "", 100),
-      permanent_phone:    sanitizeText(body.permanent_phone || "", 10),
+      permanent_phone:    sanitizeText(body.permanent_phone || "", 15),
       password_hash:      passwordHash,
       session:            "2026-27",
       admission_status:   "applied",
@@ -90,68 +117,72 @@ export async function POST(req: NextRequest) {
       is_deleted:         false,
     };
 
-    // Update the pre-registration record with full data
-    const { data, error } = await adminClient
+    // Insert final student record (clean INSERT — no stub)
+    const { data: newStudent, error: insertErr } = await adminClient
       .from("students")
-      .update(sanitizedBody)
-      .eq("id", preReg.id)
-      .select()
+      .insert([record])
+      .select("id")
       .single();
 
-    if (error) {
-      console.error("Student update error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (insertErr) {
+      console.error("[students POST] Insert error:", insertErr);
+      return NextResponse.json({ error: "Failed to create student account. Please try again." }, { status: 500 });
     }
 
-    // ── Auto-create Enquiry in Admin Pipeline ────────────────
-    const enquiryPayload = {
-      name:       String(sanitizedBody.full_name),
-      phone:      String(sanitizedBody.present_phone),
-      class:      String(sanitizedBody.present_class || sanitizedBody.course || ""),
-      stream:     String(sanitizedBody.course || ""),
-      message:    `[Verified Application] Email: ${email}. Course: ${sanitizedBody.course || "-"}. Vocational: ${sanitizedBody.vocational || "-"}. Board: ${sanitizedBody.present_board || "-"}.`,
+    const studentId = newStudent.id;
+
+    // Clean up pending_registrations record
+    await adminClient.from("pending_registrations").delete().eq("id", pending.id);
+
+    // Auto-create Enquiry in Admin Pipeline
+    const enquiryRow = {
+      name:       String(record.full_name),
+      phone:      String(record.present_phone),
+      class:      String(record.present_class || record.course || ""),
+      stream:     String(record.course || ""),
+      message:    `[Online Application] Email: ${email}. Course: ${record.course || "-"}. Vocational: ${record.vocational || "-"}. Board: ${record.present_board || "-"}.`,
       source:     "admission_form",
       status:     "new",
       is_deleted: false,
-      student_id: preReg.id,
+      student_id: studentId,
     };
 
     try {
-      await adminClient.from("enquiries").insert([enquiryPayload]);
+      await adminClient.from("enquiries").insert([enquiryRow]);
     } catch {
-      // Fallback without optional columns
       try {
         await adminClient.from("enquiries").insert([{
-          name:    enquiryPayload.name,
-          phone:   enquiryPayload.phone,
-          class:   enquiryPayload.class,
-          stream:  enquiryPayload.stream,
-          message: enquiryPayload.message,
-          source:  enquiryPayload.source,
-          status:  enquiryPayload.status,
+          name:    enquiryRow.name,
+          phone:   enquiryRow.phone,
+          class:   enquiryRow.class,
+          stream:  enquiryRow.stream,
+          message: enquiryRow.message,
+          source:  enquiryRow.source,
+          status:  enquiryRow.status,
         }]);
       } catch { /* non-critical */ }
     }
 
-    // ── Fire Admin Notification (non-blocking) ───────────────
+    // Admin Notification (non-blocking)
     try {
       const { createNotification } = await import("@/lib/notify");
       await createNotification({
-        title: "New Verified Application",
-        message: `${sanitizedBody.full_name} completed email verification. Awaiting approval. Course: ${sanitizedBody.course}`,
+        title: "New Student Application",
+        message: `${record.full_name} completed registration. Course: ${record.course}. Awaiting admin approval.`,
         type: "enquiry",
-      }).catch(() => {});
-    } catch {}
+      });
+    } catch { /* non-critical */ }
 
-    return NextResponse.json({ success: true, id: data?.id }, { status: 201 });
+    return NextResponse.json({ success: true, id: studentId }, { status: 201 });
+
   } catch (err: unknown) {
-    console.error("Student POST error:", err);
+    console.error("[students POST] Unexpected error:", err);
     const message = err instanceof Error ? err.message : "Internal server error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
-// ─── GET — Fetch students (admin only) ─────────────────────────────────────────
+// GET — Fetch students (admin only)
 export async function GET(req: NextRequest) {
   if (!(await checkAdminAuth(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -204,7 +235,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// ─── PATCH — Update student fields (admin only) ───────────────────────────────
+// PATCH — Update student fields (admin only)
 export async function PATCH(req: NextRequest) {
   if (!(await checkAdminAuth(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -224,12 +255,12 @@ export async function PATCH(req: NextRequest) {
       if (error) throw error;
       try {
         const { logAudit } = await import("@/lib/audit");
-        await logAudit({ action: "restore", table_name: "students", item_id: id }).catch(() => {});
+        await logAudit({ action: "restore", table_name: "students", item_id: id });
       } catch {}
       return NextResponse.json({ success: true });
     }
 
-    // ── Admin Password Reset (no OTP needed) ─────────────────
+    // Admin Password Reset (no OTP needed)
     if (action === "reset_password") {
       const { new_password } = updates;
       if (!new_password || new_password.length < 8) {
@@ -243,25 +274,21 @@ export async function PATCH(req: NextRequest) {
       if (error) throw error;
       try {
         const { logAudit } = await import("@/lib/audit");
-        await logAudit({ action: "reset_password", table_name: "students", item_id: id, item_label: "Admin password reset" }).catch(() => {});
+        await logAudit({ action: "reset_password", table_name: "students", item_id: id, item_label: "Admin password reset" });
       } catch {}
       return NextResponse.json({ success: true });
     }
 
-    // ── Admin Approval toggle ─────────────────────────────────
+    // Admin Approval
     if (action === "approve") {
       const { error } = await adminClient
         .from("students")
-        .update({
-          approval_status: "approved",
-          admission_status: "approved",
-          updated_at: new Date().toISOString(),
-        })
+        .update({ approval_status: "approved", admission_status: "approved", updated_at: new Date().toISOString() })
         .eq("id", id);
       if (error) throw error;
       try {
         const { logAudit } = await import("@/lib/audit");
-        await logAudit({ action: "approve", table_name: "students", item_id: id, item_label: "Student Approved" }).catch(() => {});
+        await logAudit({ action: "approve", table_name: "students", item_id: id, item_label: "Student Approved" });
       } catch {}
       return NextResponse.json({ success: true });
     }
@@ -269,17 +296,17 @@ export async function PATCH(req: NextRequest) {
     if (action === "reject") {
       const { error } = await adminClient
         .from("students")
-        .update({
-          approval_status: "rejected",
-          admission_status: "rejected",
-          updated_at: new Date().toISOString(),
-        })
+        .update({ approval_status: "rejected", admission_status: "rejected", updated_at: new Date().toISOString() })
         .eq("id", id);
       if (error) throw error;
+      try {
+        const { logAudit } = await import("@/lib/audit");
+        await logAudit({ action: "reject", table_name: "students", item_id: id, item_label: "Student Rejected" });
+      } catch {}
       return NextResponse.json({ success: true });
     }
 
-    // ── General field update ──────────────────────────────────
+    // General field update
     const validation = studentUpdateSchema.safeParse({ id, ...updates });
     if (!validation.success) {
       return NextResponse.json({ error: validation.error.errors[0].message }, { status: 400 });
@@ -305,7 +332,7 @@ export async function PATCH(req: NextRequest) {
       await logAudit({
         action: "update", table_name: "students", item_id: id,
         item_label: String(sanitizedUpdates.full_name || "Student Profile"),
-      }).catch(() => {});
+      });
     } catch {}
 
     return NextResponse.json({ success: true });
@@ -315,7 +342,7 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-// ─── DELETE — Soft or permanent delete (admin only) ───────────────────────────
+// DELETE — Soft or permanent delete (admin only)
 export async function DELETE(req: NextRequest) {
   if (!(await checkAdminAuth(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -333,7 +360,7 @@ export async function DELETE(req: NextRequest) {
       if (error) throw error;
       try {
         const { logAudit } = await import("@/lib/audit");
-        await logAudit({ action: "permanent_delete", table_name: "students", item_id: id, item_label: "Student Record" }).catch(() => {});
+        await logAudit({ action: "permanent_delete", table_name: "students", item_id: id, item_label: "Student Record" });
       } catch {}
       return NextResponse.json({ success: true, deleted: "permanent" });
     } else {
@@ -341,14 +368,11 @@ export async function DELETE(req: NextRequest) {
         .from("students")
         .update({ is_deleted: true, deleted_at: new Date().toISOString(), deleted_by: "admin", updated_at: new Date().toISOString() })
         .eq("id", id);
-
       if (error) throw error;
-
       try {
         const { logAudit } = await import("@/lib/audit");
-        await logAudit({ action: "soft_delete", table_name: "students", item_id: id, item_label: "Student Record" }).catch(() => {});
+        await logAudit({ action: "soft_delete", table_name: "students", item_id: id, item_label: "Student Record" });
       } catch {}
-
       return NextResponse.json({ success: true, deleted: "soft" });
     }
   } catch (err: unknown) {
