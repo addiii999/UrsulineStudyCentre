@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Search, Loader2, Edit3, Trash2, X, Save, Download, RotateCcw, AlertTriangle, XCircle } from "lucide-react";
 
 interface Student {
-  id: string; full_name: string; dob: string; aadhaar_last4: string;
+  id: string; full_name: string; email: string; email_verified: boolean; approval_status: string; dob: string; aadhaar_last4: string;
   mother_name: string; father_name: string; prev_board: string; prev_school: string;
   prev_year: string; prev_marks: string; present_class: string; present_board: string;
   present_school: string; present_year: string; course: string; vocational: string;
@@ -27,6 +27,8 @@ export default function AdminStudents() {
   const [actionId, setActionId] = useState<string | null>(null);
   const [confirmPermanent, setConfirmPermanent] = useState<Student | null>(null);
   const [migrationNeeded, setMigrationNeeded] = useState(false);
+  const [resetPassId, setResetPassId] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState("");
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -86,6 +88,31 @@ export default function AdminStudents() {
       await fetchStudents();
     } catch (err: any) { alert(err.message); }
     finally { setActionId(null); }
+  };
+
+  const handleApproval = async (id: string, action: "approve" | "reject") => {
+    if (!confirm(`Are you sure you want to ${action} this student account?`)) return;
+    setActionId(id);
+    try {
+      const res = await fetch("/api/students", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, action }) });
+      if (!res.ok) throw new Error((await res.json()).error || "Action failed");
+      await fetchStudents();
+    } catch (err: any) { alert(err.message); }
+    finally { setActionId(null); }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetPassId || newPassword.length < 8) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/students", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: resetPassId, action: "reset_password", new_password: newPassword }) });
+      if (!res.ok) throw new Error((await res.json()).error || "Password reset failed");
+      alert("Password reset successfully!");
+      setResetPassId(null);
+      setNewPassword("");
+    } catch (err: any) { alert(err.message); }
+    finally { setSaving(false); }
   };
 
   const handlePermanentDelete = async (student: Student) => {
@@ -196,19 +223,36 @@ export default function AdminStudents() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-[#800000] flex items-center justify-center text-white font-bold text-xs flex-shrink-0">{(s.full_name || "?")[0]}</div>
-                        <div><p className="font-semibold text-gray-900">{s.full_name}</p><p className="text-[10px] text-gray-400">{s.id.split("-")[0]}</p></div>
+                        <div>
+                          <p className="font-semibold text-gray-900">{s.full_name}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <p className="text-[10px] text-gray-500">{s.email || "No Email"}</p>
+                            {s.email_verified && <span className="bg-emerald-100 text-emerald-700 text-[8px] font-bold px-1 py-0.5 rounded uppercase">Verified</span>}
+                          </div>
+                        </div>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-gray-600 text-xs">{s.present_phone}</td>
                     <td className="px-4 py-3"><p className="font-medium text-gray-800">{s.present_class}</p><p className="text-xs text-gray-500">{s.course}</p></td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${statusColors[s.admission_status] ?? "bg-gray-50 text-gray-600 border-gray-200"}`}>
-                        {s.admission_status?.replace("_", " ")}
-                      </span>
+                      <div className="flex flex-col gap-1 items-start">
+                        <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${statusColors[s.admission_status] ?? "bg-gray-50 text-gray-600 border-gray-200"}`}>
+                          Adm: {s.admission_status?.replace("_", " ")}
+                        </span>
+                        <span className={`inline-flex text-[9px] font-bold px-2 py-0.5 rounded border uppercase ${s.approval_status === "approved" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : s.approval_status === "rejected" ? "bg-rose-50 text-rose-700 border-rose-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
+                          Acc: {s.approval_status}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-gray-400 text-xs">{new Date(s.created_at).toLocaleDateString()}</td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        {s.approval_status === "pending" && (
+                          <>
+                            <button onClick={() => handleApproval(s.id, "approve")} disabled={actionId === s.id} className="text-[10px] font-bold px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100 transition-colors">Approve</button>
+                            <button onClick={() => handleApproval(s.id, "reject")} disabled={actionId === s.id} className="text-[10px] font-bold px-2 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded hover:bg-rose-100 transition-colors">Reject</button>
+                          </>
+                        )}
                         <button onClick={() => setEditingStudent(s)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Edit"><Edit3 size={15} /></button>
                         <button onClick={() => handleArchive(s.id)} disabled={actionId === s.id} className="p-1.5 text-rose-600 hover:bg-rose-50 rounded disabled:opacity-50" title="Move to Trash">
                           {actionId === s.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
@@ -373,11 +417,29 @@ export default function AdminStudents() {
                       </select>
                     </div>
                     <div>
+                      <label className="block text-xs font-semibold text-amber-800 mb-1">Account Login Approval</label>
+                      <select value={editingStudent.approval_status} onChange={e => setEditingStudent({ ...editingStudent, approval_status: e.target.value })}
+                        className="w-full border border-amber-200 rounded-lg px-3 py-2 text-sm outline-none bg-white focus:border-amber-400">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                      </select>
+                    </div>
+                    <div>
                       <label className="block text-xs font-semibold text-amber-800 mb-1">Admin Notes (Private)</label>
                       <textarea value={editingStudent.admin_notes || ""}
                         onChange={e => setEditingStudent({ ...editingStudent, admin_notes: e.target.value })}
                         className="w-full border border-amber-200 rounded-lg px-3 py-2 text-sm outline-none bg-white focus:border-amber-400 resize-none h-[40px]"
                         placeholder="Internal notes..." />
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-amber-200/50">
+                    <label className="block text-xs font-semibold text-amber-800 mb-2">Reset Student Password</label>
+                    <div className="flex gap-2">
+                      <input type="text" placeholder="New Password (min 8 chars)" value={resetPassId === editingStudent.id ? newPassword : ""} onChange={e => { setResetPassId(editingStudent.id); setNewPassword(e.target.value); }} className="flex-1 border border-amber-200 rounded-lg px-3 py-2 text-sm outline-none bg-white focus:border-amber-400" />
+                      <button type="button" onClick={handleResetPassword} disabled={saving || resetPassId !== editingStudent.id || newPassword.length < 8} className="px-4 py-2 bg-amber-600 text-white text-xs font-bold rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors">
+                        Reset Password
+                      </button>
                     </div>
                   </div>
                 </div>
