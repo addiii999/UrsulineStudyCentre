@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // Single premium font — Inter with full weight range
 const inter = Inter({
@@ -76,6 +77,7 @@ export default function RootLayout({
           }}
         />
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
