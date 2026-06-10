@@ -1,14 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Search, Loader2, Edit3, Trash2, X, Save, Download, RotateCcw, AlertTriangle, XCircle } from "lucide-react";
+import { Search, Loader2, Edit3, Trash2, X, Save, Download, RotateCcw, AlertTriangle } from "lucide-react";
 
 interface Student {
-  id: string; full_name: string; email: string; email_verified: boolean; approval_status: string; dob: string; aadhaar_last4: string;
+  id: string; full_name: string; present_phone: string; dob: string; aadhaar_last4: string;
   mother_name: string; father_name: string; prev_board: string; prev_school: string;
   prev_year: string; prev_marks: string; present_class: string; present_board: string;
   present_school: string; present_year: string; course: string; vocational: string;
   present_village: string; present_district: string; present_ps: string;
-  present_phone: string; permanent_village: string; permanent_district: string;
+  permanent_village: string; permanent_district: string;
   permanent_ps: string; permanent_phone: string; admission_status: string;
   admin_notes: string; session: string; created_at: string; updated_at: string;
   is_deleted?: boolean; deleted_at?: string; deleted_by?: string;
@@ -28,8 +28,6 @@ export default function AdminStudents() {
   const [actionId, setActionId] = useState<string | null>(null);
   const [confirmPermanent, setConfirmPermanent] = useState<Student | null>(null);
   const [migrationNeeded, setMigrationNeeded] = useState(false);
-  const [resetPassId, setResetPassId] = useState<string | null>(null);
-  const [newPassword, setNewPassword] = useState("");
   // Bulk select state
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkModal, setBulkModal] = useState<"restore" | "delete" | null>(null);
@@ -71,7 +69,7 @@ export default function AdminStudents() {
   };
 
   const handleArchive = async (id: string) => {
-    if (!confirm("Move this student to Trash? They can be restored later.")) return;
+    if (!confirm("Move this record to Trash? It can be restored later.")) return;
     setActionId(id);
     try {
       const res = await fetch(`/api/students?id=${id}`, { method: "DELETE" });
@@ -135,8 +133,8 @@ export default function AdminStudents() {
     finally { setBulkLoading(false); }
   };
 
-  const handleApproval = async (id: string, action: "approve" | "reject") => {
-    if (!confirm(`Are you sure you want to ${action} this student account?`)) return;
+  const handleStatusUpdate = async (id: string, action: "approve" | "reject") => {
+    if (!confirm(`Are you sure you want to mark this application as ${action === "approve" ? "Approved" : "Rejected"}?`)) return;
     setActionId(id);
     try {
       const res = await fetch("/api/students", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, action }) });
@@ -144,20 +142,6 @@ export default function AdminStudents() {
       await fetchStudents();
     } catch (err: any) { alert(err.message); }
     finally { setActionId(null); }
-  };
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!resetPassId || newPassword.length < 8) return;
-    setSaving(true);
-    try {
-      const res = await fetch("/api/students", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: resetPassId, action: "reset_password", new_password: newPassword }) });
-      if (!res.ok) throw new Error((await res.json()).error || "Password reset failed");
-      alert("Password reset successfully!");
-      setResetPassId(null);
-      setNewPassword("");
-    } catch (err: any) { alert(err.message); }
-    finally { setSaving(false); }
   };
 
   const handlePermanentDelete = async (student: Student) => {
@@ -185,11 +169,11 @@ export default function AdminStudents() {
   });
 
   const statusColors: Record<string, string> = {
-    enrolled: "bg-purple-50 text-purple-700 border-purple-200",
-    approved: "bg-green-50 text-green-700 border-green-200",
-    rejected: "bg-red-50 text-red-700 border-red-200",
-    applied: "bg-blue-50 text-blue-700 border-blue-200",
-    under_review: "bg-amber-50 text-amber-700 border-amber-200",
+    enrolled:    "bg-purple-50 text-purple-700 border-purple-200",
+    approved:    "bg-green-50 text-green-700 border-green-200",
+    rejected:    "bg-red-50 text-red-700 border-red-200",
+    applied:     "bg-blue-50 text-blue-700 border-blue-200",
+    under_review:"bg-amber-50 text-amber-700 border-amber-200",
   };
 
   return (
@@ -197,8 +181,8 @@ export default function AdminStudents() {
       {/* HEADER */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="font-bold text-gray-900 text-lg" style={{ fontFamily: "var(--font-serif)" }}>Student Records Management</h2>
-          <p className="text-gray-400 text-xs">Full database of submitted applications and enrolled students</p>
+          <h2 className="font-bold text-gray-900 text-lg" style={{ fontFamily: "var(--font-serif)" }}>Admission Applications</h2>
+          <p className="text-gray-400 text-xs">Manage all submitted admission applications and enrolled students</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => window.open("/api/backup?table=students&format=json", "_blank")} className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 bg-sky-50 text-sky-700 border-sky-100 hover:bg-sky-100">
@@ -254,9 +238,9 @@ export default function AdminStudents() {
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden overflow-x-auto">
-            <table className="w-full text-sm min-w-[900px]">
+            <table className="w-full text-sm min-w-[800px]">
               <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>{["Name", "Phone", "Class & Course", "Status", "Reg Date", "Actions"].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>)}</tr>
+                <tr>{["Name", "Phone", "Class & Course", "Status", "Applied On", "Actions"].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>)}</tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {loading ? (
@@ -270,32 +254,24 @@ export default function AdminStudents() {
                         <div className="w-8 h-8 rounded-full bg-[#800000] flex items-center justify-center text-white font-bold text-xs flex-shrink-0">{(s.full_name || "?")[0]}</div>
                         <div>
                           <p className="font-semibold text-gray-900">{s.full_name}</p>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <p className="text-[10px] text-gray-500">{s.email || "No Email"}</p>
-                            {s.email_verified && <span className="bg-emerald-100 text-emerald-700 text-[8px] font-bold px-1 py-0.5 rounded uppercase">Verified</span>}
-                          </div>
+                          <p className="text-[10px] text-gray-400 mt-0.5">{s.session}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-gray-600 text-xs">{s.present_phone}</td>
                     <td className="px-4 py-3"><p className="font-medium text-gray-800">{s.present_class}</p><p className="text-xs text-gray-500">{s.course}</p></td>
                     <td className="px-4 py-3">
-                      <div className="flex flex-col gap-1 items-start">
-                        <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${statusColors[s.admission_status] ?? "bg-gray-50 text-gray-600 border-gray-200"}`}>
-                          Adm: {s.admission_status?.replace("_", " ")}
-                        </span>
-                        <span className={`inline-flex text-[9px] font-bold px-2 py-0.5 rounded border uppercase ${s.approval_status === "approved" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : s.approval_status === "rejected" ? "bg-rose-50 text-rose-700 border-rose-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
-                          Acc: {s.approval_status}
-                        </span>
-                      </div>
+                      <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${statusColors[s.admission_status] ?? "bg-gray-50 text-gray-600 border-gray-200"}`}>
+                        {s.admission_status?.replace("_", " ")}
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-gray-400 text-xs">{new Date(s.created_at).toLocaleDateString()}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        {s.approval_status === "pending" && (
+                        {s.admission_status === "applied" && (
                           <>
-                            <button onClick={() => handleApproval(s.id, "approve")} disabled={actionId === s.id} className="text-[10px] font-bold px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100 transition-colors">Approve</button>
-                            <button onClick={() => handleApproval(s.id, "reject")} disabled={actionId === s.id} className="text-[10px] font-bold px-2 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded hover:bg-rose-100 transition-colors">Reject</button>
+                            <button onClick={() => handleStatusUpdate(s.id, "approve")} disabled={actionId === s.id} className="text-[10px] font-bold px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100 transition-colors">Approve</button>
+                            <button onClick={() => handleStatusUpdate(s.id, "reject")} disabled={actionId === s.id} className="text-[10px] font-bold px-2 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded hover:bg-rose-100 transition-colors">Reject</button>
                           </>
                         )}
                         <button onClick={() => setEditingStudent(s)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Edit"><Edit3 size={15} /></button>
@@ -343,7 +319,7 @@ export default function AdminStudents() {
             <div className="px-5 py-2.5 border-b border-gray-100 bg-amber-50/60 flex items-center justify-between">
               <p className="text-xs text-amber-700 font-medium">Records are retained for 30 days before permanent automatic purge.</p>
             </div>
-            <table className="w-full text-sm min-w-[850px]">
+            <table className="w-full text-sm min-w-[800px]">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-4 py-3 w-10"></th>
@@ -366,7 +342,6 @@ export default function AdminStudents() {
                       scheduled_at: q.scheduled_deletion_at, isQueue: true, deleted_by: q.deleted_by
                     })),
                     ...trashed.filter(t => !queue.some(q => q.student_id === t.id)).map(t => {
-                      // auto purge date defaults to +30 days from deleted_at
                       const sd = new Date(t.deleted_at || Date.now());
                       sd.setDate(sd.getDate() + 30);
                       return {
@@ -445,7 +420,7 @@ export default function AdminStudents() {
         </div>
       )}
 
-            {/* BULK ACTION CONFIRMATION MODAL */}
+      {/* BULK ACTION CONFIRMATION MODAL */}
       {bulkModal && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
@@ -455,12 +430,12 @@ export default function AdminStudents() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">{bulkModal === "restore" ? `Restore ${selectedIds.length} Record(s)?` : `Schedule ${selectedIds.length} Record(s) for Deletion?`}</h3>
-                <p className="text-xs text-gray-500 mt-0.5">{bulkModal === "restore" ? "Records will return to Active Students" : "30-day recovery window applies"}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{bulkModal === "restore" ? "Records will return to Active" : "30-day recovery window applies"}</p>
               </div>
             </div>
             {bulkModal === "delete" && (
               <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-4">
-                <p className="text-sm text-amber-800 leading-relaxed">This will move selected records into <strong>scheduled permanent deletion</strong>. Records can still be recovered within <strong>30 days</strong> from the Storage &amp; Backup Manager.</p>
+                <p className="text-sm text-amber-800 leading-relaxed">This will move selected records into <strong>scheduled permanent deletion</strong>. Records can still be recovered within <strong>30 days</strong>.</p>
               </div>
             )}
             <div className="flex gap-3 mt-4">
@@ -492,7 +467,7 @@ export default function AdminStudents() {
               <p className="text-sm font-semibold text-rose-900">{confirmPermanent.full_name}</p>
               <p className="text-xs text-rose-600">{confirmPermanent.present_phone} · {confirmPermanent.present_class}</p>
             </div>
-            <p className="text-sm text-gray-600 mb-6">This will <strong>permanently remove</strong> all data for this student from the database. This cannot be recovered.</p>
+            <p className="text-sm text-gray-600 mb-6">This will <strong>permanently remove</strong> all data for this record from the database. This cannot be recovered.</p>
             <div className="flex gap-3">
               <button onClick={() => setConfirmPermanent(null)} className="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors border border-gray-200">Cancel</button>
               <button onClick={confirmDelete} className="flex-1 px-4 py-2.5 text-sm font-bold bg-rose-600 text-white rounded-xl hover:bg-rose-700 transition-colors">Yes, Delete Forever</button>
@@ -506,7 +481,7 @@ export default function AdminStudents() {
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50/50">
-              <div><h3 className="font-bold text-gray-900 text-lg">Edit Student Profile</h3><p className="text-xs text-gray-500 mt-0.5">ID: {editingStudent.id}</p></div>
+              <div><h3 className="font-bold text-gray-900 text-lg">Edit Application Record</h3><p className="text-xs text-gray-500 mt-0.5">ID: {editingStudent.id}</p></div>
               <button onClick={() => setEditingStudent(null)} className="p-2 text-gray-400 hover:bg-gray-200 rounded-full transition-colors"><X size={18} /></button>
             </div>
             <div className="flex-1 overflow-y-auto p-6">
@@ -581,29 +556,11 @@ export default function AdminStudents() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-amber-800 mb-1">Account Login Approval</label>
-                      <select value={editingStudent.approval_status} onChange={e => setEditingStudent({ ...editingStudent, approval_status: e.target.value })}
-                        className="w-full border border-amber-200 rounded-lg px-3 py-2 text-sm outline-none bg-white focus:border-amber-400">
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                      </select>
-                    </div>
-                    <div>
                       <label className="block text-xs font-semibold text-amber-800 mb-1">Admin Notes (Private)</label>
                       <textarea value={editingStudent.admin_notes || ""}
                         onChange={e => setEditingStudent({ ...editingStudent, admin_notes: e.target.value })}
                         className="w-full border border-amber-200 rounded-lg px-3 py-2 text-sm outline-none bg-white focus:border-amber-400 resize-none h-[40px]"
                         placeholder="Internal notes..." />
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-amber-200/50">
-                    <label className="block text-xs font-semibold text-amber-800 mb-2">Reset Student Password</label>
-                    <div className="flex gap-2">
-                      <input type="text" placeholder="New Password (min 8 chars)" value={resetPassId === editingStudent.id ? newPassword : ""} onChange={e => { setResetPassId(editingStudent.id); setNewPassword(e.target.value); }} className="flex-1 border border-amber-200 rounded-lg px-3 py-2 text-sm outline-none bg-white focus:border-amber-400" />
-                      <button type="button" onClick={handleResetPassword} disabled={saving || resetPassId !== editingStudent.id || newPassword.length < 8} className="px-4 py-2 bg-amber-600 text-white text-xs font-bold rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors">
-                        Reset Password
-                      </button>
                     </div>
                   </div>
                 </div>

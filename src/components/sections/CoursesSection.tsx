@@ -5,7 +5,7 @@ import clsx from "clsx";
 
 interface Course {
   id: string;
-  name: string;
+  title: string;
   category: string;
   description: string;
   is_active: boolean;
@@ -133,7 +133,7 @@ export default function CoursesSection() {
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1.5 group-hover:text-[#800000] transition-colors">
-                    {course.name}
+                    {course.title}
                   </h3>
                   <p className="text-gray-500 text-xs leading-relaxed">{course.description}</p>
                 </div>

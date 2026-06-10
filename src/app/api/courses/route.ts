@@ -10,7 +10,7 @@ export async function GET() {
     const { data, error } = await supabase
       .from("courses")
       .select("*").eq("is_deleted", false)
-      .order("sort_order", { ascending: true })
+      .order("display_order", { ascending: true })
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
     createNotification({
       title:   "New Course Added",
-      message: `Course "${body.name || "Untitled"}" (${body.category || ""}) was published.`,
+      message: `Course "${body.title || "Untitled"}" (${body.category || ""}) was published.`,
       type:    "course",
     }).catch(() => {});
     return NextResponse.json(data, { status: 201 });

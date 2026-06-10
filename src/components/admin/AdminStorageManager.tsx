@@ -66,9 +66,9 @@ const EXPORT_TABLES = [
   { key: "students",     label: "Students",     emoji: "🎓" },
   { key: "faculty",      label: "Faculty",      emoji: "👩‍🏫" },
   { key: "courses",      label: "Courses",      emoji: "📚" },
-  { key: "videos",       label: "YouTube Videos", emoji: "▶️" },
+  { key: "youtube_videos", label: "YouTube Videos", emoji: "▶️" },
   { key: "gallery",      label: "Gallery",      emoji: "🖼️" },
-  { key: "faqs",         label: "FAQs",         emoji: "❓" },
+  { key: "faq",         label: "FAQs",         emoji: "❓" },
   { key: "testimonials", label: "Testimonials", emoji: "⭐" },
   { key: "notifications",label: "Notifications",emoji: "🔔" },
 ];

@@ -10,7 +10,7 @@ export async function GET() {
     const { data, error } = await supabase
       .from("faculty")
       .select("*").eq("is_deleted", false)
-      .order("sort_order", { ascending: true })
+      .order("display_order", { ascending: true })
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
     createNotification({
       title:   "Faculty Member Added",
-      message: `${body.name || "A new faculty member"} (${body.subject || body.role || ""}) was added to the team.`,
+      message: `${body.name || "A new faculty member"} (${body.subject || body.designation || ""}) was added to the team.`,
       type:    "faculty",
     }).catch(() => {});
     return NextResponse.json(data, { status: 201 });

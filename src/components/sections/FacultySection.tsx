@@ -10,7 +10,7 @@ export default async function FacultySection() {
     .select("*")
     .eq("is_deleted", false)
     .eq("is_active", true)
-    .order("sort_order", { ascending: true })
+    .order("display_order", { ascending: true })
     .order("created_at", { ascending: false });
 
   const faculty = facultyData ?? [];
@@ -72,10 +72,10 @@ export default async function FacultySection() {
               <div key={member.id} className="card group">
                 <div className="flex items-start gap-4">
                   {/* AVATAR — Next/Image with lazy loading + skeleton */}
-                  {member.image_url ? (
+                  {member.photo_url ? (
                     <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 shadow-md border border-gray-100 bg-gray-100 relative">
                       <Image
-                        src={member.image_url}
+                        src={member.photo_url}
                         alt={member.name}
                         fill
                         sizes="56px"
@@ -103,7 +103,7 @@ export default async function FacultySection() {
                       {member.name}
                     </h3>
                     <p className="text-[#C9A84C] font-semibold text-xs uppercase tracking-wide mt-0.5">
-                      {member.role}
+                      {member.designation}
                     </p>
                   </div>
                 </div>

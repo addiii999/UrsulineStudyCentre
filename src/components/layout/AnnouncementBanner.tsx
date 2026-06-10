@@ -7,7 +7,7 @@ export default async function AnnouncementBanner() {
   const today = new Date().toISOString().split("T")[0];
   
   const { data: announcementsData } = await supabase
-    .from("announcements")
+    .from("notices")
     .select("*")
     .eq("is_active", true)
     .gte("expires_at", today)
@@ -24,10 +24,10 @@ export default async function AnnouncementBanner() {
         let bgClass = "bg-blue-600";
         let icon = <Info size={16} className="text-white" />;
         
-        if (ann.type === "success") {
+        if (ann.priority === "success") {
           bgClass = "bg-[#27663b]";
           icon = <Check size={16} className="text-white" />;
-        } else if (ann.type === "warning") {
+        } else if (ann.priority === "warning") {
           bgClass = "bg-[#d35400]";
           icon = <AlertTriangle size={16} className="text-white" />;
         }
@@ -40,7 +40,7 @@ export default async function AnnouncementBanner() {
                 <strong className="tracking-wide">{ann.title}</strong>
               </span>
               <span className="hidden sm:inline opacity-60">|</span>
-              <span className="opacity-90">{ann.message}</span>
+              <span className="opacity-90">{ann.description}</span>
             </div>
           </div>
         );

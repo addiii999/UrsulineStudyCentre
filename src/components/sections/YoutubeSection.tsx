@@ -20,11 +20,11 @@ export default async function YoutubeSection() {
   const settings = await getGlobalSettings();
   
   const { data: videosData } = await supabase
-    .from("videos")
+    .from("youtube_videos")
     .select("*")
     .eq("is_deleted", false)
     .eq("is_active", true)
-    .order("sort_order", { ascending: true })
+    .order("display_order", { ascending: true })
     .order("created_at", { ascending: false })
     .limit(4);
 
@@ -70,7 +70,7 @@ export default async function YoutubeSection() {
             {videos.map((video) => (
               <a
                 key={video.id}
-                href={`https://www.youtube.com/watch?v=${video.video_id}`}
+                href={video.youtube_url || `https://www.youtube.com/watch?v=${video.video_id}`}
                 target="_blank"
                 rel="noreferrer"
                 className="group block rounded-xl overflow-hidden border border-gray-100 bg-white shadow-sm hover:shadow-xl hover:border-[#FF0000]/20 transition-all duration-300"
@@ -79,7 +79,7 @@ export default async function YoutubeSection() {
                 <div className="relative aspect-video bg-gray-100 overflow-hidden">
                   <div className="relative w-full h-full">
                     <Image
-                      src={video.thumbnail || `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`}
+                      src={video.thumbnail_url || `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`}
                       alt={video.title ?? "YouTube video"}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 
 type AdminSection = "dashboard" | "courses" | "faculty" | "videos" | "testimonials"
-  | "results" | "faq" | "students" | "fees" | "enquiries" | "announcements" | "settings";
+  | "results" | "faq" | "students" | "fees" | "enquiries" | "notices" | "settings";
 
 interface Props {
   onNavigate: (section: AdminSection) => void;

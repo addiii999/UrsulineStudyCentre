@@ -7,6 +7,7 @@ import { X, Eye, EyeOff, Trash2, Upload, ImagePlus, Loader2, CheckCircle2, Alert
 interface GalleryItem {
   id: string;
   title: string;
+  description?: string;
   image_url: string;
   storage_path: string;
   is_active: boolean;
@@ -60,6 +61,7 @@ function Toast({ msg, type }: { msg: string; type: "ok" | "err" }) {
 // ─── UPLOAD CARD ─────────────────────────────────────────────
 function UploadCard({ onUploaded }: { onUploaded: (item: GalleryItem) => void }) {
   const [title,       setTitle]       = useState("");
+  const [description, setDescription] = useState("");
   const [preview,     setPreview]     = useState<string | null>(null);
   const [rawFile,     setRawFile]     = useState<File | null>(null);
   const [compressKB,  setCompressKB]  = useState<number | null>(null);
@@ -93,12 +95,13 @@ function UploadCard({ onUploaded }: { onUploaded: (item: GalleryItem) => void })
       const fd = new FormData();
       fd.append("file",  rawFile);
       fd.append("title", title.trim());
+      fd.append("description", description.trim());
       const res  = await fetch("/api/gallery", { method: "POST", body: fd });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Upload failed");
       onUploaded(json.item);
       showToast("Image uploaded successfully!", "ok");
-      setTitle(""); setPreview(null); setRawFile(null); setCompressKB(null); setOriginalKB(null);
+      setTitle(""); setDescription(""); setPreview(null); setRawFile(null); setCompressKB(null); setOriginalKB(null);
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : "Upload failed", "err");
     } finally {
@@ -147,6 +150,14 @@ function UploadCard({ onUploaded }: { onUploaded: (item: GalleryItem) => void })
         className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]/50 placeholder:text-gray-400"
       />
 
+      {/* Description */}
+      <input
+        value={description}
+        onChange={e => setDescription(e.target.value)}
+        placeholder="Description (optional)"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]/50 placeholder:text-gray-400"
+      />
+
       <button
         onClick={handleUpload}
         disabled={!rawFile || uploading}
@@ -190,20 +201,25 @@ function GalleryCard({
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-3 flex items-center justify-between gap-2">
-        <p className="text-[12px] font-medium text-gray-700 truncate flex-1">{item.title || <span className="text-gray-400 italic">No title</span>}</p>
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          <button onClick={() => onToggle(item.id, !item.is_active)}
-            title={item.is_active ? "Hide" : "Show"}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors">
-            {item.is_active ? <Eye size={13} /> : <EyeOff size={13} />}
-          </button>
-          <button onClick={handleDelete} disabled={deleting}
-            title="Delete"
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-rose-50 hover:text-rose-600 transition-colors">
-            {deleting ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
-          </button>
+      <div className="px-4 py-3 flex flex-col gap-1 border-t border-gray-150 bg-white">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[12px] font-bold text-gray-800 truncate flex-1">{item.title || <span className="text-gray-400 italic">No title</span>}</p>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <button onClick={() => onToggle(item.id, !item.is_active)}
+              title={item.is_active ? "Hide" : "Show"}
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors">
+              {item.is_active ? <Eye size={13} /> : <EyeOff size={13} />}
+            </button>
+            <button onClick={handleDelete} disabled={deleting}
+              title="Delete"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-rose-50 hover:text-rose-600 transition-colors">
+              {deleting ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+            </button>
+          </div>
         </div>
+        {item.description && (
+          <p className="text-[10px] text-gray-500 line-clamp-2 leading-tight">{item.description}</p>
+        )}
       </div>
     </div>
   );

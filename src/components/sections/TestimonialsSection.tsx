@@ -8,7 +8,7 @@ export default async function TestimonialsSection() {
     .from("testimonials")
     .select("*")
     .eq("is_deleted", false)
-    .eq("is_visible", true)
+    .eq("is_active", true)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
 
@@ -74,7 +74,7 @@ export default async function TestimonialsSection() {
 
                 {/* REVIEW */}
                 <p className="text-gray-600 text-sm leading-relaxed flex-1">
-                  &ldquo;{t.quote}&rdquo;
+                  &ldquo;{t.review}&rdquo;
                 </p>
 
                 {/* AUTHOR */}

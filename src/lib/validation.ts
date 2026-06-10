@@ -42,12 +42,6 @@ export const studentUpdateSchema = z.object({
   session: z.string().max(20).optional(),
 });
 
-// Student self-update schema (only safe fields)
-export const studentSelfUpdateSchema = z.object({
-  present_phone: phoneSchema.optional(),
-  emergency_contact: phoneSchema.optional(),
-});
-
 // Enquiry schema
 export const enquirySchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100, "Name too long"),
@@ -59,11 +53,12 @@ export const enquirySchema = z.object({
 
 // Course schema
 export const courseSchema = z.object({
-  name: z.string().min(2).max(200),
-  category: z.enum(["board", "competitive", "vocational"]),
+  title: z.string().min(2).max(200),
+  category: z.enum(["Academic Streams", "Competitive Exams", "Vocational Skills"]),
   description: z.string().max(1000).optional(),
+  annual_fee: z.number().int().min(0).optional(),
   is_active: z.boolean().optional(),
-  sort_order: z.number().int().min(0).optional(),
+  display_order: z.number().int().min(0).optional(),
 });
 
 // Faculty schema
@@ -72,29 +67,31 @@ export const facultySchema = z.object({
   subject: z.string().max(100).optional(),
   qualification: z.string().max(200).optional(),
   experience: z.string().max(50).optional(),
-  role: z.string().min(2).max(100),
+  designation: z.string().min(2).max(100),
   photo_url: z.string().url().optional(),
   storage_path: z.string().optional(),
   is_active: z.boolean().optional(),
-  sort_order: z.number().int().min(0).optional(),
+  display_order: z.number().int().min(0).optional(),
 });
 
 // Testimonial schema
 export const testimonialSchema = z.object({
   name: z.string().min(2).max(100),
   student_class: z.string().max(50).optional(),
-  quote: z.string().min(10).max(500),
+  review: z.string().min(10).max(500),
   rating: z.number().int().min(1).max(5).optional(),
-  is_visible: z.boolean().optional(),
+  is_active: z.boolean().optional(),
   sort_order: z.number().int().min(0).optional(),
 });
 
-// Video schema
-export const videoSchema = z.object({
+// YouTube Video schema
+export const youtubeVideoSchema = z.object({
+  youtube_url: z.string().url(),
   video_id: z.string().min(5).max(50),
+  thumbnail_url: z.string().url(),
   title: z.string().max(200).optional(),
   is_active: z.boolean().optional(),
-  sort_order: z.number().int().min(0).optional(),
+  display_order: z.number().int().min(0).optional(),
 });
 
 // FAQ schema
@@ -102,14 +99,14 @@ export const faqSchema = z.object({
   question: z.string().min(5).max(500),
   answer: z.string().min(5).max(2000),
   is_active: z.boolean().optional(),
-  sort_order: z.number().int().min(0).optional(),
+  display_order: z.number().int().min(0).optional(),
 });
 
-// Announcement schema
-export const announcementSchema = z.object({
+// Notice schema
+export const noticeSchema = z.object({
   title: z.string().min(3).max(200),
-  message: z.string().min(5).max(1000),
-  type: z.enum(["info", "success", "warning"]).optional(),
+  description: z.string().min(5).max(1000),
+  priority: z.enum(["info", "success", "warning"]).optional(),
   expires_at: z.string().optional(),
   is_active: z.boolean().optional(),
 });

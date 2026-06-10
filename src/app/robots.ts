@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin/", "/student/", "/api/"],
+        disallow: ["/admin/", "/api/"],
       },
     ],
     sitemap: "https://ursulinstudycentre.in/sitemap.xml",

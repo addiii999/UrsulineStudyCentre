@@ -11,7 +11,7 @@ interface FAQ {
   question: string;
   answer: string;
   is_active: boolean;
-  sort_order?: number;
+  display_order?: number;
 }
 
 export default function AdminFAQ() {
@@ -36,7 +36,7 @@ export default function AdminFAQ() {
   const fetchFaqs = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/faqs");
+      const res = await fetch("/api/faq");
       const data = await res.json();
       setFaqs(data.faqs ?? []);
     } catch (err: any) {
@@ -66,7 +66,7 @@ export default function AdminFAQ() {
     }
     setSaving(true);
     try {
-      const res = await fetch("/api/faqs", {
+      const res = await fetch("/api/faq", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: editingId, question: editQ.trim(), answer: editA.trim() }),
@@ -87,7 +87,7 @@ export default function AdminFAQ() {
   const deleteFaq = async (id: string) => {
     if (!confirm("Are you sure you want to delete this FAQ?")) return;
     try {
-      const res = await fetch(`/api/faqs?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/faq?id=${id}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Request failed");
       toast.success("FAQ deleted");
@@ -104,7 +104,7 @@ export default function AdminFAQ() {
     // Optimistic update
     setFaqs((prev) => prev.map((f) => f.id === faq.id ? { ...f, is_active: newState } : f));
     try {
-      const res = await fetch("/api/faqs", {
+      const res = await fetch("/api/faq", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: faq.id, is_active: newState }),
@@ -130,7 +130,7 @@ export default function AdminFAQ() {
     }
     setSaving(true);
     try {
-      const res = await fetch("/api/faqs", {
+      const res = await fetch("/api/faq", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: newQ.trim(), answer: newA.trim(), is_active: true }),

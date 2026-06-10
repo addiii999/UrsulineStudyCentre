@@ -8,12 +8,14 @@ const BACKUP_TABLES = [
   "enquiries",
   "faculty",
   "courses",
-  "videos",
+  "youtube_videos",
   "gallery",
-  "faqs",
+  "faq",
   "testimonials",
   "students",
   "notifications",
+  "results",
+  "backups_log",
   "settings"
 ];
 

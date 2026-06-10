@@ -19,7 +19,7 @@ import AdminFees from "@/components/admin/AdminFees";
 import AdminEnquiries from "@/components/admin/AdminEnquiries";
 import AdminFAQ from "@/components/admin/AdminFAQ";
 import AdminTestimonials from "@/components/admin/AdminTestimonials";
-import AdminAnnouncements from "@/components/admin/AdminAnnouncements";
+import AdminNotices from "@/components/admin/AdminNotices";
 import AdminResults from "@/components/admin/AdminResults";
 import AdminSettings from "@/components/admin/AdminSettings";
 import AdminGallery from "@/components/admin/AdminGallery";
@@ -31,7 +31,7 @@ type AdminSection =
   | "dashboard"
   | "courses" | "faculty" | "videos" | "gallery" | "testimonials" | "results" | "faq"
   | "students" | "fees" | "enquiries"
-  | "announcements"
+  | "notices"
   | "storage"
   | "settings";
 
@@ -58,14 +58,14 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Students & Leads",
     items: [
       { id: "enquiries",  label: "Enquiries",   icon: <MessageSquare size={16} /> },
-      { id: "students",   label: "Student Records",  icon: <ClipboardList size={16} /> },
+      { id: "students",   label: "Applications",  icon: <ClipboardList size={16} /> },
       { id: "fees",       label: "Fees",        icon: <CreditCard size={16} /> },
     ],
   },
   {
     label: "Promotions",
     items: [
-      { id: "announcements", label: "Announcements", icon: <Megaphone size={16} /> },
+      { id: "notices", label: "Notices", icon: <Megaphone size={16} /> },
     ],
   },
   {
@@ -96,7 +96,7 @@ export default function AdminDashboardPage() {
       case "enquiries":    return <AdminEnquiries />;
       case "faq":          return <AdminFAQ />;
       case "testimonials": return <AdminTestimonials />;
-      case "announcements":return <AdminAnnouncements />;
+      case "notices":return <AdminNotices />;
       case "results":      return <AdminResults />;
       case "storage":      return <AdminStorageManager />;
       case "settings":     return <AdminSettings />;
@@ -106,7 +106,7 @@ export default function AdminDashboardPage() {
 
   const handleLogout = async () => {
     try { await fetch("/api/admin/login", { method: "DELETE" }); } catch {}
-    router.push("/login");
+    router.push("/admin/login");
   };
 
   const currentNav = ALL_NAV_ITEMS.find((n) => n.id === activeSection);

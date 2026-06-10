@@ -10,9 +10,9 @@ interface Video {
   id: string;
   video_id: string;
   title: string | null;
-  thumbnail: string;
+  thumbnail_url: string;
   is_active: boolean;
-  sort_order: number;
+  display_order: number;
   created_at: string;
 }
 
@@ -293,7 +293,7 @@ export default function AdminVideos() {
               {/* THUMBNAIL */}
               <div className="relative aspect-video bg-gray-100">
                 <img
-                  src={v.thumbnail}
+                  src={v.thumbnail_url}
                   alt={v.title ?? "Video thumbnail"}
                   className="w-full h-full object-cover"
                   loading="lazy"

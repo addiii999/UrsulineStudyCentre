@@ -66,7 +66,7 @@ export async function PATCH(req: NextRequest) {
       } else {
         // Create new student record from enquiry data
         const newStudentPayload: any = {
-          full_name: enquiry.name,
+          full_name: enquiry.full_name,
           present_phone: enquiry.phone,
           present_class: enquiry.class || "",
           course: enquiry.stream || "",
@@ -99,11 +99,11 @@ export async function PATCH(req: NextRequest) {
       // Fire admin notification
       createNotification({
         title: "Student Approved",
-        message: `${enquiry.name} has been approved and added to Student Records.`,
+        message: `${enquiry.full_name} has been approved and added to Student Records.`,
         type: "enquiry",
       }).catch(() => {});
 
-      logAudit({ action: "update", table_name: "enquiries", item_id: id, item_label: `Approved: ${enquiry.name}` }).catch(() => {});
+      logAudit({ action: "update", table_name: "enquiries", item_id: id, item_label: `Approved: ${enquiry.full_name}` }).catch(() => {});
       return NextResponse.json({ success: true, message: "Student approved and added to records." });
     }
 

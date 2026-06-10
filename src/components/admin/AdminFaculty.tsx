@@ -9,9 +9,9 @@ interface FacultyMember {
   subject: string;
   qualification: string;
   experience: string;
-  role: string;
+  designation: string;
   is_active: boolean;
-  image_url?: string;
+  photo_url?: string;
 }
 
 export default function AdminFaculty() {
@@ -21,7 +21,7 @@ export default function AdminFaculty() {
   const [uploading, setUploading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", subject: "", qualification: "", experience: "", role: "", image_url: "" });
+  const [form, setForm] = useState({ name: "", subject: "", qualification: "", experience: "", designation: "", photo_url: "" });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -63,7 +63,7 @@ export default function AdminFaculty() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
 
-      setForm((prev) => ({ ...prev, image_url: data.url }));
+      setForm((prev) => ({ ...prev, photo_url: data.url }));
       toast.success("Photo uploaded successfully");
     } catch (err: any) {
       toast.error(err.message || "Failed to upload photo");
@@ -100,7 +100,7 @@ export default function AdminFaculty() {
         toast.success("Faculty added");
       }
       fetchFaculty();
-      setForm({ name: "", subject: "", qualification: "", experience: "", role: "", image_url: "" });
+      setForm({ name: "", subject: "", qualification: "", experience: "", designation: "", photo_url: "" });
       setShowForm(false);
     } catch (err: any) {
       toast.error(err?.message || "Failed to save faculty");
@@ -115,8 +115,8 @@ export default function AdminFaculty() {
       subject: f.subject, 
       qualification: f.qualification, 
       experience: f.experience, 
-      role: f.role,
-      image_url: f.image_url || "" 
+      designation: f.designation,
+      photo_url: f.photo_url || "" 
     });
     setEditId(f.id);
     setShowForm(true);
@@ -159,7 +159,7 @@ export default function AdminFaculty() {
           <h2 className="font-bold text-gray-900 text-lg" style={{ fontFamily: "var(--font-serif)" }}>Faculty Management</h2>
           <p className="text-gray-400 text-xs">Manage teaching staff and profiles</p>
         </div>
-        <button onClick={() => { setShowForm(true); setEditId(null); setForm({ name: "", subject: "", qualification: "", experience: "", role: "", image_url: "" }); }} className="btn-primary text-sm py-2">
+        <button onClick={() => { setShowForm(true); setEditId(null); setForm({ name: "", subject: "", qualification: "", experience: "", designation: "", photo_url: "" }); }} className="btn-primary text-sm py-2">
           <Plus size={15} /> Add Faculty
         </button>
       </div>
@@ -177,10 +177,10 @@ export default function AdminFaculty() {
             {/* PHOTO UPLOAD COLUMN */}
             <div className="flex flex-col items-center gap-3">
               <div className="w-32 h-32 rounded-2xl overflow-hidden bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center relative group">
-                {form.image_url ? (
+                {form.photo_url ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={form.image_url} alt="Preview" className="w-full h-full object-cover" />
+                    <img src={form.photo_url} alt="Preview" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <button onClick={() => fileInputRef.current?.click()} className="text-white text-xs font-semibold px-3 py-1.5 bg-white/20 rounded-lg backdrop-blur-sm hover:bg-white/30 transition-colors">
                         Replace
@@ -215,7 +215,7 @@ export default function AdminFaculty() {
                 disabled={uploading}
                 className="flex items-center justify-center gap-2 w-full py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 transition-colors"
               >
-                <Upload size={14} /> {form.image_url ? "Change Photo" : "Upload Photo"}
+                <Upload size={14} /> {form.photo_url ? "Change Photo" : "Upload Photo"}
               </button>
               <p className="text-[10px] text-gray-400 text-center leading-tight">JPG, PNG or WEBP<br/>Max 5MB</p>
             </div>
@@ -228,7 +228,7 @@ export default function AdminFaculty() {
               </div>
               <div>
                 <label className="label">Role / Designation</label>
-                <input value={form.role} onChange={(e) => setForm((p) => ({ ...p, role: e.target.value }))} className="input-field" placeholder="e.g. Senior Faculty" />
+                <input value={form.designation} onChange={(e) => setForm((p) => ({ ...p, designation: e.target.value }))} className="input-field" placeholder="e.g. Senior Faculty" />
               </div>
               <div>
                 <label className="label">Subject</label>
@@ -278,9 +278,9 @@ export default function AdminFaculty() {
               <div key={f.id} className={`bg-white rounded-2xl border p-5 shadow-sm hover:shadow-md transition-all duration-300 ${f.is_active ? "border-gray-200" : "border-gray-100 opacity-60 bg-gray-50"}`}>
                 <div className="flex items-start gap-4 mb-4">
                   <div className="relative">
-                    {f.image_url ? (
+                    {f.photo_url ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={f.image_url} alt={f.name} className="w-14 h-14 rounded-xl object-cover shadow-sm border border-gray-100" />
+                      <img src={f.photo_url} alt={f.name} className="w-14 h-14 rounded-xl object-cover shadow-sm border border-gray-100" />
                     ) : (
                       <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#800000] to-[#5C0000] flex items-center justify-center shadow-sm">
                         <span className="text-[#C9A84C] text-lg font-bold" style={{ fontFamily: "var(--font-serif)" }}>{initials}</span>
@@ -292,7 +292,7 @@ export default function AdminFaculty() {
                   </div>
                   <div className="flex-1 min-w-0 pt-1">
                     <p className="font-bold text-gray-900 text-base truncate" style={{ fontFamily: "var(--font-serif)" }}>{f.name}</p>
-                    <p className="text-[#C9A84C] text-xs font-bold uppercase tracking-wider mt-0.5">{f.role}</p>
+                    <p className="text-[#C9A84C] text-xs font-bold uppercase tracking-wider mt-0.5">{f.designation}</p>
                   </div>
                 </div>
                 

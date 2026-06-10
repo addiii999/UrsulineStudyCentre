@@ -8,11 +8,12 @@ import toast from "react-hot-toast";
 
 interface Course {
   id: string;
-  name: string;
+  title: string;
   category: string;
   description: string;
   is_active: boolean;
-  sort_order?: number;
+  annual_fee?: number;
+  display_order?: number;
 }
 
 const CATEGORIES = ["Academic Streams", "Competitive Exams", "Vocational Skills"];
@@ -24,15 +25,17 @@ export default function AdminCourses() {
 
   // Edit state
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
+  const [editTitle, setEditTitle] = useState("");
   const [editCategory, setEditCategory] = useState("Academic Streams");
   const [editDesc, setEditDesc] = useState("");
+  const [editAnnualFee, setEditAnnualFee] = useState("");
 
   // Add state
   const [adding, setAdding] = useState(false);
-  const [newName, setNewName] = useState("");
+  const [newTitle, setNewTitle] = useState("");
   const [newCategory, setNewCategory] = useState("Academic Streams");
   const [newDesc, setNewDesc] = useState("");
+  const [newAnnualFee, setNewAnnualFee] = useState("");
 
   /* ── DATA ─────────────────────────────────────────────── */
   const fetchCourses = async () => {
@@ -53,17 +56,18 @@ export default function AdminCourses() {
   /* ── EDIT ─────────────────────────────────────────────── */
   const startEdit = (course: Course) => {
     setEditingId(course.id);
-    setEditName(course.name);
+    setEditTitle(course.title);
     setEditCategory(course.category);
     setEditDesc(course.description || "");
+    setEditAnnualFee(course.annual_fee?.toString() || "");
     setAdding(false);
   };
 
-  const cancelEdit = () => { setEditingId(null); setEditName(""); setEditDesc(""); };
+  const cancelEdit = () => { setEditingId(null); setEditTitle(""); setEditDesc(""); setEditAnnualFee(""); };
 
   const saveEdit = async () => {
-    if (!editName.trim()) {
-      toast.error("Course name cannot be empty");
+    if (!editTitle.trim()) {
+      toast.error("Course title cannot be empty");
       return;
     }
     setSaving(true);
@@ -73,9 +77,10 @@ export default function AdminCourses() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editingId,
-          name: editName.trim(),
+          title: editTitle.trim(),
           category: editCategory,
           description: editDesc.trim(),
+          annual_fee: editAnnualFee ? parseInt(editAnnualFee) || 0 : 0,
         }),
       });
       const data = await res.json();
@@ -125,11 +130,11 @@ export default function AdminCourses() {
 
   /* ── ADD ──────────────────────────────────────────────── */
   const startAdding = () => { setAdding(true); setEditingId(null); };
-  const cancelAdd = () => { setAdding(false); setNewName(""); setNewDesc(""); setNewCategory("Academic Streams"); };
+  const cancelAdd = () => { setAdding(false); setNewTitle(""); setNewDesc(""); setNewCategory("Academic Streams"); setNewAnnualFee(""); };
 
   const addCourse = async () => {
-    if (!newName.trim()) {
-      toast.error("Course name cannot be empty");
+    if (!newTitle.trim()) {
+      toast.error("Course title cannot be empty");
       return;
     }
     setSaving(true);
@@ -138,9 +143,10 @@ export default function AdminCourses() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: newName.trim(),
+          title: newTitle.trim(),
           category: newCategory,
           description: newDesc.trim(),
+          annual_fee: newAnnualFee ? parseInt(newAnnualFee) || 0 : 0,
           is_active: true,
         }),
       });
@@ -191,10 +197,10 @@ export default function AdminCourses() {
           <div className="p-5 space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="label">Course Name *</label>
+                <label className="label">Course Title *</label>
                 <input
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
                   className="input-field"
                   placeholder="e.g. Science (PCM)"
                   autoFocus
@@ -213,19 +219,31 @@ export default function AdminCourses() {
                 </select>
               </div>
             </div>
-            <div>
-              <label className="label">Description</label>
-              <input
-                value={newDesc}
-                onChange={(e) => setNewDesc(e.target.value)}
-                className="input-field"
-                placeholder="Brief description (e.g. Physics, Chemistry, Maths for JEE)"
-              />
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="label">Description</label>
+                <input
+                  value={newDesc}
+                  onChange={(e) => setNewDesc(e.target.value)}
+                  className="input-field"
+                  placeholder="Brief description (e.g. Physics, Chemistry, Maths for JEE)"
+                />
+              </div>
+              <div>
+                <label className="label">Annual Fee (₹)</label>
+                <input
+                  type="number"
+                  value={newAnnualFee}
+                  onChange={(e) => setNewAnnualFee(e.target.value)}
+                  className="input-field"
+                  placeholder="e.g. 45000"
+                />
+              </div>
             </div>
             <div className="flex gap-2.5 pt-1">
               <button
                 onClick={addCourse}
-                disabled={saving || !newName.trim()}
+                disabled={saving || !newTitle.trim()}
                 className="flex items-center gap-2 bg-[#800000] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#6a0000] disabled:opacity-50 transition-colors"
               >
                 {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
@@ -248,8 +266,9 @@ export default function AdminCourses() {
         <table className="w-full text-sm text-left">
           <thead className="bg-gray-50/80 border-b border-gray-100">
             <tr>
-              <th className="px-5 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Course Name</th>
+              <th className="px-5 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Course Title</th>
               <th className="px-5 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Category</th>
+              <th className="px-5 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Annual Fee</th>
               <th className="px-5 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider hidden md:table-cell">Description</th>
               <th className="px-5 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
             </tr>
@@ -257,14 +276,14 @@ export default function AdminCourses() {
           <tbody className="divide-y divide-gray-50/80">
             {loading ? (
               <tr>
-                <td colSpan={4} className="px-5 py-12 text-center">
+                <td colSpan={5} className="px-5 py-12 text-center">
                   <Loader2 size={24} className="animate-spin text-gray-300 mx-auto mb-2" />
                   <p className="text-gray-400 text-sm">Loading courses...</p>
                 </td>
               </tr>
             ) : courses.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-5 py-12 text-center">
+                <td colSpan={5} className="px-5 py-12 text-center">
                   <BookOpen size={32} className="text-gray-200 mx-auto mb-3" />
                   <p className="text-gray-400 text-sm font-medium">No courses found</p>
                   <p className="text-gray-300 text-xs mt-1">Click "Add Course" to get started</p>
@@ -275,15 +294,15 @@ export default function AdminCourses() {
                 editingId === course.id ? (
                   /* ─ EDIT ROW ─ */
                   <tr key={course.id} className="bg-[#800000]/[0.02]">
-                    <td colSpan={4} className="p-5 border-l-[3px] border-[#800000]">
+                    <td colSpan={5} className="p-5 border-l-[3px] border-[#800000]">
                       <div className="space-y-4 max-w-2xl">
                         <p className="text-xs font-semibold text-[#800000] flex items-center gap-1.5">
                           <Pencil size={11} /> Editing Course
                         </p>
                         <div className="grid sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="label">Course Name</label>
-                            <input value={editName} onChange={(e) => setEditName(e.target.value)} className="input-field bg-white" autoFocus />
+                            <label className="label">Course Title</label>
+                            <input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="input-field bg-white" autoFocus />
                           </div>
                           <div>
                             <label className="label">Category</label>
@@ -292,9 +311,15 @@ export default function AdminCourses() {
                             </select>
                           </div>
                         </div>
-                        <div>
-                          <label className="label">Description</label>
-                          <input value={editDesc} onChange={(e) => setEditDesc(e.target.value)} className="input-field bg-white" />
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="label">Description</label>
+                            <input value={editDesc} onChange={(e) => setEditDesc(e.target.value)} className="input-field bg-white" />
+                          </div>
+                          <div>
+                            <label className="label">Annual Fee (₹)</label>
+                            <input type="number" value={editAnnualFee} onChange={(e) => setEditAnnualFee(e.target.value)} className="input-field bg-white" />
+                          </div>
                         </div>
                         <div className="flex gap-2 pt-2">
                           <button onClick={saveEdit} disabled={saving} className="flex items-center gap-2 bg-[#800000] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-[#6a0000] disabled:opacity-50 transition-colors">
@@ -311,11 +336,16 @@ export default function AdminCourses() {
                   /* ─ VIEW ROW ─ */
                   <tr key={course.id} className={`hover:bg-gray-50/40 transition-colors ${!course.is_active ? "opacity-60" : ""}`}>
                     <td className="px-5 py-4">
-                      <p className={`font-semibold text-[13px] ${course.is_active ? "text-gray-900" : "text-gray-500"}`}>{course.name}</p>
+                      <p className={`font-semibold text-[13px] ${course.is_active ? "text-gray-900" : "text-gray-500"}`}>{course.title}</p>
                     </td>
                     <td className="px-5 py-4">
                       <span className="inline-flex px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 border border-gray-200 text-[10.5px] font-semibold whitespace-nowrap">
                         {course.category}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="text-gray-700 text-[12px] font-medium">
+                        {course.annual_fee ? `₹${course.annual_fee.toLocaleString()}` : "—"}
                       </span>
                     </td>
                     <td className="px-5 py-4 hidden md:table-cell">

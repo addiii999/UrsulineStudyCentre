@@ -8,10 +8,10 @@ const SOFT_DELETE_TABLES = [
   "gallery",
   "faculty",
   "courses",
-  "videos",
+  "youtube_videos",
   "testimonials",
   "enquiries",
-  "faqs",
+  "faq",
   "results",
   "students",
 ] as const;
@@ -20,15 +20,15 @@ type SoftDeleteTable = (typeof SOFT_DELETE_TABLES)[number];
 
 // Human-readable labels for each table
 const TABLE_LABELS: Record<SoftDeleteTable, { singular: string; labelField: string }> = {
-  gallery:      { singular: "Gallery Image",   labelField: "title"   },
-  faculty:      { singular: "Faculty Member",  labelField: "name"    },
-  courses:      { singular: "Course",          labelField: "name"    },
-  videos:       { singular: "YouTube Video",   labelField: "title"   },
-  testimonials: { singular: "Testimonial",     labelField: "name"    },
-  enquiries:    { singular: "Enquiry",         labelField: "name"    },
-  faqs:         { singular: "FAQ",             labelField: "q"       },
-  results:      { singular: "Result",          labelField: "student_name" },
-  students:     { singular: "Student Record",  labelField: "full_name" },
+  gallery:        { singular: "Gallery Image",   labelField: "title"   },
+  faculty:        { singular: "Faculty Member",  labelField: "name"    },
+  courses:        { singular: "Course",          labelField: "title"   },
+  youtube_videos: { singular: "YouTube Video",   labelField: "title"   },
+  testimonials:   { singular: "Testimonial",     labelField: "name"    },
+  enquiries:      { singular: "Enquiry",         labelField: "full_name" },
+  faq:            { singular: "FAQ",             labelField: "question" },
+  results:        { singular: "Result",          labelField: "label"    },
+  students:       { singular: "Student Record",  labelField: "full_name" },
 };
 
 // ─── GET: All soft-deleted items across all tables ──────────

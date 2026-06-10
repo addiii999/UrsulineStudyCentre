@@ -11,7 +11,7 @@ export async function GET() {
       .from("gallery")
       .select("*").eq("is_deleted", false)
       .eq("is_active", true)
-      .order("sort_order", { ascending: true })
+      .order("display_order", { ascending: true })
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file     = formData.get("file") as File | null;
     const title    = (formData.get("title") as string) || "";
+    const description = (formData.get("description") as string) || "";
 
     if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
 
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
     // Insert DB record ──────────────────────────────────────
     const { data, error: dbErr } = await adminClient
       .from("gallery")
-      .insert({ title, image_url: publicUrl, storage_path: fileName, is_active: true, sort_order: 0 })
+      .insert({ title, description, image_url: publicUrl, storage_path: fileName, is_active: true, display_order: 0 })
       .select()
       .single();
 
@@ -101,12 +102,13 @@ export async function PATCH(req: NextRequest) {
     const isAdmin = await checkAdminAuth(req);
     if (!isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id, is_active, title } = await req.json();
+    const { id, is_active, title, description } = await req.json();
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
 
     const updates: Record<string, unknown> = {};
     if (typeof is_active === "boolean") updates.is_active = is_active;
     if (typeof title === "string")     updates.title      = title;
+    if (typeof description === "string") updates.description = description;
 
     const adminClient = createAdminClient();
     const { data, error } = await adminClient

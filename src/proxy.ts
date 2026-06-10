@@ -9,19 +9,11 @@ const ADMIN_MAX_REQUESTS = 20; // Stricter for admin logins
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // 1. Auth Protection (from proxy.ts)
+  // 1. Auth Protection
   if (pathname.startsWith("/admin")) {
     const adminSession = req.cookies.get("admin_session");
     if (!adminSession) {
-      const loginUrl = new URL("/login", req.url);
-      return NextResponse.redirect(loginUrl);
-    }
-  }
-
-  if (pathname.startsWith("/student")) {
-    const studentSession = req.cookies.get("student_session");
-    if (!studentSession) {
-      const loginUrl = new URL("/login", req.url);
+      const loginUrl = new URL("/admin/login", req.url);
       return NextResponse.redirect(loginUrl);
     }
   }
@@ -85,5 +77,5 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/admin/:path*", "/student/:path*"],
+  matcher: ["/api/:path*", "/admin/:path*"],
 };

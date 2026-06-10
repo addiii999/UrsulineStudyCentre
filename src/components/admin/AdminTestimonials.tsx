@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Check, X, Star, Quote, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
-interface Testimonial { id: string; name: string; role: string; quote: string; rating: number; is_visible: boolean; }
+interface Testimonial { id: string; name: string; role: string; review: string; rating: number; is_active: boolean; }
 
 // ─── Lifted OUT of the main component — never remounts ────────
 function StarRating({ value, onChange }: { value: number; onChange?: (v: number) => void }) {
@@ -52,10 +52,10 @@ function FormFields({
         </div>
       </div>
       <div>
-        <label className="block text-xs font-semibold text-gray-600 mb-1">Testimonial Quote *</label>
+        <label className="block text-xs font-semibold text-gray-600 mb-1">Testimonial Review *</label>
         <textarea
-          value={data.quote || ""}
-          onChange={(e) => setData({ ...data, quote: e.target.value })}
+          value={data.review || ""}
+          onChange={(e) => setData({ ...data, review: e.target.value })}
           rows={3}
           className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:border-[#800000] focus:outline-none resize-none"
           placeholder="What the student said..."
@@ -77,7 +77,7 @@ export default function AdminTestimonials() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Partial<Testimonial>>({});
   const [adding, setAdding] = useState(false);
-  const [newItem, setNewItem] = useState<Partial<Testimonial>>({ rating: 5, is_visible: true });
+  const [newItem, setNewItem] = useState<Partial<Testimonial>>({ rating: 5, is_active: true });
 
   const fetchTestimonials = async () => {
     setLoading(true);
@@ -129,25 +129,25 @@ export default function AdminTestimonials() {
     }
   };
 
-  const toggleVisible = async (item: Testimonial) => {
-    const newState = !item.is_visible;
-    setItems(items.map((t) => (t.id === item.id ? { ...t, is_visible: newState } : t)));
+  const toggleActive = async (item: Testimonial) => {
+    const newState = !item.is_active;
+    setItems(items.map((t) => (t.id === item.id ? { ...t, is_active: newState } : t)));
     try {
       const res = await fetch("/api/testimonials", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: item.id, is_visible: newState }),
+        body: JSON.stringify({ id: item.id, is_active: newState }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Request failed");
     } catch (err: any) {
       toast.error(err?.message || "Update failed");
-      setItems(items.map((t) => (t.id === item.id ? { ...t, is_visible: !newState } : t)));
+      setItems(items.map((t) => (t.id === item.id ? { ...t, is_active: !newState } : t)));
     }
   };
 
   const addItem = async () => {
-    if (!newItem.name?.trim() || !newItem.quote?.trim()) return;
+    if (!newItem.name?.trim() || !newItem.review?.trim()) return;
     setSaving(true);
     try {
       const res = await fetch("/api/testimonials", {
@@ -158,7 +158,7 @@ export default function AdminTestimonials() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to add testimonial");
       toast.success("Added successfully");
-      setNewItem({ rating: 5, is_visible: true });
+      setNewItem({ rating: 5, is_active: true });
       setAdding(false);
       fetchTestimonials();
     } catch (err: any) {
@@ -173,7 +173,7 @@ export default function AdminTestimonials() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-gray-900">Testimonials</h2>
-          <p className="text-gray-500 text-sm mt-0.5">{items.filter((t) => t.is_visible).length} visible on website</p>
+          <p className="text-gray-500 text-sm mt-0.5">{items.filter((t) => t.is_active).length} visible on website</p>
         </div>
         <button
           onClick={() => setAdding(true)}
@@ -198,7 +198,7 @@ export default function AdminTestimonials() {
               {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} Save
             </button>
             <button
-              onClick={() => { setAdding(false); setNewItem({ rating: 5 }); }}
+              onClick={() => { setAdding(false); setNewItem({ rating: 5, is_active: true }); }}
               disabled={saving}
               className="flex items-center gap-1.5 border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-xs font-semibold"
             >
@@ -222,7 +222,7 @@ export default function AdminTestimonials() {
           {items.map((t) => (
             <div
               key={t.id}
-              className={`bg-white rounded-xl border shadow-sm overflow-hidden ${t.is_visible ? "border-gray-200" : "border-gray-100 opacity-60"}`}
+              className={`bg-white rounded-xl border shadow-sm overflow-hidden ${t.is_active ? "border-gray-200" : "border-gray-100 opacity-60"}`}
             >
               {editingId === t.id ? (
                 <div className="p-5 space-y-4">
@@ -252,10 +252,10 @@ export default function AdminTestimonials() {
                     </div>
                     <div className="flex items-center gap-1.5 ml-auto">
                       <button
-                        onClick={() => toggleVisible(t)}
-                        className={`text-xs px-2.5 py-1 rounded-full font-semibold border transition-colors ${t.is_visible ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}
+                        onClick={() => toggleActive(t)}
+                        className={`text-xs px-2.5 py-1 rounded-full font-semibold border transition-colors ${t.is_active ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}
                       >
-                        {t.is_visible ? "Visible" : "Hidden"}
+                        {t.is_active ? "Visible" : "Hidden"}
                       </button>
                       <button
                         onClick={() => startEdit(t)}
@@ -272,7 +272,7 @@ export default function AdminTestimonials() {
                     </div>
                   </div>
                   <StarRating value={t.rating} />
-                  <p className="text-gray-600 text-sm italic mt-2 leading-relaxed">&quot;{t.quote}&quot;</p>
+                  <p className="text-gray-600 text-sm italic mt-2 leading-relaxed">&quot;{t.review}&quot;</p>
                   <div className="mt-3 pt-3 border-t border-gray-50">
                     <p className="font-bold text-gray-900 text-sm">{t.name}</p>
                     <p className="text-gray-400 text-xs">{t.role}</p>

@@ -29,11 +29,12 @@ export async function GET(req: NextRequest) {
       { key: "gallery",      label: "Gallery",      emoji: "🖼️" },
       { key: "faculty",      label: "Faculty",      emoji: "👩‍🏫" },
       { key: "courses",      label: "Courses",      emoji: "📚" },
-      { key: "videos",       label: "Videos",       emoji: "▶️" },
+      { key: "youtube_videos", label: "YouTube Videos", emoji: "▶️" },
       { key: "testimonials", label: "Testimonials", emoji: "⭐" },
       { key: "enquiries",    label: "Enquiries",    emoji: "📩" },
-      { key: "faqs",         label: "FAQs",         emoji: "❓" },
+      { key: "faq",         label: "FAQs",         emoji: "❓" },
       { key: "notifications",label: "Notifications",emoji: "🔔" },
+      { key: "results",      label: "Results",      emoji: "🏆" },
     ];
 
     const tableStats: {
@@ -55,7 +56,7 @@ export async function GET(req: NextRequest) {
 
       // Deleted count (only for tables that have is_deleted)
       let deleted = 0;
-      if (["students", "gallery", "faculty", "courses", "videos", "testimonials", "enquiries", "faqs"].includes(t.key)) {
+      if (["students", "gallery", "faculty", "courses", "youtube_videos", "testimonials", "enquiries", "faq", "results"].includes(t.key)) {
         const { count } = await adminClient
           .from(t.key)
           .select("*", { count: "exact", head: true })
@@ -106,7 +107,7 @@ export async function GET(req: NextRequest) {
 
     // 5. Items approaching auto-purge (deleted 25+ days ago)
     const twentyFiveDaysAgo = new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString();
-    const softDeleteTables = ["students", "gallery", "faculty", "courses", "videos", "testimonials", "enquiries", "faqs"];
+    const softDeleteTables = ["students", "gallery", "faculty", "courses", "youtube_videos", "testimonials", "enquiries", "faq", "results"];
     let expiringCount = 0;
 
     for (const table of softDeleteTables) {

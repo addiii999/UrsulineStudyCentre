@@ -18,7 +18,7 @@ export default function FaqSection() {
   useEffect(() => {
     const fetchFaqs = async () => {
       try {
-        const res = await fetch("/api/faqs", { cache: "no-store" });
+        const res = await fetch("/api/faq", { cache: "no-store" });
         const data = await res.json();
         const activeFaqs = data.faqs?.filter((f: FAQ) => f.is_active) ?? [];
         setFaqs(activeFaqs);

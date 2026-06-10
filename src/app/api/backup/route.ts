@@ -7,12 +7,13 @@ type ExportTable =
   | "enquiries"
   | "faculty"
   | "courses"
-  | "videos"
+  | "youtube_videos"
   | "gallery"
-  | "faqs"
+  | "faq"
   | "testimonials"
   | "students"
-  | "notifications";
+  | "notifications"
+  | "results";
 
 // Fields to exclude from export (sensitive/internal)
 const EXCLUDE_FIELDS: Partial<Record<ExportTable, string[]>> = {
@@ -41,8 +42,8 @@ export async function GET(req: NextRequest) {
     const format = (searchParams.get("format") ?? "json") as "json" | "csv";
 
     const validTables: ExportTable[] = [
-      "enquiries", "faculty", "courses", "videos",
-      "gallery", "faqs", "testimonials", "students", "notifications",
+      "enquiries", "faculty", "courses", "youtube_videos",
+      "gallery", "faq", "testimonials", "students", "notifications", "results",
     ];
     if (!validTables.includes(table)) {
       return NextResponse.json({ error: "Invalid table" }, { status: 400 });
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
   if (!isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const tables = ["gallery", "faculty", "courses", "videos", "testimonials", "enquiries", "faqs"];
+    const tables = ["gallery", "faculty", "courses", "youtube_videos", "testimonials", "enquiries", "faq", "results"];
     const adminClient = createAdminClient();
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 

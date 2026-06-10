@@ -35,9 +35,9 @@ export async function GET(req: NextRequest) {
 
     const supabase = createAdminClient();
     let query = supabase
-      .from("videos")
+      .from("youtube_videos")
       .select("*").eq("is_deleted", false)
-      .order("sort_order", { ascending: true })
+      .order("display_order", { ascending: true })
       .order("created_at", { ascending: false })
       .limit(limit);
 
@@ -82,26 +82,27 @@ export async function POST(req: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Get current max sort_order
+    // Get current max display_order
     const { data: maxRow } = await supabase
-      .from("videos")
-      .select("sort_order")
-      .order("sort_order", { ascending: false })
+      .from("youtube_videos")
+      .select("display_order")
+      .order("display_order", { ascending: false })
       .limit(1)
       .single();
 
-    const sort_order = (maxRow?.sort_order ?? 0) + 1;
+    const display_order = (maxRow?.display_order ?? 0) + 1;
 
     const { data, error } = await supabase
-      .from("videos")
+      .from("youtube_videos")
       .insert([
         {
+          youtube_url: url.trim(),
           video_id,
           title: (title ?? "").trim() || null,
-          thumbnail,
+          thumbnail_url: thumbnail,
           maxres_thumbnail,
           is_active: true,
-          sort_order,
+          display_order,
         },
       ])
       .select()
@@ -138,11 +139,11 @@ export async function PATCH(req: NextRequest) {
     const updates: Record<string, unknown> = {};
     if (typeof is_active === "boolean") updates.is_active = is_active;
     if (typeof title === "string") updates.title = title;
-    if (typeof sort_order === "number") updates.sort_order = sort_order;
+    if (typeof sort_order === "number") updates.display_order = sort_order;
 
     const supabase = createAdminClient();
     const { data, error } = await supabase
-      .from("videos")
+      .from("youtube_videos")
       .update(updates)
       .eq("id", id)
       .select()
@@ -172,7 +173,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     const supabase = createAdminClient();
-    const { error } = await supabase.from("videos").update({ is_deleted: true, deleted_at: new Date().toISOString() }).eq("id", id);
+    const { error } = await supabase.from("youtube_videos").update({ is_deleted: true, deleted_at: new Date().toISOString() }).eq("id", id);
 
     if (error) {
       console.error("[Videos DELETE]", error.message);

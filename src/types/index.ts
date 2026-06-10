@@ -64,6 +64,6 @@ export interface FeeRecord {
 export interface AdminUser {
   id: string;
   email: string;
-  role: "admin" | "student";
+  role: "admin";
   name: string;
 }

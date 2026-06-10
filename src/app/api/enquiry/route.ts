@@ -47,7 +47,11 @@ export async function POST(req: NextRequest) {
     const { data, error } = await adminClient
       .from("enquiries")
       .insert([{
-        ...sanitizedData,
+        full_name: sanitizedData.name,
+        phone: sanitizedData.phone,
+        class: sanitizedData.class,
+        stream: sanitizedData.stream,
+        message: sanitizedData.message,
         status: "new",
         is_deleted: false,
       }])
@@ -126,7 +130,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ enquiries: data ?? [] }, {
+    const mapped = (data ?? []).map((row: any) => ({
+      ...row,
+      name: row.full_name, // Map for frontend compatibility
+    }));
+
+    return NextResponse.json({ enquiries: mapped }, {
       headers: { "Cache-Control": "no-store, max-age=0" }
     });
   } catch (err) {

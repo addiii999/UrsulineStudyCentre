@@ -1,8 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import Link from "next/link";
-import { Menu, X, ChevronDown, Phone, MapPin, GraduationCap } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, MapPin } from "lucide-react";
 import { SITE_CONFIG, NAV_LINKS, MORE_LINKS } from "@/lib/constants";
 import clsx from "clsx";
 
@@ -198,12 +197,6 @@ export default function Navbar() {
 
             {/* RIGHT: CTA BUTTONS */}
             <div className="hidden lg:flex items-center gap-2.5">
-              <Link
-                href="/login"
-                className="px-4 py-2 text-sm font-semibold text-[#800000] border-2 border-[#800000]/20 rounded-lg hover:border-[#800000] hover:bg-[#800000]/5 transition-all duration-200"
-              >
-                Student Login
-              </Link>
               <button
                 onClick={() => scrollTo("/#contact")}
                 className="btn-primary text-sm py-2 px-4"
@@ -237,13 +230,6 @@ export default function Navbar() {
                 </button>
               ))}
               <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
-                <Link
-                  href="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="text-center px-4 py-2.5 text-sm font-semibold text-[#800000] border-2 border-[#800000]/20 rounded-lg"
-                >
-                  Student Login
-                </Link>
                 <button
                   onClick={() => scrollTo("/#contact")}
                   className="btn-primary justify-center text-sm"

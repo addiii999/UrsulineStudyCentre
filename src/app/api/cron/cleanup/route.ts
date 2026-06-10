@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const tables = ["gallery", "faculty", "courses", "videos", "testimonials", "enquiries", "faqs"];
+    const tables = ["gallery", "faculty", "courses", "youtube_videos", "testimonials", "enquiries", "faq", "results"];
     const adminClient = createAdminClient();
     
     // Calculate timestamp for 30 days ago
