@@ -3,7 +3,6 @@
  * Prevents injection attacks and ensures data integrity
  */
 import { z } from "zod";
-import DOMPurify from "isomorphic-dompurify";
 
 // Phone number validation (10 digits)
 export const phoneSchema = z.string().regex(/^\d{10}$/, "Phone must be exactly 10 digits");
@@ -126,16 +125,6 @@ export const settingsUpdateSchema = z.object({
   key: z.string().min(1).max(100),
   value: z.string().max(1000),
 });
-
-// Sanitize HTML content to prevent XSS
-// Uses isomorphic-dompurify which works in both browser and Node.js server environments
-// without needing jsdom — keeping bundle size small
-export function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ["b", "i", "em", "strong", "a", "p", "br"],
-    ALLOWED_ATTR: ["href"],
-  });
-}
 
 // Validate and sanitize text input
 export function sanitizeText(text: string, maxLength: number = 1000): string {

@@ -3,13 +3,15 @@ import { supabase } from "@/lib/supabase";
 export const revalidate = 3600; // Revalidate every 1 hour (ISR)
 
 export default async function ResultsSection() {
-  const { data: statsData } = await supabase
+  console.log("=== ResultsSection: START FETCH ===");
+  const { data: statsData, error } = await supabase
     .from("results")
     .select("*")
     .eq("is_deleted", false)
     .eq("is_visible", true)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
+  console.log("=== ResultsSection: END FETCH ===", { count: statsData?.length, error });
 
   const stats = statsData ?? [];
 

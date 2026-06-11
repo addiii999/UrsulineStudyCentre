@@ -4,13 +4,15 @@ import { supabase } from "@/lib/supabase";
 export const revalidate = 3600; // Revalidate every 1 hour (ISR)
 
 export default async function FacultySection() {
-  const { data: facultyData } = await supabase
+  console.log("=== FacultySection: START FETCH ===");
+  const { data: facultyData, error } = await supabase
     .from("faculty")
     .select("*")
     .eq("is_deleted", false)
     .eq("is_active", true)
     .order("display_order", { ascending: true })
     .order("created_at", { ascending: false });
+  console.log("=== FacultySection: END FETCH ===", { count: facultyData?.length, error });
 
   const faculty = facultyData ?? [];
 

@@ -5,14 +5,15 @@ export const revalidate = 300; // Revalidate every 5 minutes (ISR)
 
 export default async function AnnouncementBanner() {
   const today = new Date().toISOString().split("T")[0];
-  
-  const { data: announcementsData } = await supabase
+  console.log("=== AnnouncementBanner: START FETCH ===");
+  const { data: announcementsData, error } = await supabase
     .from("notices")
     .select("*")
     .eq("is_active", true)
     .gte("expires_at", today)
     .order("created_at", { ascending: false })
     .limit(3);
+  console.log("=== AnnouncementBanner: END FETCH ===", { count: announcementsData?.length, error });
 
   const announcements = announcementsData ?? [];
 

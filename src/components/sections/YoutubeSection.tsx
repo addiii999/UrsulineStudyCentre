@@ -19,7 +19,8 @@ const YouTubeIcon = ({ size = 20, white = false }: { size?: number; white?: bool
 export default async function YoutubeSection() {
   const settings = await getGlobalSettings();
   
-  const { data: videosData } = await supabase
+  console.log("=== YoutubeSection: START FETCH ===");
+  const { data: videosData, error } = await supabase
     .from("youtube_videos")
     .select("*")
     .eq("is_deleted", false)
@@ -27,6 +28,7 @@ export default async function YoutubeSection() {
     .order("display_order", { ascending: true })
     .order("created_at", { ascending: false })
     .limit(4);
+  console.log("=== YoutubeSection: END FETCH ===", { count: videosData?.length, error });
 
   const videos = videosData ?? [];
 

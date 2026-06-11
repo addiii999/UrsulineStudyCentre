@@ -17,6 +17,5 @@ export {
   noticeSchema,
   resultSchema,
   settingsUpdateSchema,
-  sanitizeHtml,
   sanitizeText,
 } from "@/lib/validations";
