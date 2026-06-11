@@ -63,6 +63,8 @@ export default function Navbar() {
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
       }
+    } else {
+      window.location.href = href;
     }
   };
 
@@ -196,7 +198,13 @@ export default function Navbar() {
             </div>
 
             {/* RIGHT: CTA BUTTONS */}
-            <div className="hidden lg:flex items-center gap-2.5">
+            <div className="hidden lg:flex items-center gap-4">
+              <button
+                onClick={() => scrollTo("/admin/login")}
+                className="text-xs font-semibold text-gray-500 hover:text-[#800000] transition-colors"
+              >
+                Admin
+              </button>
               <button
                 onClick={() => scrollTo("/#contact")}
                 className="btn-primary text-sm py-2 px-4"
@@ -230,6 +238,12 @@ export default function Navbar() {
                 </button>
               ))}
               <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
+                <button
+                  onClick={() => scrollTo("/admin/login")}
+                  className="w-full text-center py-2 text-xs font-semibold text-gray-500 hover:text-[#800000] transition-colors"
+                >
+                  Admin Login
+                </button>
                 <button
                   onClick={() => scrollTo("/#contact")}
                   className="btn-primary justify-center text-sm"

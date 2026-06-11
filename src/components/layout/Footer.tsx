@@ -23,6 +23,8 @@ export default function Footer() {
       const id = href.replace("/#", "");
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.location.href = href;
     }
   };
 

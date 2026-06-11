@@ -98,4 +98,5 @@ export const MORE_LINKS = [
   { label: "YouTube", href: "/#youtube" },
   { label: "FAQ", href: "/#faq" },
   { label: "Contact", href: "/#contact" },
+  { label: "Admin Login", href: "/admin/login" },
 ];
