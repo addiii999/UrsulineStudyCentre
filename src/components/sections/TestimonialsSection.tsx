@@ -1,7 +1,7 @@
 import { Star, Quote } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-export const revalidate = 0;
+export const revalidate = 3600; // Revalidate every 1 hour (ISR)
 
 export default async function TestimonialsSection() {
   const { data: testimonialsData } = await supabase

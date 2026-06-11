@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 
-export const revalidate = 0;
+export const revalidate = 3600; // Revalidate every 1 hour (ISR)
 
 export default async function ResultsSection() {
   const { data: statsData } = await supabase

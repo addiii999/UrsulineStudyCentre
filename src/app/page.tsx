@@ -18,7 +18,7 @@ import TrustBanner from "@/components/sections/TrustBanner";
 import MobileActionBar from "@/components/ui/MobileActionBar";
 import AnnouncementBanner from "@/components/layout/AnnouncementBanner";
 
-export const revalidate = 0;
+export const revalidate = 300; // Revalidate every 5 minutes (ISR)
 
 export default function HomePage() {
   return (

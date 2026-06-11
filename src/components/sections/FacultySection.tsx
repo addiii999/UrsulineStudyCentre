@@ -1,10 +1,9 @@
 import Image from "next/image";
 import { BookOpen, GraduationCap, Star } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { unstable_noStore as noStore } from "next/cache";
+export const revalidate = 3600; // Revalidate every 1 hour (ISR)
 
 export default async function FacultySection() {
-  noStore();
   const { data: facultyData } = await supabase
     .from("faculty")
     .select("*")

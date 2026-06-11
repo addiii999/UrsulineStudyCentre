@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { AlertTriangle, Info, Check, Calendar } from "lucide-react";
 
-export const revalidate = 0;
+export const revalidate = 300; // Revalidate every 5 minutes (ISR)
 
 export default async function AnnouncementBanner() {
   const today = new Date().toISOString().split("T")[0];

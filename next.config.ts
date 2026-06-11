@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: path.resolve("."),
+  turbopack: {
+    root: path.resolve("."),
+  },
 
   images: {
     // Allow images from all these external sources

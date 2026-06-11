@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
 import { SITE_CONFIG } from "@/config/constants";
 
-export const revalidate = 0;
 
 export async function getGlobalSettings() {
   try {

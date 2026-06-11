@@ -3,7 +3,7 @@ import { ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getGlobalSettings } from "@/lib/settings";
 
-export const revalidate = 0;
+export const revalidate = 3600; // Revalidate every 1 hour (ISR)
 
 // ── Official YouTube SVG icon (white — for use on colored backgrounds) ───────
 const YouTubeIcon = ({ size = 20, white = false }: { size?: number; white?: boolean }) => (
