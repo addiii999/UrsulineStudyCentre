@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { AlertTriangle, Info, Check, Calendar } from "lucide-react";
+import { AlertTriangle, Info, Check } from "lucide-react";
 
 export const revalidate = 300; // Revalidate every 5 minutes (ISR)
 

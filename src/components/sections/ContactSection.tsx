@@ -202,7 +202,7 @@ export default function ContactSection() {
                 </button>
 
                 <p className="text-center text-xs text-gray-400 mt-1">
-                  Your data is safe. We'll never share your information.
+                  Your data is safe. We&apos;ll never share your information.
                 </p>
               </form>
             )}

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
 import { createNotification } from "@/lib/notify";
+import { revalidatePath } from "next/cache";
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function extractVideoId(input: string): string | null {
@@ -118,6 +119,8 @@ export async function POST(req: NextRequest) {
       message: `Video "${(title ?? "").trim() || video_id}" was added to the website.`,
       type:    "video",
     }).catch(() => {});
+    revalidatePath("/videos");
+    revalidatePath("/");
     return NextResponse.json({ video: data }, { status: 201 });
   } catch (err) {
     console.error("[Videos POST] Unexpected:", err);
@@ -154,6 +157,8 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    revalidatePath("/videos");
+    revalidatePath("/");
     return NextResponse.json({ video: data });
   } catch (err) {
     console.error("[Videos PATCH] Unexpected:", err);
@@ -181,6 +186,8 @@ export async function DELETE(req: NextRequest) {
     }
 
     logAudit({ action: "soft_delete", table_name: "videos", item_id: id }).catch(() => {});
+    revalidatePath("/videos");
+    revalidatePath("/");
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[Videos DELETE] Unexpected:", err);

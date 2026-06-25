@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export default function FloatingWhatsApp() {
-  const [isVisible, setIsVisible] = useState(false);
   const [settings, setSettings] = useState(SITE_CONFIG);
 
   useEffect(() => {
@@ -15,11 +14,6 @@ export default function FloatingWhatsApp() {
         }
       })
       .catch(console.error);
-
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 3000);
-    return () => clearTimeout(timer);
   }, []);
 
   return (

@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { createAdminClient, supabase } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
 import { createNotification } from "@/lib/notify";
+import { revalidatePath } from "next/cache";
 
 // ─── GET: Public gallery fetch ────────────────────────────────
 export async function GET() {
@@ -89,6 +90,8 @@ export async function POST(req: NextRequest) {
       type:    "gallery",
     }).catch(() => {});
 
+    revalidatePath("/gallery");
+    revalidatePath("/");
     return NextResponse.json({ item: data }, { status: 201 });
   } catch (err) {
     console.error("Gallery POST error:", err);
@@ -119,6 +122,8 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    revalidatePath("/gallery");
+    revalidatePath("/");
     return NextResponse.json({ item: data });
   } catch (err) {
     console.error("Gallery PATCH error:", err);
@@ -146,6 +151,8 @@ export async function DELETE(req: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     logAudit({ action: "soft_delete", table_name: "gallery", item_id: id }).catch(() => {});
+    revalidatePath("/gallery");
+    revalidatePath("/");
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Gallery DELETE error:", err);

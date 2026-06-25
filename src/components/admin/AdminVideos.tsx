@@ -39,6 +39,7 @@ export default function AdminVideos() {
     }
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchVideos(); }, []);
 
   // ── Extract video ID from URL for preview ────────────────────────────────────

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   try {
@@ -32,6 +33,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) throw error;
+    revalidatePath("/");
     return NextResponse.json(data, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -53,6 +55,7 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) throw error;
+    revalidatePath("/");
     return NextResponse.json(data);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -70,6 +73,7 @@ export async function DELETE(req: NextRequest) {
 
     if (error) throw error;
     logAudit({ action: "soft_delete", table_name: "notices", item_id: id }).catch(() => {});
+    revalidatePath("/");
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase";
 import { checkAdminAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/notify";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   try {
@@ -39,6 +40,8 @@ export async function POST(req: NextRequest) {
       message: `${body.name || "A new faculty member"} (${body.subject || body.designation || ""}) was added to the team.`,
       type:    "faculty",
     }).catch(() => {});
+    revalidatePath("/faculty");
+    revalidatePath("/");
     return NextResponse.json(data, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -60,6 +63,8 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) throw error;
+    revalidatePath("/faculty");
+    revalidatePath("/");
     return NextResponse.json(data);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -77,6 +82,8 @@ export async function DELETE(req: NextRequest) {
 
     if (error) throw error;
     logAudit({ action: "soft_delete", table_name: "faculty", item_id: id }).catch(() => {});
+    revalidatePath("/faculty");
+    revalidatePath("/");
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

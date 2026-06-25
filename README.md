@@ -92,23 +92,15 @@ src/
 │   └── ui/                     # Shared UI elements (WhatsApp button, etc.)
 │
 ├── lib/
-│   ├── supabase/
-│   │   └── client.ts           # Supabase browser and admin clients
-│   ├── auth/
-│   │   └── index.ts            # JWT authentication helpers
-│   ├── validations/
-│   │   └── index.ts            # Zod input validation schemas
-│   └── security/
-│       ├── audit.ts            # Audit log helper
-│       └── rate-limit.ts       # In-memory rate limiting
-│
-├── services/                   # Server-side service layer
-│   ├── email.ts                # Nodemailer email service
-│   ├── notifications.ts        # Admin notification service
-│   └── settings.ts             # Application settings fetcher
-│
-├── config/
-│   └── constants.ts            # Static site configuration and navigation
+│   ├── audit.ts                # Audit log helper
+│   ├── auth.ts                 # JWT authentication helpers
+│   ├── constants.ts            # Static site configuration and navigation
+│   ├── notify.ts               # Admin notification service
+│   ├── rateLimit.ts            # In-memory rate limiting
+│   ├── sendEmail.ts            # Nodemailer email service
+│   ├── settings.ts             # Application settings fetcher
+│   ├── supabase.ts             # Supabase browser and admin clients
+│   └── validation.ts           # Zod input validation schemas
 │
 ├── types/
 │   └── index.ts                # Shared TypeScript interfaces
@@ -274,7 +266,7 @@ See `docs/SECURITY.md` for full security procedures.
 All site content (faculty, courses, gallery, notices, testimonials, results, FAQs, YouTube videos) is managed through the admin panel at `/admin/dashboard`. No code changes are required for content updates.
 
 ### Site Settings
-Key site configuration values (contact details, social links, etc.) can be updated through the Settings section of the admin panel. These are stored in the `settings` table and override the default values in `src/config/constants.ts`.
+Key site configuration values (contact details, social links, etc.) can be updated through the Settings section of the admin panel. These are stored in the `settings` table and override the default values in `src/lib/constants.ts`.
 
 ### Backups
 The admin panel includes a built-in backup tool that exports data as a ZIP archive. Regular weekly backups are recommended. The `WeeklyBackupReminder` component prompts the admin if a backup has not been performed recently.

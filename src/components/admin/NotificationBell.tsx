@@ -51,7 +51,7 @@ function relativeTime(iso: string): string {
 export default function NotificationBell() {
   const [open,          setOpen]          = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading,       setLoading]       = useState(false);
+  const [loading,       setLoading]       = useState(true);
   const [marking,       setMarking]       = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +69,7 @@ export default function NotificationBell() {
 
   // Initial load + polling every 30s
   useEffect(() => {
-    setLoading(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchNotifications().finally(() => setLoading(false));
     const interval = setInterval(fetchNotifications, 30_000);
     return () => clearInterval(interval);
