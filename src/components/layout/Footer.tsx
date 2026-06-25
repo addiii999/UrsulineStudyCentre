@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { GraduationCap, MapPin, Phone, Mail, Play, MessageCircle } from "lucide-react";
+import { MapPin, Phone, Mail, Play, MessageCircle } from "lucide-react";
 import { SITE_CONFIG, NAV_LINKS, MORE_LINKS } from "@/lib/constants";
 import { useState, useEffect } from "react";
 
@@ -18,15 +18,6 @@ export default function Footer() {
       })
       .catch(console.error);
   }, []);
-  const scrollTo = (href: string) => {
-    if (href.startsWith("/#")) {
-      const id = href.replace("/#", "");
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
-    } else {
-      window.location.href = href;
-    }
-  };
 
   return (
     <footer className="bg-[#0D0505] text-white">
@@ -108,22 +99,22 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {NAV_LINKS.map((link) => (
                 <li key={link.label}>
-                  <button
-                    onClick={() => scrollTo(link.href)}
+                  <Link
+                    href={link.href}
                     className="text-white/60 text-sm hover:text-[#C9A84C] transition-colors"
                   >
                     {link.label}
-                  </button>
+                  </Link>
                 </li>
               ))}
               {MORE_LINKS.map((link) => (
                 <li key={link.label}>
-                  <button
-                    onClick={() => scrollTo(link.href)}
+                  <Link
+                    href={link.href}
                     className="text-white/60 text-sm hover:text-[#C9A84C] transition-colors"
                   >
                     {link.label}
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>

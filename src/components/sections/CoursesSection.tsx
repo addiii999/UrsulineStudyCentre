@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { BookOpen, Trophy, Briefcase, Loader2 } from "lucide-react";
 import clsx from "clsx";
 
@@ -26,7 +27,7 @@ const COURSE_ICON: Record<string, React.ReactNode> = {
 // Default categories in specific order
 const CATEGORY_ORDER = ["Academic Streams", "Competitive Exams", "Vocational Skills"];
 
-export default function CoursesSection() {
+export default function CoursesSection({ isPreview = false }: { isPreview?: boolean }) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
@@ -48,10 +49,13 @@ export default function CoursesSection() {
   }, []);
 
   // Group active courses by category
-  const groupedCourses = CATEGORY_ORDER.map(category => ({
-    category,
-    courses: courses.filter(c => c.category === category),
-  })).filter(group => group.courses.length > 0);
+  const groupedCourses = CATEGORY_ORDER.map(category => {
+    const catCourses = courses.filter(c => c.category === category);
+    return {
+      category,
+      courses: isPreview ? catCourses.slice(0, 4) : catCourses,
+    };
+  }).filter(group => group.courses.length > 0);
 
   if (loading) {
     return (
@@ -139,12 +143,12 @@ export default function CoursesSection() {
                 </div>
               </div>
               <div className="mt-4 pt-3 border-t border-gray-100">
-                <button
-                  onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                <Link
+                  href="/contact"
                   className="text-[#C9A84C] text-xs font-semibold hover:text-[#800000] transition-colors"
                 >
                   Enquire Now →
-                </button>
+                </Link>
               </div>
             </div>
           ))}
@@ -156,12 +160,19 @@ export default function CoursesSection() {
             <h4 className="font-bold text-gray-900 text-base mb-1" style={{ fontFamily: "var(--font-serif)" }}>Not sure which course to choose?</h4>
             <p className="text-gray-500 text-sm">Talk to our counselors for guidance.</p>
           </div>
-          <button 
-            onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-            className="btn-primary text-sm whitespace-nowrap"
-          >
-            Request Counseling
-          </button>
+          <div className="flex flex-wrap gap-3">
+            {isPreview && (
+              <Link href="/courses" className="btn-secondary text-sm text-center">
+                View All Courses
+              </Link>
+            )}
+            <Link 
+              href="/contact"
+              className="btn-primary text-sm whitespace-nowrap text-center"
+            >
+              Request Counseling
+            </Link>
+          </div>
         </div>
       </div>
     </section>

@@ -83,20 +83,21 @@ export const FEE_TABLE = [
 ];
 
 export const NAV_LINKS = [
-  { label: "Home", href: "/#hero" },
-  { label: "About", href: "/#about" },
-  { label: "Courses", href: "/#courses" },
-  { label: "Faculty", href: "/#faculty" },
-  { label: "Admission", href: "/#admission" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Courses", href: "/courses" },
+  { label: "Faculty", href: "/faculty" },
+  { label: "Admission", href: "/admission" },
 ];
 
 export const MORE_LINKS = [
-  { label: "Founder", href: "/#founder" },
-  { label: "Gallery", href: "/#gallery" },
-  { label: "Results", href: "/#results" },
-  { label: "Testimonials", href: "/#testimonials" },
-  { label: "YouTube", href: "/#youtube" },
-  { label: "FAQ", href: "/#faq" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Founder", href: "/founder" },
+  { label: "Mission", href: "/mission" },
+  { label: "Gallery", href: "/gallery" },
+  { label: "Results", href: "/results" },
+  { label: "Testimonials", href: "/testimonials" },
+  { label: "YouTube", href: "/videos" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Contact", href: "/contact" },
   { label: "Admin Login", href: "/admin/login" },
 ];

@@ -1,9 +1,10 @@
 import Image from "next/image";
+import Link from "next/link";
 import { BookOpen, GraduationCap, Star } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 export const revalidate = 3600; // Revalidate every 1 hour (ISR)
 
-export default async function FacultySection() {
+export default async function FacultySection({ isPreview = false }: { isPreview?: boolean }) {
   console.log("=== FacultySection: START FETCH ===");
   const { data: facultyData, error } = await supabase
     .from("faculty")
@@ -15,6 +16,7 @@ export default async function FacultySection() {
   console.log("=== FacultySection: END FETCH ===", { count: facultyData?.length, error });
 
   const faculty = facultyData ?? [];
+  const displayedFaculty = isPreview ? faculty.slice(0, 3) : faculty;
 
   if (faculty.length === 0) {
     return (
@@ -53,7 +55,7 @@ export default async function FacultySection() {
 
         {/* FACULTY CARDS */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {faculty.map((member, i) => {
+          {displayedFaculty.map((member, i) => {
             const initials = member.name
               .split(" ")
               .map((w: string) => w[0])
@@ -127,6 +129,17 @@ export default async function FacultySection() {
             );
           })}
         </div>
+
+        {isPreview && (
+          <div className="text-center mt-10">
+            <Link
+              href="/faculty"
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              View All Faculty Members
+            </Link>
+          </div>
+        )}
 
         <div className="text-center mt-8 space-y-1">
           <p className="text-gray-500 text-sm">

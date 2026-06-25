@@ -1,9 +1,10 @@
 import { Star, Quote } from "lucide-react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 export const revalidate = 3600; // Revalidate every 1 hour (ISR)
 
-export default async function TestimonialsSection() {
+export default async function TestimonialsSection({ isPreview = false }: { isPreview?: boolean }) {
   console.log("=== TestimonialsSection: START FETCH ===");
   const { data: testimonialsData, error } = await supabase
     .from("testimonials")
@@ -15,6 +16,7 @@ export default async function TestimonialsSection() {
   console.log("=== TestimonialsSection: END FETCH ===", { count: testimonialsData?.length, error });
 
   const testimonials = testimonialsData ?? [];
+  const displayedTestimonials = isPreview ? testimonials.slice(0, 3) : testimonials;
 
   if (testimonials.length === 0) {
     return (
@@ -50,7 +52,7 @@ export default async function TestimonialsSection() {
 
         {/* TESTIMONIAL GRID */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((t) => {
+          {displayedTestimonials.map((t) => {
             const initials = t.name
               ? t.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
               : "";
@@ -93,6 +95,17 @@ export default async function TestimonialsSection() {
             );
           })}
         </div>
+
+        {isPreview && (
+          <div className="text-center mt-10">
+            <Link
+              href="/testimonials"
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              View All Testimonials
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

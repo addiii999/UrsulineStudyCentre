@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Plus, Minus, Loader2 } from "lucide-react";
 import clsx from "clsx";
 
@@ -10,7 +11,7 @@ interface FAQ {
   is_active: boolean;
 }
 
-export default function FaqSection() {
+export default function FaqSection({ isPreview = false }: { isPreview?: boolean }) {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState<string | null>(null);
@@ -78,7 +79,7 @@ export default function FaqSection() {
 
         {/* ACCORDION */}
         <div className="space-y-3">
-          {faqs.map((faq) => (
+          {(isPreview ? faqs.slice(0, 4) : faqs).map((faq) => (
             <div
               key={faq.id}
               className={clsx(
@@ -114,15 +115,26 @@ export default function FaqSection() {
           ))}
         </div>
 
+        {isPreview && (
+          <div className="text-center mt-8">
+            <Link
+              href="/faq"
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              View All FAQs
+            </Link>
+          </div>
+        )}
+
         <div className="text-center mt-10">
           <p className="text-gray-500 text-sm">
             Have more questions?{" "}
-            <button
-              onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+            <Link
+              href="/contact"
               className="text-[#800000] font-semibold hover:underline"
             >
               Contact us directly
-            </button>
+            </Link>
           </p>
         </div>
       </div>

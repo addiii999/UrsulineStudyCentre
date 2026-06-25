@@ -1,6 +1,8 @@
 "use client";
 import Image from "next/image";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, ChevronDown, Phone, MapPin } from "lucide-react";
 import { SITE_CONFIG, NAV_LINKS, MORE_LINKS } from "@/lib/constants";
 import clsx from "clsx";
@@ -9,9 +11,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("hero");
   const [settings, setSettings] = useState(SITE_CONFIG);
-  const tickingRef = useRef(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     fetch("/api/settings")
@@ -24,49 +25,13 @@ export default function Navbar() {
       .catch(console.error);
   }, []);
 
-  const handleScroll = useCallback(() => {
-    if (!tickingRef.current) {
-      window.requestAnimationFrame(() => {
-        const isScrolled = window.scrollY > 40;
-        setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
-
-        const sectionIds = [
-          "hero", "about", "founder", "courses", "faculty",
-          "why-us", "results", "testimonials", "youtube", "faq", "admission", "contact",
-        ];
-        let current = "hero";
-        for (const id of sectionIds) {
-          const el = document.getElementById(id);
-          if (el) {
-            const top = el.getBoundingClientRect().top;
-            if (top <= 100) current = id;
-          }
-        }
-        setActiveSection(current);
-        tickingRef.current = false;
-      });
-      tickingRef.current = true;
-    }
-  }, []);
-
   useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
-  const scrollTo = (href: string) => {
-    setMobileOpen(false);
-    setMoreOpen(false);
-    if (href.startsWith("/#")) {
-      const id = href.replace("/#", "");
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    } else {
-      window.location.href = href;
-    }
-  };
+  }, []);
 
   return (
     <>
@@ -126,8 +91,9 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-18">
             {/* LEFT: LOGO */}
-            <button
-              onClick={() => scrollTo("/#hero")}
+            <Link
+              href="/"
+              onClick={() => setMobileOpen(false)}
               className="flex items-center gap-3 group flex-shrink-0 text-left"
             >
               <Image
@@ -146,17 +112,16 @@ export default function Navbar() {
                   Under the Visionary Guidance of Sr. Dr. Mary Grace
                 </span>
               </div>
-            </button>
+            </Link>
 
             {/* CENTER: NAV LINKS (Desktop) */}
             <div className="hidden lg:flex items-center gap-1">
               {NAV_LINKS.map((link) => {
-                const sectionId = link.href.replace("/#", "");
-                const isActive = activeSection === sectionId;
+                const isActive = pathname === link.href;
                 return (
-                  <button
+                  <Link
                     key={link.label}
-                    onClick={() => scrollTo(link.href)}
+                    href={link.href}
                     className={clsx(
                       "px-3.5 py-2 text-sm font-medium rounded-md transition-all duration-200",
                       isActive
@@ -165,7 +130,7 @@ export default function Navbar() {
                     )}
                   >
                     {link.label}
-                  </button>
+                  </Link>
                 );
               })}
 
@@ -183,15 +148,24 @@ export default function Navbar() {
                 </button>
                 {moreOpen && (
                   <div className="absolute top-full left-0 mt-1 w-44 bg-white rounded-xl shadow-xl border border-[#f0ebe0] py-1.5 z-50">
-                    {MORE_LINKS.map((link) => (
-                      <button
-                        key={link.label}
-                        onClick={() => scrollTo(link.href)}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:text-[#800000] hover:bg-[#800000]/5 transition-colors"
-                      >
-                        {link.label}
-                      </button>
-                    ))}
+                    {MORE_LINKS.map((link) => {
+                      const isActive = pathname === link.href;
+                      return (
+                        <Link
+                          key={link.label}
+                          href={link.href}
+                          onClick={() => setMoreOpen(false)}
+                          className={clsx(
+                            "block w-full text-left px-4 py-2 text-sm transition-colors",
+                            isActive
+                              ? "text-[#800000] bg-[#800000]/5 font-semibold"
+                              : "text-gray-700 hover:text-[#800000] hover:bg-[#800000]/5"
+                          )}
+                        >
+                          {link.label}
+                        </Link>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -199,18 +173,18 @@ export default function Navbar() {
 
             {/* RIGHT: CTA BUTTONS */}
             <div className="hidden lg:flex items-center gap-4">
-              <button
-                onClick={() => scrollTo("/admin/login")}
+              <Link
+                href="/admin/login"
                 className="text-xs font-semibold text-gray-500 hover:text-[#800000] transition-colors"
               >
                 Admin
-              </button>
-              <button
-                onClick={() => scrollTo("/#contact")}
-                className="btn-primary text-sm py-2 px-4"
+              </Link>
+              <Link
+                href="/contact"
+                className="btn-primary text-sm py-2 px-4 text-center"
               >
                 Book Free Counselling
-              </button>
+              </Link>
             </div>
 
             {/* MOBILE MENU TOGGLE */}
@@ -228,28 +202,39 @@ export default function Navbar() {
         {mobileOpen && (
           <div className="lg:hidden bg-white border-t border-[#f0ebe0] shadow-lg">
             <div className="px-4 py-4 space-y-1">
-              {[...NAV_LINKS, ...MORE_LINKS].map((link) => (
-                <button
-                  key={link.label}
-                  onClick={() => scrollTo(link.href)}
-                  className="w-full text-left px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-[#800000] hover:bg-[#800000]/5 rounded-lg transition-colors"
-                >
-                  {link.label}
-                </button>
-              ))}
+              {[...NAV_LINKS, ...MORE_LINKS].map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={clsx(
+                      "block w-full text-left px-3 py-2.5 text-sm font-medium rounded-lg transition-colors",
+                      isActive
+                        ? "text-[#800000] bg-[#800000]/5 font-semibold"
+                        : "text-gray-700 hover:text-[#800000] hover:bg-[#800000]/5"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
               <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
-                <button
-                  onClick={() => scrollTo("/admin/login")}
+                <Link
+                  href="/admin/login"
+                  onClick={() => setMobileOpen(false)}
                   className="w-full text-center py-2 text-xs font-semibold text-gray-500 hover:text-[#800000] transition-colors"
                 >
                   Admin Login
-                </button>
-                <button
-                  onClick={() => scrollTo("/#contact")}
-                  className="btn-primary justify-center text-sm"
+                </Link>
+                <Link
+                  href="/contact"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-primary justify-center text-sm text-center"
                 >
                   Book Free Counselling
-                </button>
+                </Link>
               </div>
             </div>
           </div>

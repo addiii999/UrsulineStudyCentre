@@ -1,5 +1,6 @@
 import { MapPin, Building, Users, BookOpen, Languages } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
+import Link from "next/link";
 
 const INFO_CHIPS = [
   { icon: <MapPin size={14} className="text-[#C9A84C]" />, label: "Ursuline Convent Campus, Ranchi" },
@@ -9,7 +10,7 @@ const INFO_CHIPS = [
   { icon: <Languages size={14} className="text-[#C9A84C]" />, label: "English + Hindi" },
 ];
 
-export default function AboutSection() {
+export default function AboutSection({ isPreview = false }: { isPreview?: boolean }) {
   return (
     <section id="about" className="py-14 md:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -56,6 +57,17 @@ export default function AboutSection() {
                 </div>
               ))}
             </div>
+
+            {isPreview && (
+              <div className="pt-4 text-left">
+                <Link
+                  href="/about"
+                  className="btn-primary text-sm inline-flex items-center gap-2"
+                >
+                  Read Full About Us
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* RIGHT: VISUAL */}

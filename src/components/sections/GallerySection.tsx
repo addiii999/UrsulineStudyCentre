@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { X, ChevronLeft, ChevronRight, ImagePlus, ZoomIn } from "lucide-react";
 
@@ -120,7 +121,7 @@ function GallerySkeleton() {
 }
 
 // ─── MAIN SECTION ─────────────────────────────────────────────
-export default function GallerySection() {
+export default function GallerySection({ isPreview = false }: { isPreview?: boolean }) {
   const [items,      setItems]      = useState<GalleryItem[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
@@ -157,37 +158,50 @@ export default function GallerySection() {
         {loading ? (
           <GallerySkeleton />
         ) : (
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-            {items.map((item, idx) => (
-              <div
-                key={item.id}
-                className="break-inside-avoid group relative cursor-pointer rounded-2xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-xl transition-shadow duration-300"
-                onClick={() => setLightboxIdx(idx)}
-              >
-                <div className="relative w-full" style={{ aspectRatio: idx % 4 === 0 ? "1/1" : idx % 4 === 1 ? "4/3" : idx % 4 === 2 ? "3/4" : "16/9" }}>
-                  <Image
-                    src={item.image_url}
-                    alt={item.title || "USC Campus"}
-                    fill
-                    loading="lazy"
-                    quality={75}
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                </div>
+          <>
+            <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+              {(isPreview ? items.slice(0, 8) : items).map((item, idx) => (
+                <div
+                  key={item.id}
+                  className="break-inside-avoid group relative cursor-pointer rounded-2xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-xl transition-shadow duration-300"
+                  onClick={() => setLightboxIdx(idx)}
+                >
+                  <div className="relative w-full" style={{ aspectRatio: idx % 4 === 0 ? "1/1" : idx % 4 === 1 ? "4/3" : idx % 4 === 2 ? "3/4" : "16/9" }}>
+                    <Image
+                      src={item.image_url}
+                      alt={item.title || "USC Campus"}
+                      fill
+                      loading="lazy"
+                      quality={75}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  </div>
 
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-4">
-                  {item.title && (
-                    <p className="text-white text-[12px] font-semibold leading-tight drop-shadow">{item.title}</p>
-                  )}
-                  <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center ml-auto flex-shrink-0">
-                    <ZoomIn size={14} className="text-white" />
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-4">
+                    {item.title && (
+                      <p className="text-white text-[12px] font-semibold leading-tight drop-shadow">{item.title}</p>
+                    )}
+                    <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center ml-auto flex-shrink-0">
+                      <ZoomIn size={14} className="text-white" />
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {isPreview && (
+              <div className="text-center mt-10">
+                <Link
+                  href="/gallery"
+                  className="btn-primary inline-flex items-center gap-2"
+                >
+                  View All Gallery
+                </Link>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
 
         {/* Empty state (for logged-in admin visit) */}

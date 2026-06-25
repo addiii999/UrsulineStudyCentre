@@ -1,8 +1,9 @@
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 export const revalidate = 3600; // Revalidate every 1 hour (ISR)
 
-export default async function ResultsSection() {
+export default async function ResultsSection({ isPreview = false }: { isPreview?: boolean }) {
   console.log("=== ResultsSection: START FETCH ===");
   const { data: statsData, error } = await supabase
     .from("results")
@@ -14,6 +15,7 @@ export default async function ResultsSection() {
   console.log("=== ResultsSection: END FETCH ===", { count: statsData?.length, error });
 
   const stats = statsData ?? [];
+  const displayedStats = isPreview ? stats.slice(0, 4) : stats;
 
   if (stats.length === 0) {
     return (
@@ -71,7 +73,7 @@ export default async function ResultsSection() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat) => (
+          {displayedStats.map((stat) => (
             <div
               key={stat.id}
               className="text-center p-6 rounded-2xl bg-white/8 border border-white/10 hover:bg-white/12 transition-colors relative"
@@ -89,6 +91,17 @@ export default async function ResultsSection() {
             </div>
           ))}
         </div>
+
+        {isPreview && (
+          <div className="text-center mt-10">
+            <Link
+              href="/results"
+              className="btn-primary inline-flex items-center gap-2 bg-[#C9A84C] text-[#800000] border-[#C9A84C] hover:bg-white hover:border-white transition-colors"
+            >
+              View Detailed Results
+            </Link>
+          </div>
+        )}
 
         <div className="mt-8 bg-white/5 border border-white/10 rounded-2xl p-5 md:p-6 text-center max-w-4xl mx-auto flex flex-col items-center gap-4">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-[#C9A84C]/30 text-white/90 text-[11px] md:text-xs font-semibold px-4 py-1.5 rounded-full tracking-wider uppercase">

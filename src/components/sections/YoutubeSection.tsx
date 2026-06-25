@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getGlobalSettings } from "@/lib/settings";
@@ -16,18 +17,23 @@ const YouTubeIcon = ({ size = 20, white = false }: { size?: number; white?: bool
   </svg>
 );
 
-export default async function YoutubeSection() {
+export default async function YoutubeSection({ isPreview = false }: { isPreview?: boolean }) {
   const settings = await getGlobalSettings();
   
   console.log("=== YoutubeSection: START FETCH ===");
-  const { data: videosData, error } = await supabase
+  let query = supabase
     .from("youtube_videos")
     .select("*")
     .eq("is_deleted", false)
     .eq("is_active", true)
     .order("display_order", { ascending: true })
-    .order("created_at", { ascending: false })
-    .limit(4);
+    .order("created_at", { ascending: false });
+
+  if (isPreview) {
+    query = query.limit(4);
+  }
+
+  const { data: videosData, error } = await query;
   console.log("=== YoutubeSection: END FETCH ===", { count: videosData?.length, error });
 
   const videos = videosData ?? [];
@@ -117,6 +123,17 @@ export default async function YoutubeSection() {
                 </div>
               </a>
             ))}
+          </div>
+        )}
+
+        {isPreview && (
+          <div className="text-center mb-8">
+            <Link
+              href="/videos"
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              View All Videos
+            </Link>
           </div>
         )}
 

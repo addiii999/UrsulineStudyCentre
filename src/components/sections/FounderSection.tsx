@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { Award, Users, BookOpen, Target, ArrowRight, Quote } from "lucide-react";
 
 const ACHIEVEMENTS = [
@@ -9,7 +10,7 @@ const ACHIEVEMENTS = [
   { icon: <BookOpen size={18} className="text-[#C9A84C]" />, value: "Mission", label: "Girls' Education" },
 ];
 
-export default function FounderSection() {
+export default function FounderSection({ isPreview = false }: { isPreview?: boolean }) {
   return (
     <section id="founder" className="py-20 md:py-28 bg-[#FDF8F0] relative overflow-hidden">
 
@@ -147,14 +148,22 @@ export default function FounderSection() {
             </div>
 
             {/* CTA */}
-            <div className="pt-2">
-              <button
-                onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-                className="group relative inline-flex items-center gap-3 bg-[#800000] text-white px-8 py-4 rounded-xl font-semibold text-[14px] overflow-hidden transition-all hover:bg-[#600000] hover:shadow-[0_8px_20px_rgb(128,0,0,0.2)] active:scale-[0.98]"
+            <div className="pt-2 flex flex-wrap gap-4">
+              <Link
+                href="/contact"
+                className="group relative inline-flex items-center gap-3 bg-[#800000] text-white px-8 py-4 rounded-xl font-semibold text-[14px] overflow-hidden transition-all hover:bg-[#600000] hover:shadow-[0_8px_20px_rgb(128,0,0,0.2)] active:scale-[0.98] text-center justify-center"
               >
                 <span className="relative z-10">Book a Counselling Session</span>
                 <ArrowRight size={18} className="relative z-10 transition-transform duration-300 group-hover:translate-x-1" />
-              </button>
+              </Link>
+              {isPreview && (
+                <Link
+                  href="/founder"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-[#800000] font-bold text-sm rounded-xl border border-[#800000]/30 hover:border-[#800000] hover:bg-[#800000]/5 transition-all duration-300"
+                >
+                  Read Full Message
+                </Link>
+              )}
             </div>
 
           </div>
