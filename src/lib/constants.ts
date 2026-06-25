@@ -24,6 +24,7 @@ export const SITE_CONFIG = {
   youtubeChannel: "https://youtube.com/@academicorigin",
   establishedYear: "2026",
   sessionYear: "2026-27",
+  admissionsOpen: "true",
 };
 
 export const STATS: { value: string; label: string; }[] = [];

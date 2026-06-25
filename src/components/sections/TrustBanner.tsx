@@ -7,7 +7,7 @@ export default async function TrustBanner() {
   const settings = await getGlobalSettings();
 
   // If admissions are closed, don't show the banner
-  if (settings.admissionsOpen === "false" || settings.admissionsOpen === false) {
+  if (String(settings.admissionsOpen) === "false") {
     return null;
   }
 
