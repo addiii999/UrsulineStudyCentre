@@ -51,7 +51,7 @@ export default function HeroSection() {
         )}
 
         <div className="space-y-4 mb-7 mt-2">
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-bold text-white tracking-tight leading-[1.05]">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-bold text-white tracking-tight leading-[1.05] uppercase">
             Ursuline{" "}
             <span className="text-[#C9A84C]">Study Centre</span>
           </h1>
