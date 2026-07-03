@@ -5,8 +5,8 @@
 
 export const SITE_CONFIG = {
   name: "Ursuline Study Centre",
-  tagline: "Empowering Girls. Building Futures.",
-  taglineHindi: "बेटियों का भविष्य, हमारी ज़िम्मेदारी",
+  tagline: "Empowering Students. Building Futures.",
+  taglineHindi: "हर विद्यार्थी का भविष्य, हमारी ज़िम्मेदारी",
   motto: "ज्ञान · अनुशासन · सफलता",
   phone: "+91 95075 89503",
   phone2: "+91 62025 78886",
@@ -35,8 +35,8 @@ export const FACULTY: unknown[] = [];
 export const WHY_CHOOSE_US = [
   {
     icon: "shield",
-    title: "Girls-Only Safe Campus",
-    desc: "100% girls-only environment providing a secure, distraction-free learning space focused on academic excellence.",
+    title: "Safe & Disciplined Campus",
+    desc: "A secure, distraction-free learning environment on the prestigious Ursuline Convent Campus, focused on academic excellence for every student.",
   },
   {
     icon: "book",

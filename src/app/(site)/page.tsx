@@ -15,9 +15,9 @@ import type { Metadata } from "next";
 export const revalidate = 300; // Revalidate every 5 minutes (ISR)
 
 export const metadata: Metadata = {
-  title: "Ursuline Study Centre | Premium Girls Educational Institution in Ranchi",
+  title: "Ursuline Study Centre | Premium Educational Institution in Ranchi",
   description:
-    "Ursuline Study Centre - Premium girls-only educational institution in Ranchi for Classes 9-12, JEE, NEET & Board preparation (JAC & CBSE). Under the visionary guidance of Sr. Dr. Mary Grace.",
+    "Ursuline Study Centre - Premium educational institution in Ranchi for Classes 9-12, JEE, NEET & Board preparation (JAC & CBSE). Under the visionary guidance of Sr. Dr. Mary Grace.",
   alternates: {
     canonical: "https://ursulinstudycentre.in/",
   },
@@ -52,11 +52,11 @@ export default function HomePage() {
             Admissions Open 2026-27
           </span>
           <h2 className="text-3xl md:text-4xl font-bold font-serif">
-            Empower Your Daughter&apos;s Academic Future
+            Shape Your Child&apos;s Academic Future
           </h2>
           <div className="w-16 h-[2px] bg-[#C9A84C] mx-auto opacity-70" />
           <p className="text-white/80 max-w-xl mx-auto text-sm leading-relaxed font-light">
-            Join Ranchi&apos;s premium girls-only institution. Read about our step-by-step admission process, stream selections, and fee structure.
+            Join Ranchi&apos;s premium institution. Read about our step-by-step admission process, stream selections, and fee structure.
           </p>
           <div className="pt-2">
             <Link

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Our Courses | Ursuline Study Centre",
   description:
-    "Explore our comprehensive academic streams, competitive exams prep (JEE/NEET/CLAT), and future-ready vocational skills courses for girls in Ranchi.",
+    "Explore our comprehensive academic streams, competitive exams prep (JEE/NEET/CLAT), and future-ready vocational skills courses in Ranchi.",
   alternates: {
     canonical: "https://ursulinstudycentre.in/courses",
   },

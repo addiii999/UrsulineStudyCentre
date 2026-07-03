@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const ADMISSION_FAQS = [
   {
     q: "Who is eligible to apply for courses at Ursuline Study Centre?",
-    a: "Girls studying in Class 9, 10, 11, or 12 under JAC (Jharkhand Academic Council) or CBSE boards are eligible to join. We also welcome students who have completed Class 10 or 12 looking for dedicated JEE/NEET entrance preparation.",
+    a: "Students studying in Class 9, 10, 11, or 12 under JAC (Jharkhand Academic Council) or CBSE boards are eligible to join. We also welcome students who have completed Class 10 or 12 looking for dedicated JEE/NEET entrance preparation.",
   },
   {
     q: "Is there an entrance test for admission?",

@@ -99,7 +99,7 @@ export default function CoursesSection({ isPreview = false }: { isPreview?: bool
           </h2>
           <div className="gold-divider mx-auto mt-3" />
           <p className="section-subheading mx-auto mt-3">
-            Comprehensive learning programs designed specifically for girls, focusing on
+            Comprehensive learning programs designed for every student, focusing on
             academic excellence and holistic development.
           </p>
         </div>

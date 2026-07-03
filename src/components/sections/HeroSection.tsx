@@ -62,10 +62,10 @@ export default function HeroSection() {
 
         <div className="space-y-4 max-w-2xl mx-auto mb-8">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-white/95 tracking-wide">
-            Empowering Girls. Building Futures.
+            Empowering Students. Building Futures.
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-white/70 leading-relaxed font-light">
-            Girls-only educational institution for Classes 9–12 (JAC & CBSE) with JEE/NEET preparation.
+            Premium educational institution for Classes 9–12 (JAC &amp; CBSE) with JEE/NEET preparation.
           </p>
         </div>
 

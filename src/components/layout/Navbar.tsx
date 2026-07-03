@@ -45,7 +45,7 @@ export default function Navbar() {
             </span>
             <span className="opacity-70 glow float-text">|</span>
             <span className="text-[#E5C97A] font-semibold">
-              100% Girls-Only Premium Institution
+              Premium Educational Institution
             </span>
           </div>
           <div className="flex items-center gap-6">

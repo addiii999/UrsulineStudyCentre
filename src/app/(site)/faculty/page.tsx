@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Expert Faculty | Ursuline Study Centre",
   description:
-    "Meet our highly qualified and experienced faculty members dedicated exclusively to building strong foundations and girls' academic excellence in Ranchi.",
+    "Meet our highly qualified and experienced faculty members dedicated to building strong academic foundations and student excellence in Ranchi.",
   alternates: {
     canonical: "https://ursulinstudycentre.in/faculty",
   },

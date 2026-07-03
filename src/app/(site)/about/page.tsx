@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About Us | Ursuline Study Centre",
   description:
-    "Learn about Ursuline Study Centre, a premium girls-only educational institution in Ranchi. Under the visionary guidance of Sr. Dr. Mary Grace.",
+    "Learn about Ursuline Study Centre, a premium educational institution in Ranchi. Under the visionary guidance of Sr. Dr. Mary Grace.",
   alternates: {
     canonical: "https://ursulinstudycentre.in/about",
   },
@@ -43,10 +43,10 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold text-[#800000] font-serif">Our Legacy</h2>
               <div className="w-10 h-[2px] bg-[#C9A84C]" />
               <p className="text-gray-600 text-sm leading-relaxed pt-2">
-                Ursuline Study Centre was established with the vision of offering high-quality, comprehensive educational mentorship specifically tailored for girls. Situated in the historic Ursuline Convent Campus in Ranchi, Jharkhand, our roots are deeply intertwined with the region&apos;s educational advancement.
+                Ursuline Study Centre was established with the vision of offering high-quality, comprehensive educational mentorship for every aspiring student. Situated in the historic Ursuline Convent Campus in Ranchi, Jharkhand, our roots are deeply intertwined with the region&apos;s educational advancement.
               </p>
               <p className="text-gray-600 text-sm leading-relaxed">
-                By bridging board curricula (JAC & CBSE) with competitive entrance prep (JEE & NEET), we provide a smooth transition for girls targeting elite engineering and medical seats nationwide.
+                By bridging board curricula (JAC & CBSE) with competitive entrance prep (JEE & NEET), we provide a smooth transition for students targeting elite engineering and medical seats nationwide.
               </p>
             </div>
 
@@ -55,12 +55,12 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold text-[#800000] font-serif">Campus Infrastructure</h2>
               <div className="w-10 h-[2px] bg-[#C9A84C]" />
               <p className="text-gray-600 text-sm leading-relaxed pt-2">
-                Our campus features modern classroom environments designed to be secure and nurturing. We ensure a disciplined study setting, enabling young women to focus entirely on academic learning.
+                Our campus features modern classroom environments designed to be secure and nurturing. We ensure a disciplined study setting, enabling every student to focus entirely on academic learning.
               </p>
               <ul className="space-y-2 text-gray-600 text-sm pt-2">
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C]" />
-                  Secure, girls-only convent environment
+                  Secure, disciplined convent campus environment
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C]" />

@@ -5,7 +5,7 @@ import Link from "next/link";
 const INFO_CHIPS = [
   { icon: <MapPin size={14} className="text-[#C9A84C]" />, label: "Ursuline Convent Campus, Ranchi" },
   { icon: <Building size={14} className="text-[#C9A84C]" />, label: `Estd. ${SITE_CONFIG.founded}` },
-  { icon: <Users size={14} className="text-[#C9A84C]" />, label: "Only Girls" },
+  { icon: <Users size={14} className="text-[#C9A84C]" />, label: "All Students Welcome" },
   { icon: <BookOpen size={14} className="text-[#C9A84C]" />, label: "JAC + CBSE" },
   { icon: <Languages size={14} className="text-[#C9A84C]" />, label: "English + Hindi" },
 ];
@@ -23,16 +23,16 @@ export default function AboutSection({ isPreview = false }: { isPreview?: boolea
             <h2 className="section-heading">
               A New Standard for
               <br />
-              <span className="text-[#800000]">Girls&apos; Education</span> in Ranchi
+              <span className="text-[#800000]">Academic Excellence</span> in Ranchi
             </h2>
             <div className="gold-divider" />
             <div className="space-y-4 text-gray-600 leading-relaxed">
               <p>
-                <strong className="text-gray-900">Ursuline Study Centre</strong> is a premium,
-                girls-only academic educational institution located in the heart of Ranchi, Jharkhand.
+                <strong className="text-gray-900">Ursuline Study Centre</strong> is a premium
+                academic educational institution located in the heart of Ranchi, Jharkhand.
                 Established in {SITE_CONFIG.founded} under the visionary guidance of{" "}
                 <strong className="text-[#800000]">Sr. Dr. Mary Grace</strong>, we are committed
-                to providing world-class education to young girls of Jharkhand.
+                to providing world-class education to every student of Jharkhand.
               </p>
               <p>
                 Situated at the Ursuline Convent Campus on Dr. Camil Bulcke Path, our institute offers a
@@ -82,7 +82,7 @@ export default function AboutSection({ isPreview = false }: { isPreview?: boolea
                   Our Mission
                 </div>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                  To empower every girl with knowledge, discipline, and confidence - creating leaders
+                  To empower every student with knowledge, discipline, and confidence - creating leaders
                   who will shape the future of Jharkhand and India.
                 </p>
               </div>
@@ -95,7 +95,7 @@ export default function AboutSection({ isPreview = false }: { isPreview?: boolea
                   Our Vision
                 </div>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                  To be Ranchi&apos;s most trusted and premium girls-only educational institution, known
+                  To be Ranchi&apos;s most trusted and premium educational institution, known
                   for academic excellence, character building, and career guidance.
                 </p>
               </div>

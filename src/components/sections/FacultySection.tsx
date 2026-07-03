@@ -48,7 +48,7 @@ export default async function FacultySection({ isPreview = false }: { isPreview?
           </h2>
           <div className="gold-divider mx-auto mt-4" />
           <p className="section-subheading mx-auto mt-4">
-            Highly qualified, experienced faculty dedicated exclusively to girls&apos; academic
+            Highly qualified, experienced faculty dedicated to student academic
             excellence.
           </p>
         </div>
@@ -143,7 +143,7 @@ export default async function FacultySection({ isPreview = false }: { isPreview?
 
         <div className="text-center mt-8 space-y-1">
           <p className="text-gray-500 text-sm">
-            All faculty members are subject matter experts with a passion for girls&apos; education.
+            All faculty members are subject matter experts with a passion for education and student success.
           </p>
           <p className="text-[#800000]/60 text-sm font-medium">शिक्षा ही सशक्त भविष्य की नींव है</p>
         </div>

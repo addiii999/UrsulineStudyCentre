@@ -114,7 +114,7 @@ export default async function ResultsSection({ isPreview = false }: { isPreview?
 
         <div className="text-center mt-8 pt-6 border-t border-white/10">
           <p className="text-white/50 text-sm italic">
-            &ldquo;Our results are not just numbers - they are the dreams of thousands of girls
+            &ldquo;Our results are not just numbers - they are the dreams of thousands of students
             fulfilled.&rdquo;
           </p>
           <p className="text-[#C9A84C] text-xs mt-2">- Abhishek Pathak, Founder</p>

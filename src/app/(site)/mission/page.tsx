@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Mission, Vision & Values | Ursuline Study Centre",
   description:
-    "Explore our core institutional mission, vision, and values (ज्ञान, अनुशासन, सफलता) guiding girls' academic excellence at Ursuline Study Centre Ranchi.",
+    "Explore our core institutional mission, vision, and values (ज्ञान, अनुशासन, सफलता) guiding academic excellence at Ursuline Study Centre Ranchi.",
   alternates: {
     canonical: "https://ursulinstudycentre.in/mission",
   },
@@ -42,7 +42,7 @@ export default function MissionPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-[#800000] font-serif">Our Mission</h2>
                 <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-                  To empower every young girl with deep conceptual knowledge, academic discipline, and self-confidence. We strive to nurture leaders who will shape the socio-economic and technological future of Jharkhand and the nation by making elite educational resources accessible.
+                  To empower every student with deep conceptual knowledge, academic discipline, and self-confidence. We strive to nurture leaders who will shape the socio-economic and technological future of Jharkhand and the nation by making elite educational resources accessible.
                 </p>
               </div>
             </div>
@@ -55,7 +55,7 @@ export default function MissionPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-[#800000] font-serif">Our Vision</h2>
                 <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-                  To be recognized as Ranchi&apos;s most trusted and premier girls-only educational institution. We aim to establish a gold standard in board exam scores and national entrance clearances (JEE/NEET/CLAT) while emphasizing character building, moral values, and active career guidance.
+                  To be recognized as Ranchi&apos;s most trusted and premier educational institution. We aim to establish a gold standard in board exam scores and national entrance clearances (JEE/NEET/CLAT) while emphasizing character building, moral values, and active career guidance.
                 </p>
               </div>
             </div>

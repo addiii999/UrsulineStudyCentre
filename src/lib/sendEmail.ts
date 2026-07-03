@@ -142,7 +142,7 @@ export async function sendStudentAutoReply(
       <div class="container">
         <div class="header">
           <h1>🎓 Ursuline Study Centre</h1>
-          <p>Empowering Girls. Building Futures.</p>
+          <p>Empowering Students. Building Futures.</p>
         </div>
         <div class="body">
           <h2 style="color:#800000; margin-top:0;">Dear ${studentName},</h2>
@@ -159,7 +159,7 @@ export async function sendStudentAutoReply(
           </div>
         </div>
         <div class="footer">
-          <p>Ursuline Study Centre · 100% Girls-Only Premium Institution</p>
+          <p>Ursuline Study Centre · Premium Educational Institution</p>
         </div>
       </div>
     </body>

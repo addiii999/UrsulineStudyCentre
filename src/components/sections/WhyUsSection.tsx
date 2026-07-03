@@ -43,10 +43,10 @@ export default function WhyUsSection() {
           </h2>
           <div className="gold-divider mx-auto mt-4" />
           <p className="text-white/60 text-sm mt-4 max-w-xl mx-auto leading-relaxed">
-            Six compelling reasons why top-performing girls choose Ursuline Study Centre.
+            Six compelling reasons why top-performing students choose Ursuline Study Centre.
           </p>
           <p className="text-[#C9A84C]/70 text-sm mt-1 font-medium">
-            आपकी बेटी का भविष्य सुरक्षित हाथों में
+            आपके बच्चे का भविष्य सुरक्षित हाथों में
           </p>
         </div>
 

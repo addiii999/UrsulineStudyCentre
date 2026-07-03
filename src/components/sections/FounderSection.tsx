@@ -7,7 +7,7 @@ const ACHIEVEMENTS = [
   { icon: <Users size={18} className="text-[#C9A84C]" />, value: "5000+", label: "Students Guided" },
   { icon: <Target size={18} className="text-[#C9A84C]" />, value: "JEE/NEET", label: "Expert Mentorship" },
   { icon: <Award size={18} className="text-[#C9A84C]" />, value: "10+", label: "Years Experience" },
-  { icon: <BookOpen size={18} className="text-[#C9A84C]" />, value: "Mission", label: "Girls' Education" },
+  { icon: <BookOpen size={18} className="text-[#C9A84C]" />, value: "Mission", label: "Quality Education" },
 ];
 
 export default function FounderSection({ isPreview = false }: { isPreview?: boolean }) {
@@ -86,9 +86,9 @@ export default function FounderSection({ isPreview = false }: { isPreview?: bool
                 unparalleled depth, clarity, and passion to every classroom.
               </p>
               <p>
-                Driven by a deep commitment to <strong className="text-[#800000] font-semibold">girls&apos; education</strong>, he founded
-                Ursuline Study Centre to create a world-class academic environment exclusively for
-                young women. His philosophy centers on building strong fundamentals while developing 
+                Driven by a deep commitment to <strong className="text-[#800000] font-semibold">quality education</strong>, he founded
+                Ursuline Study Centre to create a world-class academic environment for
+                every aspiring student. His philosophy centers on building strong fundamentals while developing 
                 problem-solving instincts—the exact skills that guarantee success in competitive exams.
               </p>
             </div>
