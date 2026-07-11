@@ -51,9 +51,27 @@ export default function HeroSection() {
         )}
 
         <div className="space-y-4 mb-7 mt-2">
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-bold text-white tracking-tight leading-[1.05] uppercase flex flex-col items-center">
-            <span>Ursuline</span>
-            <span className="text-[#C9A84C]">Study Centre</span>
+          <h1 className="flex flex-col items-center uppercase tracking-tight" style={{ lineHeight: 1 }}>
+            {/* LINE 1 — Dominant brand name */}
+            <span className="text-[72px] sm:text-[96px] md:text-[120px] lg:text-[144px] font-bold text-white block" style={{ letterSpacing: "-0.02em", lineHeight: 1 }}>
+              Ursuline
+            </span>
+
+            {/* LINE 2 — Secondary with decorative lines */}
+            <span className="flex items-center justify-center gap-2 sm:gap-3 mt-1 w-full">
+              {/* Left decorative line */}
+              <span className="hidden sm:block h-[1.5px] bg-[#C9A84C] opacity-70 flex-1 max-w-[60px] md:max-w-[90px]" />
+
+              <span
+                className="text-[38px] sm:text-[52px] md:text-[64px] lg:text-[76px] font-bold text-[#C9A84C] whitespace-nowrap"
+                style={{ letterSpacing: "0.06em", lineHeight: 1 }}
+              >
+                Study Centre
+              </span>
+
+              {/* Right decorative line */}
+              <span className="hidden sm:block h-[1.5px] bg-[#C9A84C] opacity-70 flex-1 max-w-[60px] md:max-w-[90px]" />
+            </span>
           </h1>
           <p className="text-xs sm:text-sm md:text-[15px] font-medium text-[#C9A84C]/90 tracking-[0.2em] uppercase">
             Under the Visionary Guidance of Sr. Dr. Mary Grace
