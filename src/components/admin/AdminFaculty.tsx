@@ -7,9 +7,6 @@ const FACULTY_CATEGORIES = [
   "Science",
   "Commerce",
   "Humanities",
-  "Competitive Exams",
-  "Vocational",
-  "Other",
 ] as const;
 
 interface FacultyMember {
@@ -31,7 +28,7 @@ export default function AdminFaculty() {
   const [uploading, setUploading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", subject: "", qualification: "", experience: "", designation: "", faculty_category: "Other", photo_url: "" });
+  const [form, setForm] = useState({ name: "", subject: "", qualification: "", experience: "", designation: "", faculty_category: "Science", photo_url: "" });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -110,7 +107,7 @@ export default function AdminFaculty() {
         toast.success("Faculty added");
       }
       fetchFaculty();
-      setForm({ name: "", subject: "", qualification: "", experience: "", designation: "", faculty_category: "Other", photo_url: "" });
+      setForm({ name: "", subject: "", qualification: "", experience: "", designation: "", faculty_category: "Science", photo_url: "" });
       setShowForm(false);
     } catch (err: any) {
       toast.error(err?.message || "Failed to save faculty");
@@ -126,7 +123,7 @@ export default function AdminFaculty() {
       qualification: f.qualification, 
       experience: f.experience, 
       designation: f.designation,
-      faculty_category: f.faculty_category || "Other",
+      faculty_category: f.faculty_category || "Science",
       photo_url: f.photo_url || "" 
     });
     setEditId(f.id);
@@ -170,7 +167,7 @@ export default function AdminFaculty() {
           <h2 className="font-bold text-gray-900 text-lg" style={{ fontFamily: "var(--font-serif)" }}>Faculty Management</h2>
           <p className="text-gray-400 text-xs">Manage teaching staff and profiles</p>
         </div>
-        <button onClick={() => { setShowForm(true); setEditId(null); setForm({ name: "", subject: "", qualification: "", experience: "", designation: "", faculty_category: "Other", photo_url: "" }); }} className="btn-primary text-sm py-2">
+        <button onClick={() => { setShowForm(true); setEditId(null); setForm({ name: "", subject: "", qualification: "", experience: "", designation: "", faculty_category: "Science", photo_url: "" }); }} className="btn-primary text-sm py-2">
           <Plus size={15} /> Add Faculty
         </button>
       </div>
@@ -336,7 +333,7 @@ export default function AdminFaculty() {
                   <div className="col-span-2">
                     <p className="text-[10px] text-gray-400 font-medium uppercase">Category</p>
                     <span className="inline-block mt-0.5 px-2 py-0.5 bg-[#800000]/10 text-[#800000] text-[10px] font-bold uppercase tracking-wider rounded-full">
-                      {f.faculty_category || "Other"}
+                      {f.faculty_category || "Science"}
                     </span>
                   </div>
                 </div>

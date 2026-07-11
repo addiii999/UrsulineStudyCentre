@@ -1,48 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { BookOpen, GraduationCap, Clock } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import FacultyFilterGrid from "@/components/sections/FacultyFilterGrid";
 
 export const revalidate = 3600;
-
-// ─── Category config ─────────────────────────────────────────────────────────
-const CATEGORY_ORDER = [
-  "Science",
-  "Commerce",
-  "Humanities",
-  "Competitive Exams",
-  "Vocational",
-  "Other",
-] as const;
-
-type Category = (typeof CATEGORY_ORDER)[number];
-
-const CATEGORY_META: Record<Category, { subtitle: string; color: string }> = {
-  Science: {
-    subtitle: "Experienced educators for Physics, Chemistry, Biology and Mathematics.",
-    color: "from-[#800000] to-[#5C0000]",
-  },
-  Commerce: {
-    subtitle: "Expert faculty for Accountancy, Business Studies, Economics and Tally.",
-    color: "from-[#6B4000] to-[#4A2C00]",
-  },
-  Humanities: {
-    subtitle: "Dedicated educators for History, Geography, Political Science and Literature.",
-    color: "from-[#1a3a1a] to-[#0f220f]",
-  },
-  "Competitive Exams": {
-    subtitle: "Specialist mentors for JEE, NEET, CLAT and other national entrance exams.",
-    color: "from-[#1a1a4a] to-[#0f0f2e]",
-  },
-  Vocational: {
-    subtitle: "Skilled instructors for AI, Coding, Digital Marketing and future-ready skills.",
-    color: "from-[#2D2D2D] to-[#1a1a1a]",
-  },
-  Other: {
-    subtitle: "Qualified educators supporting diverse academic needs.",
-    color: "from-[#800000] to-[#5C0000]",
-  },
-};
 
 const GRADIENTS = [
   "from-[#800000] to-[#5C0000]",
@@ -53,8 +15,8 @@ const GRADIENTS = [
   "from-[#2D2D2D] to-[#1a1a1a]",
 ];
 
-// ─── Faculty Card (shared) ────────────────────────────────────────────────────
-function FacultyCard({ member, index }: { member: any; index: number }) {
+// ─── Compact preview card (homepage — no tabs needed) ────────────────────────
+function PreviewCard({ member, index }: { member: any; index: number }) {
   const initials = member.name
     .split(" ")
     .map((w: string) => w[0])
@@ -64,7 +26,6 @@ function FacultyCard({ member, index }: { member: any; index: number }) {
 
   return (
     <div className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_2px_16px_rgba(0,0,0,0.07)] hover:shadow-[0_8px_32px_rgba(128,0,0,0.12)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
-      {/* PHOTO */}
       <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100 flex-shrink-0">
         {member.photo_url ? (
           <Image
@@ -86,8 +47,6 @@ function FacultyCard({ member, index }: { member: any; index: number }) {
         )}
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
       </div>
-
-      {/* INFO */}
       <div className="flex flex-col flex-1 p-5">
         <div className="mb-3">
           <h3 className="font-bold text-gray-900 text-lg leading-snug group-hover:text-[#800000] transition-colors duration-200" style={{ fontFamily: "var(--font-serif)" }}>
@@ -117,43 +76,7 @@ function FacultyCard({ member, index }: { member: any; index: number }) {
   );
 }
 
-// ─── Section heading ──────────────────────────────────────────────────────────
-function CategorySection({
-  category,
-  members,
-}: {
-  category: Category;
-  members: any[];
-}) {
-  const meta = CATEGORY_META[category];
-  return (
-    <div className="mb-16 last:mb-0">
-      {/* Section header */}
-      <div className="flex items-center gap-4 mb-3">
-        <div className={`w-1 h-10 rounded-full bg-gradient-to-b ${meta.color} flex-shrink-0`} />
-        <div>
-          <h3
-            className="text-xl md:text-2xl font-bold text-gray-900"
-            style={{ fontFamily: "var(--font-serif)" }}
-          >
-            {category} <span className="text-[#800000]">Faculty</span>
-          </h3>
-          <p className="text-gray-500 text-sm mt-0.5">{meta.subtitle}</p>
-        </div>
-      </div>
-      <div className="h-[1px] bg-gradient-to-r from-[#C9A84C]/40 via-[#C9A84C]/10 to-transparent mb-8" />
-
-      {/* Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
-        {members.map((member, i) => (
-          <FacultyCard key={member.id} member={member} index={i} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── Main Section ─────────────────────────────────────────────────────────────
+// ─── Main Section (Server Component) ────────────────────────────────────────
 export default async function FacultySection({ isPreview = false }: { isPreview?: boolean }) {
   console.log("=== FacultySection: START FETCH ===");
   const { data: facultyData, error } = await supabase
@@ -184,7 +107,7 @@ export default async function FacultySection({ isPreview = false }: { isPreview?
     );
   }
 
-  // ── Preview mode: just show flat grid of 3 ──────────────────────────────
+  // ── PREVIEW MODE (homepage): flat 3-card grid, no tabs ─────────────────
   if (isPreview) {
     const previewFaculty = faculty.slice(0, 3);
     return (
@@ -200,7 +123,7 @@ export default async function FacultySection({ isPreview = false }: { isPreview?
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
             {previewFaculty.map((member, i) => (
-              <FacultyCard key={member.id} member={member} index={i} />
+              <PreviewCard key={member.id} member={member} index={i} />
             ))}
           </div>
           <div className="text-center mt-12">
@@ -213,24 +136,12 @@ export default async function FacultySection({ isPreview = false }: { isPreview?
     );
   }
 
-  // ── Full page mode: group by category ────────────────────────────────────
-  const grouped: Partial<Record<Category, any[]>> = {};
-  for (const member of faculty) {
-    const cat: Category = CATEGORY_ORDER.includes(member.faculty_category)
-      ? member.faculty_category
-      : "Other";
-    if (!grouped[cat]) grouped[cat] = [];
-    grouped[cat]!.push(member);
-  }
-
-  // Only include categories that have at least one member, in defined order
-  const activeCategories = CATEGORY_ORDER.filter((cat) => (grouped[cat]?.length ?? 0) > 0);
-
+  // ── FULL PAGE MODE: filter tabs via client component ───────────────────
   return (
     <section id="faculty" className="py-14 md:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         {/* HEADER */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-10">
           <span className="section-tag">Our Faculty</span>
           <h2 className="section-heading mt-4">
             Expert <span className="text-[#800000]">Educators</span>
@@ -241,10 +152,8 @@ export default async function FacultySection({ isPreview = false }: { isPreview?
           </p>
         </div>
 
-        {/* STREAM-WISE SECTIONS */}
-        {activeCategories.map((cat) => (
-          <CategorySection key={cat} category={cat} members={grouped[cat]!} />
-        ))}
+        {/* CLIENT-SIDE FILTER TABS + GRID */}
+        <FacultyFilterGrid faculty={faculty} />
 
         <div className="text-center mt-10 space-y-1 border-t border-gray-100 pt-10">
           <p className="text-gray-500 text-sm">
