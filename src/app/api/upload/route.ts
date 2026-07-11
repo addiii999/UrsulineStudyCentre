@@ -66,7 +66,11 @@ export async function POST(req: NextRequest) {
     
     // Apply optimizations based on category
     if (folder === "faculty") {
-      sharpInstance = sharpInstance.resize(600, 600, { fit: "cover", withoutEnlargement: true }).webp({ quality: 65, effort: 6 });
+      // 3:4 portrait — pre-cropped by client, just resize to final target
+      sharpInstance = sharpInstance
+        .resize(600, 800, { fit: "cover", position: "center", withoutEnlargement: false })
+        .webp({ quality: 72, effort: 6 });
+
     } else if (folder === "gallery") {
       sharpInstance = sharpInstance.resize(1600, 1600, { fit: "inside", withoutEnlargement: true }).webp({ quality: 70, effort: 6 });
     } else if (folder === "logos") {
