@@ -199,10 +199,10 @@ export default function AdminFaculty() {
           </div>
 
           <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
-            <button onClick={() => setShowForm(false)} disabled={saving || uploading} className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors">
+            <button onClick={() => setShowForm(false)} disabled={saving} className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors">
               Cancel
             </button>
-            <button onClick={handleSubmit} disabled={saving || uploading} className="btn-primary text-sm px-8 py-2.5 flex items-center gap-2 shadow-md">
+            <button onClick={handleSubmit} disabled={saving} className="btn-primary text-sm px-8 py-2.5 flex items-center gap-2 shadow-md">
               {saving ? <Loader2 size={16} className="animate-spin" /> : null}
               {editId ? "Save Changes" : "Add Faculty"}
             </button>
