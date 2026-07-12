@@ -55,7 +55,7 @@ export default function MissionPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-[#800000] font-serif">Our Vision</h2>
                 <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-                  To be recognized as Ranchi&apos;s most trusted and premier educational institution. We aim to establish a gold standard in board exam scores and national entrance clearances (JEE/NEET/CLAT) while emphasizing character building, moral values, and active career guidance.
+                  To be recognized as Ranchi&apos;s most trusted and premier educational institution. We aim to establish a gold standard in academic performance across Science, Commerce, and Humanities, while emphasizing character building, moral values, and active career guidance.
                 </p>
               </div>
             </div>

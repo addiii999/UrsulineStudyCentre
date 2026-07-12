@@ -226,7 +226,7 @@ export default function AdminCourses() {
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
                   className="input-field"
-                  placeholder="Brief description (e.g. Physics, Chemistry, Maths for JEE)"
+                  placeholder="Brief description (e.g. Physics, Chemistry, Maths)"
                 />
               </div>
               <div>

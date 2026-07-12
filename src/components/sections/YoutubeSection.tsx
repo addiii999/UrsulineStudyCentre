@@ -52,7 +52,7 @@ export default async function YoutubeSection({ isPreview = false }: { isPreview?
             </h2>
             <div className="gold-divider mt-4" />
             <p className="section-subheading mt-4">
-              Free educational content - JEE, NEET, Board prep and more. Click any video to watch on YouTube.
+              Free educational content - Science, Commerce, Humanities, board preparation and more. Click any video to watch on YouTube.
             </p>
           </div>
           <a

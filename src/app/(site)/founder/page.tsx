@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Founder's Message | Ursuline Study Centre",
   description:
-    "Read the message from our founder Abhishek Pathak (JEE Mathematics Expert) about his academic philosophy and our mission for quality education in Ranchi.",
+    "Read the message from our founder Abhishek Pathak (Mathematics Expert) about his academic philosophy and our mission for quality education in Ranchi.",
   alternates: {
     canonical: "https://ursulinstudycentre.in/founder",
   },

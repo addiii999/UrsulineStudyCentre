@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Frequently Asked Questions | Ursuline Study Centre",
   description:
-    "Find answers to common questions about admissions, academic boards (JAC & CBSE), class schedules, bilingual teaching, safety, and faculty at Ursuline Study Centre Ranchi.",
+    "Find answers to common questions about admissions, academic streams, class schedules, bilingual teaching, safety, and faculty at Ursuline Study Centre Ranchi.",
   alternates: {
     canonical: "https://ursulinstudycentre.in/faq",
   },

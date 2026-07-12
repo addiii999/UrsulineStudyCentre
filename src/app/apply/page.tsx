@@ -423,7 +423,7 @@ export default function ApplyPage() {
                   value={form.message}
                   onChange={(e) => set("message", e.target.value)}
                   className={inp + " min-h-[96px] resize-none"}
-                  placeholder="e.g. I am interested in JEE preparation alongside Class 11..."
+                  placeholder="e.g. I am interested in the Science stream alongside Class 11..."
                 />
               </Field>
             </div>

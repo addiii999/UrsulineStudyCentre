@@ -46,7 +46,7 @@ export default function AboutPage() {
                 Ursuline Study Centre was established with the vision of offering high-quality, comprehensive educational mentorship for every aspiring student. Situated in the historic Ursuline Convent Campus in Ranchi, Jharkhand, our roots are deeply intertwined with the region&apos;s educational advancement.
               </p>
               <p className="text-gray-600 text-sm leading-relaxed">
-                By bridging board curricula (JAC & CBSE) with competitive entrance prep (JEE & NEET), we provide a smooth transition for students targeting elite engineering and medical seats nationwide.
+                By providing structured learning across Science, Commerce, and Humanities, we ensure students develop a deep conceptual understanding that translates to success in both board exams and national-level entrances.
               </p>
             </div>
 

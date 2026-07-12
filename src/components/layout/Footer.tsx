@@ -66,8 +66,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-white/60 text-sm leading-relaxed">
-              Empowering students with world-class education. Premium education for Classes 9–12 with
-              JEE, NEET and Board preparation under expert guidance.
+              Empowering students with world-class education. Premium education for Science, Commerce, and Humanities streams under expert guidance.
             </p>
             <div className="flex items-center gap-3">
               <a
@@ -131,10 +130,8 @@ export default function Footer() {
                 "Science (PCB)",
                 "Commerce",
                 "Humanities",
-                "JEE Preparation",
-                "NEET Preparation",
-                "CLAT",
-                "DCA",
+                "Advanced Lab Work",
+                "Vocational Skills",
                 "Tally & Accounts",
               ].map((c) => (
                 <li key={c}>

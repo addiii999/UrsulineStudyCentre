@@ -5,7 +5,7 @@ import { Award, Users, BookOpen, Target, ArrowRight, Quote } from "lucide-react"
 
 const ACHIEVEMENTS = [
   { icon: <Users size={18} className="text-[#C9A84C]" />, value: "5000+", label: "Students Guided" },
-  { icon: <Target size={18} className="text-[#C9A84C]" />, value: "JEE/NEET", label: "Expert Mentorship" },
+  { icon: <Target size={18} className="text-[#C9A84C]" />, value: "Academic", label: "Expert Mentorship" },
   { icon: <Award size={18} className="text-[#C9A84C]" />, value: "10+", label: "Years Experience" },
   { icon: <BookOpen size={18} className="text-[#C9A84C]" />, value: "Mission", label: "Quality Education" },
 ];
@@ -68,7 +68,7 @@ export default function FounderSection({ isPreview = false }: { isPreview?: bool
                 Founder &amp; Director
               </p>
               <p className="text-gray-500 text-[13px] font-medium pt-1">
-                JEE Expert · Mathematics Specialist
+                Senior Faculty · Mathematics Specialist
               </p>
             </div>
           </div>
@@ -80,9 +80,9 @@ export default function FounderSection({ isPreview = false }: { isPreview?: bool
             {/* Story & Mission Intro */}
             <div className="space-y-5 text-[15px] text-gray-600 leading-[1.8]">
               <p>
-                <strong className="text-gray-900 font-semibold">Abhishek Pathak</strong> is a highly accomplished
+                <strong className="text-gray-900 font-semibold font-serif">Abhishek Pathak</strong> is a highly accomplished
                 educator with over a decade of experience teaching Mathematics and
-                guiding students for JEE Main &amp; Advanced. Holding an M.Sc in Mathematics, he brings
+                guiding students toward academic excellence. Holding an M.Sc in Mathematics, he brings
                 unparalleled depth, clarity, and passion to every classroom.
               </p>
               <p>

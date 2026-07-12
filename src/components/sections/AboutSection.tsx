@@ -6,7 +6,7 @@ const INFO_CHIPS = [
   { icon: <MapPin size={14} className="text-[#C9A84C]" />, label: "Ursuline Convent Campus, Ranchi" },
   { icon: <Building size={14} className="text-[#C9A84C]" />, label: `Estd. ${SITE_CONFIG.founded}` },
   { icon: <Users size={14} className="text-[#C9A84C]" />, label: "All Students Welcome" },
-  { icon: <BookOpen size={14} className="text-[#C9A84C]" />, label: "JAC + CBSE" },
+  { icon: <BookOpen size={14} className="text-[#C9A84C]" />, label: "Science, Commerce & Humanities" },
   { icon: <Languages size={14} className="text-[#C9A84C]" />, label: "English + Hindi" },
 ];
 
@@ -37,8 +37,7 @@ export default function AboutSection({ isPreview = false }: { isPreview?: boolea
               <p>
                 Situated at the Ursuline Convent Campus on Dr. Camil Bulcke Path, our institute offers a
                 safe, disciplined, and nurturing academic environment. We specialize in preparation for
-                Classes 9–12 covering both JAC and CBSE curricula, alongside rigorous preparation
-                for JEE, NEET, and CLAT.
+                Classes 9–12, providing robust and thorough academic instruction across Science, Commerce, and Humanities.
               </p>
               <p>
                 Our bilingual (English + Hindi) teaching methodology ensures that every student -

@@ -20,8 +20,8 @@ const DEFAULT_FEES: FeesData = {
   session: "2026-27",
   admissionsOpen: true,
   fees: [
-    { stream: "Science (PCM)", annual: "15000", includes: "JEE Prep Included" },
-    { stream: "Science (PCB)", annual: "15000", includes: "NEET Prep Included" },
+    { stream: "Science (PCM)", annual: "15000", includes: "Advanced Maths & Entrance Prep" },
+    { stream: "Science (PCB)", annual: "15000", includes: "Biology Lab & Entrance Prep" },
     { stream: "Commerce", annual: "15000", includes: "Tally Basics Included" },
     { stream: "Humanities", annual: "15000", includes: "CLAT Basics Included" },
   ],

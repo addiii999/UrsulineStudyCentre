@@ -83,7 +83,7 @@ export default function HeroSection() {
             Empowering Students. Building Futures.
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-white/70 leading-relaxed font-light">
-            Premium educational institution for Classes 9–12 (JAC &amp; CBSE) with JEE/NEET preparation.
+            Premium educational institution offering comprehensive streams in Science, Commerce, and Humanities.
           </p>
         </div>
 

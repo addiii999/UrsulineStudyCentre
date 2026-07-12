@@ -40,13 +40,13 @@ export const WHY_CHOOSE_US = [
   },
   {
     icon: "book",
-    title: "JAC & CBSE Expertise",
-    desc: "Comprehensive coverage of both JAC and CBSE curricula, ensuring complete board exam preparation.",
+    title: "Academic Stream Expertise",
+    desc: "Comprehensive coverage of standard curricula in Science, Commerce, and Humanities, ensuring complete board exam preparation.",
   },
   {
     icon: "users",
     title: "Expert Faculty",
-    desc: "Highly qualified teachers with deep subject expertise, many with IIT/AIIMS alumni background.",
+    desc: "Highly qualified teachers with deep subject expertise, dedicated to high-quality classroom learning.",
   },
   {
     icon: "languages",
@@ -56,7 +56,7 @@ export const WHY_CHOOSE_US = [
   {
     icon: "lightbulb",
     title: "Academic + Vocational",
-    desc: "Unique combination of board prep with future-ready vocational skills like AI, coding, and digital marketing.",
+    desc: "Unique combination of stream-wise board prep with future-ready vocational skills like AI, coding, and digital marketing.",
   },
   {
     icon: "map",
@@ -77,8 +77,8 @@ export const ADMISSION_STEPS = [
 ];
 
 export const FEE_TABLE = [
-  { stream: "Science (PCM)", annual: "₹15,000", monthly: "₹1,500", includes: "JEE Prep Included" },
-  { stream: "Science (PCB)", annual: "₹15,000", monthly: "₹1,500", includes: "NEET Prep Included" },
+  { stream: "Science (PCM)", annual: "₹15,000", monthly: "₹1,500", includes: "Advanced Maths & Entrance Prep" },
+  { stream: "Science (PCB)", annual: "₹15,000", monthly: "₹1,500", includes: "Biology Lab & Entrance Prep" },
   { stream: "Commerce", annual: "₹15,000", monthly: "₹1,500", includes: "Tally Basics Included" },
   { stream: "Humanities", annual: "₹15,000", monthly: "₹1,500", includes: "CLAT Basics Included" },
 ];

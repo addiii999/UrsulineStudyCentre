@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Academic Results & Achievements | Ursuline Study Centre",
   description:
-    "See our student results in JAC and CBSE boards, JEE Main/Advanced, and NEET exams. Verified accomplishments showing our commitment to academic excellence.",
+    "Explore the academic milestones and board results of our students across Science, Commerce, and Humanities. Verified accomplishments showing our commitment to excellence.",
   alternates: {
     canonical: "https://ursulinstudycentre.in/results",
   },

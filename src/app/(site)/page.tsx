@@ -17,7 +17,7 @@ export const revalidate = 300; // Revalidate every 5 minutes (ISR)
 export const metadata: Metadata = {
   title: "Ursuline Study Centre | Premium Educational Institution in Ranchi",
   description:
-    "Ursuline Study Centre - Premium educational institution in Ranchi for Classes 9-12, JEE, NEET & Board preparation (JAC & CBSE). Under the visionary guidance of Sr. Dr. Mary Grace.",
+    "Ursuline Study Centre - Premium educational institution in Ranchi offering Science, Commerce, and Humanities. Under the visionary guidance of Sr. Dr. Mary Grace.",
   alternates: {
     canonical: "https://ursulinstudycentre.in/",
   },

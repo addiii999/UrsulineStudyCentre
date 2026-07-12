@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Admissions | Ursuline Study Centre",
   description:
-    "Admission details, eligibility criteria, fee structure, and step-by-step application guide for Class 9-12 and JEE/NEET preparation at Ursuline Study Centre Ranchi.",
+    "Admission details, eligibility criteria, fee structure, and step-by-step application guide for Science, Commerce, and Humanities streams at Ursuline Study Centre Ranchi.",
   alternates: {
     canonical: "https://ursulinstudycentre.in/admission",
   },
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const ADMISSION_FAQS = [
   {
     q: "Who is eligible to apply for courses at Ursuline Study Centre?",
-    a: "Students studying in Class 9, 10, 11, or 12 under JAC (Jharkhand Academic Council) or CBSE boards are eligible to join. We also welcome students who have completed Class 10 or 12 looking for dedicated JEE/NEET entrance preparation.",
+    a: "Students studying in Class 9, 10, 11, or 12 under recognized school boards are eligible to join. We also welcome students looking for robust academic preparation in Science, Commerce, and Humanities.",
   },
   {
     q: "Is there an entrance test for admission?",

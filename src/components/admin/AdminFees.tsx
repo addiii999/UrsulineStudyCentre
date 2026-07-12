@@ -19,8 +19,8 @@ const DEFAULT_FEES: FeesData = {
   session: "2026-27",
   admissionsOpen: true,
   fees: [
-    { stream: "Science (PCM)", annual: "15000", includes: "JEE Prep Included" },
-    { stream: "Science (PCB)", annual: "15000", includes: "NEET Prep Included" },
+    { stream: "Science (PCM)", annual: "15000", includes: "Advanced Maths & Entrance Prep" },
+    { stream: "Science (PCB)", annual: "15000", includes: "Biology Lab & Entrance Prep" },
     { stream: "Commerce", annual: "15000", includes: "Tally Basics Included" },
     { stream: "Humanities", annual: "15000", includes: "CLAT Basics Included" },
   ],
@@ -160,7 +160,7 @@ export default function AdminFees() {
                   value={row.includes}
                   onChange={(e) => updateFee(i, "includes", e.target.value)}
                   className="text-xs text-gray-400 mt-0.5 bg-transparent border-none outline-none w-full focus:text-gray-700 focus:bg-green-50 rounded px-1 -ml-1 transition-colors"
-                  placeholder="e.g. JEE Prep Included"
+                  placeholder="e.g. Entrance Prep Included"
                 />
               </div>
 
