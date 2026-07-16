@@ -104,18 +104,46 @@ export default function HeroSection() {
             </a>
           </div>
           
-          <a
-            href={playStoreLink}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm font-medium transition-colors"
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path d="M17.523 15.3414L5.34142 22.4283C4.85764 22.7099 4.25002 22.3614 4.25002 21.8021V2.19796C4.25002 1.63855 4.85764 1.29013 5.34142 1.57169L17.523 8.65863C17.9734 8.92095 17.9734 9.57908 17.523 9.8414L15.3414 11.1111L12.5 12L15.3414 12.8889L17.523 15.3414Z" />
-              <path d="M19.4673 10.7483L18.4908 10.1802L16.2737 11.4705L16.2738 12.5295L18.4908 13.8198L19.4673 13.2517C20.1776 12.8383 20.1776 11.1617 19.4673 10.7483Z" />
-            </svg>
-            <span className="underline underline-offset-4 decoration-white/30">Download Academic Origin App</span>
-          </a>
+          {/* Tertiary App Links */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 mt-4 w-full">
+            {/* Ursuline Study Centre App */}
+            <a
+              href="https://play.google.com/store/apps/details?id=co.learnol.kyaja"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-3 text-white/70 hover:text-white transition-colors"
+            >
+              <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#C9A84C]/10 group-hover:border-[#C9A84C]/40 transition-colors">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-[#C9A84C]">
+                  <path d="M17.523 15.3414L5.34142 22.4283C4.85764 22.7099 4.25002 22.3614 4.25002 21.8021V2.19796C4.25002 1.63855 4.85764 1.29013 5.34142 1.57169L17.523 8.65863C17.9734 8.92095 17.9734 9.57908 17.523 9.8414L15.3414 11.1111L12.5 12L15.3414 12.8889L17.523 15.3414Z" />
+                  <path d="M19.4673 10.7483L18.4908 10.1802L16.2737 11.4705L16.2738 12.5295L18.4908 13.8198L19.4673 13.2517C20.1776 12.8383 20.1776 11.1617 19.4673 10.7483Z" />
+                </svg>
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-semibold underline underline-offset-4 decoration-white/30 group-hover:decoration-white transition-colors">Download Ursuline App</span>
+                <span className="text-[10px] text-white/50">Official student learning application</span>
+              </div>
+            </a>
+
+            {/* Academic Origin App */}
+            <a
+              href={playStoreLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-3 text-white/70 hover:text-white transition-colors"
+            >
+              <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#C9A84C]/10 group-hover:border-[#C9A84C]/40 transition-colors">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-[#C9A84C]">
+                  <path d="M17.523 15.3414L5.34142 22.4283C4.85764 22.7099 4.25002 22.3614 4.25002 21.8021V2.19796C4.25002 1.63855 4.85764 1.29013 5.34142 1.57169L17.523 8.65863C17.9734 8.92095 17.9734 9.57908 17.523 9.8414L15.3414 11.1111L12.5 12L15.3414 12.8889L17.523 15.3414Z" />
+                  <path d="M19.4673 10.7483L18.4908 10.1802L16.2737 11.4705L16.2738 12.5295L18.4908 13.8198L19.4673 13.2517C20.1776 12.8383 20.1776 11.1617 19.4673 10.7483Z" />
+                </svg>
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-semibold underline underline-offset-4 decoration-white/30 group-hover:decoration-white transition-colors">Download Academic Origin App</span>
+                <span className="text-[10px] text-white/50">Powered by Academic Origin</span>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
     </section>
