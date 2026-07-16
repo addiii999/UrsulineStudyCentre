@@ -96,3 +96,12 @@ Always prioritize:
 - security
 - scalability
 - clean architecture
+
+---
+
+## Vercel Deployment & CLI Rules
+
+- This repository is associated with the **Ursuline Study Centre** Vercel account (`adityaursuline-2686s-projects`).
+- **DO NOT** run Vercel CLI commands globally without specifying the dedicated token.
+- Always use the local environment variable `VERCEL_TOKEN` from `.env.local` (e.g. read the token value from there) to authenticate your `vercel` commands.
+- Ensure that deployments are only made to the linked project `ursuline-study-centre` and never cross over to "Academic Origin" or any other workspace.
