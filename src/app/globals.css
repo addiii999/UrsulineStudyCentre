@@ -321,3 +321,17 @@
 
 .animate-fade-up    { animation: fadeInUp 0.55s ease forwards; }
 .animate-pulse-ring { animation: pulse-ring 2s ease infinite; }
+
+/* Custom layout wrapper to handle mobile sticky bottom bar with safe-area spacing */
+.site-layout-wrapper {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  .site-layout-wrapper {
+    padding-bottom: 0;
+  }
+}
+

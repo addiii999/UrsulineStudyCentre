@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-[#FDF8F0] flex items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Background Decorative Blobs */}
       <div className="absolute top-[-10%] right-[-10%] w-[30rem] h-[30rem] rounded-full bg-[#800000]/5 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[35rem] h-[35rem] rounded-full bg-[#C9A84C]/5 blur-3xl pointer-events-none" />

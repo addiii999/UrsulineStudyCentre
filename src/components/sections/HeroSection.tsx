@@ -25,7 +25,7 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#800000]"
+      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-[#800000]"
     >
       {/* BACKGROUND LAYERS */}
       <div className="absolute inset-0 pointer-events-none">

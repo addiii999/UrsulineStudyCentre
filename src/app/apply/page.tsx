@@ -167,7 +167,7 @@ export default function ApplyPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-[#FDF8F0] flex items-center justify-center p-6">
+      <div className="min-h-[100dvh] bg-[#FDF8F0] flex items-center justify-center p-6">
         <div className="bg-white rounded-3xl shadow-xl border border-[#f0ebe0] p-10 max-w-md w-full text-center">
           <div className="w-20 h-20 rounded-full bg-green-50 border-2 border-green-200 flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 size={40} className="text-green-500" />
@@ -193,7 +193,7 @@ export default function ApplyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDF8F0]">
+    <div className="min-h-[100dvh] bg-[#FDF8F0]">
       {/* HEADER */}
       <div className="bg-[#800000] text-white">
         <div className="max-w-2xl mx-auto px-6 py-8">

@@ -25,7 +25,12 @@ export default function MobileActionBar() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+    <div 
+      className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+      style={{
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+      }}
+    >
       <div className="grid grid-cols-3 h-[62px]">
         {/* CALL */}
         <a
